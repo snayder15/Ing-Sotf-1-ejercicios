@@ -40,7 +40,7 @@ int main(int argc, char const *argv[])
 		Si dureza = 0 y porosidad = 0 entonces el robot no ejecuta accion
 	*/
 	
-	if((dureza = 0 && porosidad = 0) || (dureza > 0 && porosidad > 0)){
+	if(dureza = 0 && porosidad = 0){
 		exit(0);
 	}
 	
