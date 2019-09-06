@@ -21,6 +21,12 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
+!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/5/2019 21:25:57'!
+addCustomerAndSupend: customerBook name: paulMcCartney
+
+	customerBook addCustomerNamed: paulMcCartney.
+	customerBook suspendCustomerNamed: paulMcCartney.! !
+
 !CustomerBookTest methodsFor: 'testing' stamp: 'car 9/2/2019 19:32:11'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
@@ -75,7 +81,7 @@ test04CanNotRemoveAnInvalidCustomer
 			self oneNameCustomerBelongToCustomerBook: customerBook name: johnLennon ]
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/2/2019 21:56:58'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/5/2019 21:26:03'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
@@ -83,8 +89,7 @@ test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
 	
-	customerBook addCustomerNamed: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
+	self addCustomerAndSupend: customerBook name: paulMcCartney.
 	
 	self notActiveCustomersAndExistsACustomerSuspendedAndIsTheOnlyCustomerOfThe: customerBook.
 	self assert: (customerBook includesCustomerNamed: paulMcCartney).
@@ -93,7 +98,7 @@ test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:28'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/5/2019 21:26:15'!
 test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
@@ -101,8 +106,7 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
 	
-	customerBook addCustomerNamed: paulMcCartney.
-	customerBook suspendCustomerNamed: paulMcCartney.
+	self addCustomerAndSupend: customerBook name: paulMcCartney.
 	customerBook removeCustomerNamed: paulMcCartney.
 	
 	self assert: 0 equals: customerBook numberOfActiveCustomers.
@@ -130,15 +134,15 @@ test07CanNotSuspendAnInvalidCustomer
 			self oneNameCustomerBelongToCustomerBook: customerBook name: johnLennon]
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/2/2019 21:11:05'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/5/2019 21:28:59'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
 	
 	| customerBook johnLennon |
 			
 	customerBook := CustomerBook new.
 	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-	customerBook suspendCustomerNamed: johnLennon.
+	self addCustomerAndSupend: customerBook name: johnLennon.
+
 	
 	[ customerBook suspendCustomerNamed: johnLennon.
 	self closureFail ]
@@ -146,6 +150,18 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 		do: [ :anError | 
 			self oneNameCustomerBelongToCustomerBook: customerBook name: johnLennon ]
 ! !
+
+!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/5/2019 21:23:00'!
+xxxx: closure1 
+
+	closure1 value
+	! !
+
+!CustomerBookTest methodsFor: 'testing' stamp: 'car 9/5/2019 21:25:03'!
+xxxx: customerBook name: paulMcCartney
+
+	customerBook addCustomerNamed: paulMcCartney.
+	customerBook suspendCustomerNamed: paulMcCartney.! !
 
 
 !CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'car 9/2/2019 20:56:41'!
@@ -164,6 +180,13 @@ evaluateTheClosureAndResultConditionLessTime: closure time: time
 	
 	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (time * millisecond)
 	! !
+
+!CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'car 9/5/2019 21:27:33'!
+notActiveCustomersAndExistsACustomerSuspendedAndIsTheOnlyCustomerOfThe:  customerBook
+
+	self assert: 0 equals: customerBook numberOfActiveCustomers.
+	self assert: 1 equals: customerBook numberOfSuspendedCustomers.
+	self assert: 1 equals: customerBook numberOfCustomers.! !
 
 !CustomerBookTest methodsFor: 'as yet unclassified' stamp: 'car 9/2/2019 21:10:32'!
 oneNameCustomerBelongToCustomerBook: customerBook name: name
@@ -265,13 +288,6 @@ suspendCustomerNamed: aName
 	suspended add: aName
 ! !
 
-
-!CustomerBook methodsFor: 'as yet unclassified' stamp: 'car 9/2/2019 21:55:10'!
-notActiveCustomersAndExistsACustomerSuspendedAndIsTheOnlyCustomerOfThe:  customerBook
-
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 1 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 1 equals: customerBook numberOfCustomers.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
