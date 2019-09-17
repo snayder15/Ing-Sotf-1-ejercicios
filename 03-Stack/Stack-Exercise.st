@@ -5,134 +5,235 @@ TestCase subclass: #OOStackTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:30'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:06:01'!
 test01StackShouldBeEmptyWhenCreated
+
+
 
 	| stack |
 	
+	
+	
 	stack := OOStack new.
+	
+	
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:30'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:06:15'!
 test02PushAddElementsToTheStack
+
+
 
 	| stack |
 	
+	
+	
 	stack := OOStack new.
+	
 	stack push: 'Something'.
+	
+	
 	
 	self deny: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:31'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:06:34'!
 test03PopRemovesElementsFromTheStack
+
+
 
 	| stack |
 	
+	
+	
 	stack := OOStack new.
+	
 	stack push: 'Something'.
+	
 	stack pop.
+	
+	
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/8/2012 08:20'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:06:50'!
 test04PopReturnsLastPushedObject
+
+
 
 	| stack pushedObject |
 	
+	
+	
 	stack := OOStack new.
+	
 	pushedObject := 'Something'.
+	
 	stack push: pushedObject.
+	
+	
 	
 	self assert: stack pop = pushedObject! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:33'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:07:17'!
 test05StackBehavesLIFO
+
+
 
 	| stack firstPushedObject secondPushedObject |
 	
+	
+	
 	stack := OOStack new.
+	
 	firstPushedObject := 'First'.
+	
 	secondPushedObject := 'Second'.
 	
+	
+	
 	stack push: firstPushedObject.
+	
 	stack push: secondPushedObject.
 	
+	
+	
 	self assert: stack pop = secondPushedObject.
+	
 	self assert: stack pop = firstPushedObject.
+	
 	self assert: stack isEmpty 
+	
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:35'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:07:37'!
 test06TopReturnsLastPushedObject
 
+
+
 	| stack pushedObject |
 	
+	
+	
 	stack := OOStack new.
+	
 	pushedObject := 'Something'.
 	
+	
+	
 	stack push: pushedObject.
+	
+	
 	
 	self assert: stack top = pushedObject.
+	
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:36'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:08:00'!
 test07TopDoesNotRemoveObjectFromStack
+
+
 
 	| stack pushedObject |
 	
+	
+	
 	stack := OOStack new.
+	
 	pushedObject := 'Something'.
+	
+	
 	
 	stack push: pushedObject.
 	
+	
+	
 	self assert: stack size = 1.
+	
 	stack top.
+	
 	self assert: stack size = 1.
+	
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:26'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:08:20'!
 test08CanNotPopWhenThereAreNoObjectsInTheStack
 
+
+
 	| stack  |
 	
+	
+	
 	stack := OOStack new.
+	
 	self
+	
 		should: [ stack pop ]
+		
 		raise: Error - MessageNotUnderstood 
+		
 		withExceptionDo: [ :anError |
+			
 			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+		
+		
 		
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:36'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:08:46'!
 test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 
+
+
 	| stack  |
 	
+	
+	
 	stack := OOStack new.
+	
 	stack push: 'Something'.
+	
 	stack pop.
 	
+	
+	
 	self
+	
 		should: [ stack pop ]
+		
 		raise: Error - MessageNotUnderstood 
+		
 		withExceptionDo: [ :anError |
+			
 			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+		
+		
 		
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:44'!
+!OOStackTest methodsFor: 'test' stamp: 'car 9/17/2019 00:09:06'!
 test10CanNotTopWhenThereAreNoObjectsInTheStack
+
+
 
 	| stack  |
 	
+	
+	
 	stack := OOStack new.
+	
 	self
+	
 		should: [ stack top ]
+		
 		raise: Error - MessageNotUnderstood 
+		
 		withExceptionDo: [ :anError |
+			
 			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+		
+		
 		
 ! !
 
@@ -160,66 +261,76 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:57:59'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:16:02'!
 initialize
+
 	|x|
-	x := ZZZ new.
+	
+	x := YYY new.
+	
 	store:= OrderedCollection with: x.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 19:47:27'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:25:29'!
 isEmpty
 
-	^ store isEmpty.! !
+	^ store size = 1.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:42:28'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:02'!
 pop
-
 	|x|
-	x := XXX new.
-	x popStack: self! !
+	x := store last.
+	^x popStack: self! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:36:03'!
-popYYY
-
-	|last|
-	last := store last.
-	store removeLast.
-	^last! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:36:51'!
-popZZZ
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:23:50'!
+popYYY: YYY
 
 	^self error: OOStack stackEmptyErrorDescription ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:58:54'!
-push: something
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:32:49'!
+popZZZ: ZZZ
+	|x|
+	
+	x := ZZZ value.
+	
+	store removeLast.
+	
+	^x
+
+! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:15:54'!
+push: something	
 	
 	|x|
-	x := YYY with: something.
-	store add: x. 	
 	
-	! !
+	x := ZZZ with: something.
+	
+	store add: x. 	! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 19:47:48'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:25:51'!
 size
 
-	^store size.! !
+	^store size - 1.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:42:34'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:14'!
 top
+
 	|x|
-	x := XXX new.
-	x topStack: self! !
+	
+	x := store last.
+	
+	^x topStack: self! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:36:16'!
-topYYY
-
-	store last.! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:36:21'!
-topZZZ
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:24:10'!
+topYYY: YYY
 
 	^self error: OOStack stackEmptyErrorDescription! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:11:58'!
+topZZZ: ZZZ
+
+	^store last value.
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -227,7 +338,7 @@ topZZZ
 OOStack class
 	instanceVariableNames: ''!
 
-!OOStack class methodsFor: 'error descriptions' stamp: 'HernanWilkinson 5/7/2012 11:51'!
+!OOStack class methodsFor: 'error descriptions' stamp: 'car 9/17/2019 00:42:51'!
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty'! !
@@ -248,6 +359,16 @@ Object subclass: #XXX
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!XXX methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:44:29'!
+popStack: stack
+
+	^self subclassResponsibility ! !
+
+!XXX methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:44:33'!
+topStack: stack
+
+	^self subclassResponsibility ! !
+
 
 !classDefinition: #YYY category: #'Stack-Exercise'!
 XXX subclass: #YYY
@@ -256,30 +377,51 @@ XXX subclass: #YYY
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!YYY methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:37:13'!
+!YYY methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:38'!
 popStack: stack
 
-	^stack popYYY! !
+	^stack popYYY: self! !
 
-!YYY methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:37:18'!
+!YYY methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:44'!
 topStack: stack
 
-	^stack topYYY! !
+	^stack topYYY: self! !
 
 
 !classDefinition: #ZZZ category: #'Stack-Exercise'!
 XXX subclass: #ZZZ
-	instanceVariableNames: ''
+	instanceVariableNames: 'value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:37:02'!
+!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:41:59'!
+initialize: aSomething
+
+	value := aSomething! !
+
+!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:54'!
 popStack: stack
 
-	^stack popZZZ! !
+	^stack popZZZ: self ! !
 
-!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/16/2019 21:37:06'!
+!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:09:00'!
 topStack: stack
 
-	^stack topZZZ! !
+	^stack topZZZ: self! !
+
+!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:31:36'!
+value
+
+	^value ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ZZZ class' category: #'Stack-Exercise'!
+ZZZ class
+	instanceVariableNames: ''!
+
+!ZZZ class methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:53:56'!
+with: aSomething
+
+	 ^self new initialize: aSomething! !
