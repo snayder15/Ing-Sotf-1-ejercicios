@@ -246,6 +246,81 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	category: 'Stack-Exercise'!
 
 
+!classDefinition: #Element category: #'Stack-Exercise'!
+Object subclass: #Element
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!Element methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:44:29'!
+popStack: stack
+
+	^self subclassResponsibility ! !
+
+!Element methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:44:33'!
+topStack: stack
+
+	^self subclassResponsibility ! !
+
+
+!classDefinition: #ElementWithMeaning category: #'Stack-Exercise'!
+Element subclass: #ElementWithMeaning
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!ElementWithMeaning methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:14:30'!
+giveMeTheElementOfTheTopOfTheStack: stack
+
+	^stack printAnElementWithMeaning: self! !
+
+!ElementWithMeaning methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:41:59'!
+initialize: aSomething
+
+	value := aSomething! !
+
+!ElementWithMeaning methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:03:24'!
+popTheElementOfTheTopOfTheStack: stack
+
+	^stack popAnElementWithMeaning: self ! !
+
+!ElementWithMeaning methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:31:36'!
+value
+
+	^value ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ElementWithMeaning class' category: #'Stack-Exercise'!
+ElementWithMeaning class
+	instanceVariableNames: ''!
+
+!ElementWithMeaning class methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:53:56'!
+with: aSomething
+
+	 ^self new initialize: aSomething! !
+
+
+!classDefinition: #ElementWithoutMeaning category: #'Stack-Exercise'!
+Element subclass: #ElementWithoutMeaning
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!ElementWithoutMeaning methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:02:35'!
+giveMeTheElementOfTheTopOfTheStack: stack
+
+	^stack printAnElementWithoutMeaning: self! !
+
+!ElementWithoutMeaning methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:03:56'!
+popTheElementOfTheTopOfTheStack: stack
+
+	^stack popAnElementWithoutMeaning: self! !
+
+
 !classDefinition: #NameOfSubclass category: #'Stack-Exercise'!
 Object subclass: #NameOfSubclass
 	instanceVariableNames: 'value'
@@ -261,12 +336,12 @@ Object subclass: #OOStack
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:16:02'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 21:54:31'!
 initialize
 
 	|x|
 	
-	x := YYY new.
+	x := ElementWithoutMeaning new.
 	
 	store:= OrderedCollection with: x.! !
 
@@ -275,22 +350,17 @@ isEmpty
 
 	^ store size = 1.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:02'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 21:57:31'!
 pop
 	|x|
 	x := store last.
-	^x popStack: self! !
+	^x popTheElementOfTheTopOfTheStack: self! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:23:50'!
-popYYY: YYY
-
-	^self error: OOStack stackEmptyErrorDescription ! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:32:49'!
-popZZZ: ZZZ
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:03:05'!
+popAnElementWithMeaning: anElement
 	|x|
 	
-	x := ZZZ value.
+	x := anElement value.
 	
 	store removeLast.
 	
@@ -298,12 +368,28 @@ popZZZ: ZZZ
 
 ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:15:54'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:03:45'!
+popAnElementWithoutMeaning: anElement
+
+	^self error: OOStack stackEmptyErrorDescription ! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:01:38'!
+printAnElementWithMeaning: anElement
+
+	^store last value.
+	! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:02:21'!
+printAnElementWithoutMeaning: anElement
+
+	^self error: OOStack stackEmptyErrorDescription! !
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 21:54:48'!
 push: something	
 	
 	|x|
 	
-	x := ZZZ with: something.
+	x := ElementWithMeaning with: something.
 	
 	store add: x. 	! !
 
@@ -312,25 +398,14 @@ size
 
 	^store size - 1.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:14'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:00:29'!
 top
 
 	|x|
 	
 	x := store last.
 	
-	^x topStack: self! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:24:10'!
-topYYY: YYY
-
-	^self error: OOStack stackEmptyErrorDescription! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:11:58'!
-topZZZ: ZZZ
-
-	^store last value.
-	! !
+	^x giveMeTheElementOfTheTopOfTheStack: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -350,78 +425,3 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
-
-
-!classDefinition: #XXX category: #'Stack-Exercise'!
-Object subclass: #XXX
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!XXX methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:44:29'!
-popStack: stack
-
-	^self subclassResponsibility ! !
-
-!XXX methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:44:33'!
-topStack: stack
-
-	^self subclassResponsibility ! !
-
-
-!classDefinition: #YYY category: #'Stack-Exercise'!
-XXX subclass: #YYY
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!YYY methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:38'!
-popStack: stack
-
-	^stack popYYY: self! !
-
-!YYY methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:44'!
-topStack: stack
-
-	^stack topYYY: self! !
-
-
-!classDefinition: #ZZZ category: #'Stack-Exercise'!
-XXX subclass: #ZZZ
-	instanceVariableNames: 'value'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:41:59'!
-initialize: aSomething
-
-	value := aSomething! !
-
-!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:08:54'!
-popStack: stack
-
-	^stack popZZZ: self ! !
-
-!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 01:09:00'!
-topStack: stack
-
-	^stack topZZZ: self! !
-
-!ZZZ methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:31:36'!
-value
-
-	^value ! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'ZZZ class' category: #'Stack-Exercise'!
-ZZZ class
-	instanceVariableNames: ''!
-
-!ZZZ class methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 00:53:56'!
-with: aSomething
-
-	 ^self new initialize: aSomething! !
