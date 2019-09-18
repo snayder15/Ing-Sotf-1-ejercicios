@@ -240,10 +240,15 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'sentenceFinderByPrefix'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/18/2019 00:56:39'!
+setUp
+		
+		sentenceFinderByPrefix := SentenceFinderByPrefix  new.! !
 
 
 !classDefinition: #Element category: #'Stack-Exercise'!
@@ -421,7 +426,37 @@ stackEmptyErrorDescription
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: ''
+	instanceVariableNames: 'stack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 23:53:37'!
+find: prefix
+	
+	|prefijos elementos|
+	
+	prefijos := OrderedCollection new.
+	
+	elementos  := OrderedCollection new.
+	
+	(stack empty not) whileTrue:[ |element| element := stack pop.
+					    		     (element value beginsWith: prefix ) ifTrue:[ prefijos add: element value. ].
+								     elementos add: element.
+								   ].
+							
+	self restablecer: elementos .
+	
+	^prefijos.! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 23:36:31'!
+initialize
+
+	stack = OOStack new.! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 23:59:50'!
+restablecer: elementos 
+
+	(elementos empty not) whileTrue:[
+										 	stack push: elementos removeLast.
+									     ].! !
