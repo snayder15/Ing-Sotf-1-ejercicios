@@ -313,8 +313,8 @@ test03NonExistPrefixInASentenceWithSpaces
 
 	self assert: cant = 0.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:28:13'!
-test04CanNotFinderSentenceByPrefixEmptyInAStackEmpty
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:49:26'!
+test04CanNotSentenceFinderByPrefixEmptyInAStackEmpty
 
 	self
 		should: [ sentenceFinderByPrefix find: '' on: AnEmptyStack ]
@@ -322,8 +322,8 @@ test04CanNotFinderSentenceByPrefixEmptyInAStackEmpty
 		asserting: [ :anError |  
 			self assert: anError messageText = SentenceFinderByPrefix prefixEmptyErrorDescription]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:29:16'!
-test05CanNotFinderSentenceByPrefixEmptyInAStackNotEmpty
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:49:41'!
+test05CanNotSentenceFinderByPrefixEmptyInAStackNotEmpty
 
 	self
 		should: [ sentenceFinderByPrefix find: '' on: aStackWithOneSentence ]
@@ -331,8 +331,8 @@ test05CanNotFinderSentenceByPrefixEmptyInAStackNotEmpty
 		asserting: [ :anError |  
 			self assert: anError messageText = SentenceFinderByPrefix prefixEmptyErrorDescription]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:34:16'!
-test05CanNotFinderSentenceByPrefixWithSpacesInAStackNotEmpty
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:49:57'!
+test05CanNotSentenceFinderByPrefixWithSpacesInAStackNotEmpty
 
 	self
 		should: [ sentenceFinderByPrefix find: ' ' on: aStackWithOneSentence ]
@@ -388,8 +388,8 @@ test09TheSentenceFinderByPrefixNotChangeTheOrderOfTheSentencesInTheStackAndTheyA
 	
 ! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:35:33'!
-test10CanNotFinderSentenceByPrefixWithSpacesInAStackEmpty
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:50:12'!
+test10CanNotSentenceFinderByPrefixWithSpacesInAStackEmpty
 
 	self
 		should: [ sentenceFinderByPrefix find: ' ' on: AnEmptyStack ]
