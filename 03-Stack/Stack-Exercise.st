@@ -240,15 +240,80 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: 'sentenceFinderByPrefix'
+	instanceVariableNames: 'sentenceFinderByPrefix AnEmptyStack aStackWithOneSentence aStackWithOneSentenceThatIncludeSpaces'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/18/2019 00:56:39'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/18/2019 23:36:08'!
 setUp
-		
-		sentenceFinderByPrefix := SentenceFinderByPrefix  new.! !
+	|aEmptyStack aStackWithASentence aStackWithASentenceWithSpaces|
+	
+	aEmptyStack := OOStack new.
+	aStackWithASentence:= OOStack new.
+	aStackWithASentenceWithSpaces:= OOStack new.
+	
+	aStackWithASentence push: 'Winter'.
+	aStackWithASentenceWithSpaces push: 'Wi n t er'.
+	
+	AnEmptyStack :=aEmptyStack.
+	aStackWithOneSentence := aStackWithASentence .
+	aStackWithOneSentenceThatIncludeSpaces :=aStackWithASentenceWithSpaces.
+	
+	sentenceFinderByPrefix := SentenceFinderByPrefix new.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 02:50:22'!
+should: aBlockToRun raise: anExceptionType asserting: aVerificationBlock
+
+	[ aBlockToRun value.
+	self fail ]
+		on: anExceptionType 
+		do: aVerificationBlock ! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 01:52:52'!
+test01NoPuedoEncontrarPrefijosEnUnaPilaVacia
+	|prefix prefixes|
+	prefix := 'Wint'.
+	prefixes := sentenceFinderByPrefix find: prefix on: AnEmptyStack .
+	
+	self assert: prefixes size = 0.
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 01:53:05'!
+test02PuedoEncontrarFraseQueEsPrefijoEnUnaPilaQueContieneUnSoloElemento
+	|prefix prefixes|
+	prefix := 'Win'.
+	prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentence.
+	
+	self assert: prefixes size = 1.
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/18/2019 23:36:08'!
+test03NoPuedoEncontrarFraseQueEsPrefijoEnUnaPilaQueContieneUnSoloElementoQueTieneEspacios
+	|prefix prefijos|
+	prefix := 'Win'.
+	prefijos := sentenceFinderByPrefix find: prefix on: aStackWithOneSentenceThatIncludeSpaces.
+	
+	self assert: prefijos size = 0.
+	! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:28:13'!
+test04CanNotFinderSentenceByPrefixEmptyInAStackEmpty
+
+	self
+		should: [ sentenceFinderByPrefix find: '' on: AnEmptyStack ]
+		raise: Error
+		asserting: [ :anError |  
+			self assert: anError messageText = SentenceFinderByPrefix prefixEmptyErrorDescription]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:29:16'!
+test05CanNotFinderSentenceByPrefixEmptyInAStackNotEmpty
+
+	self
+		should: [ sentenceFinderByPrefix find: '' on: aStackWithOneSentence ]
+		raise: Error
+		asserting: [ :anError |  
+			self assert: anError messageText = SentenceFinderByPrefix prefixEmptyErrorDescription]! !
 
 
 !classDefinition: #Element category: #'Stack-Exercise'!
@@ -426,37 +491,50 @@ stackEmptyErrorDescription
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: 'stack'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 23:53:37'!
-find: prefix
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:21:35'!
+find: prefix on: aStack
 	
-	|prefijos elementos|
+	|prefixes elements|
 	
-	prefijos := OrderedCollection new.
+	(prefix = '') ifTrue:[ self signalPrefixEmptyErrorDescription ].
 	
-	elementos  := OrderedCollection new.
+	prefixes := OrderedCollection new.
 	
-	(stack empty not) whileTrue:[ |element| element := stack pop.
-					    		     (element value beginsWith: prefix ) ifTrue:[ prefijos add: element value. ].
-								     elementos add: element.
+	elements  := OrderedCollection new.
+	
+	[aStack isEmpty not] whileTrue:[ |element| element := aStack pop.
+					    		     (element value beginsWith: prefix ) ifTrue:[ prefixes add: element value. ].
+								     elements add: element.
 								   ].
 							
-	self restablecer: elementos .
+	self restore: elements on: aStack.
 	
-	^prefijos.! !
+	^prefixes.! !
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 23:36:31'!
-initialize
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 01:30:41'!
+restore: elements on: aStack
 
-	stack = OOStack new.! !
-
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/17/2019 23:59:50'!
-restablecer: elementos 
-
-	(elementos empty not) whileTrue:[
-										 	stack push: elementos removeLast.
+	[elements isEmpty not] whileTrue:[
+										 	aStack push: elements removeLast.
 									     ].! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:17:41'!
+signalPrefixEmptyErrorDescription 
+
+	self error: self class prefixEmptyErrorDescription! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:01:15'!
+prefixEmptyErrorDescription
+	
+	^ 'Prefix cannot be empty'! !
