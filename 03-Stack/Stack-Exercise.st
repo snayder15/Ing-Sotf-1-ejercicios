@@ -240,25 +240,32 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: 'sentenceFinderByPrefix AnEmptyStack aStackWithOneSentence aStackWithOneSentenceThatIncludeSpaces'
+	instanceVariableNames: 'sentenceFinderByPrefix AnEmptyStack aStackWithOneSentence aStackWithOneSentenceThatIncludeSpaces aStackWithSeveralSentences'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/18/2019 23:36:08'!
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:26:11'!
 setUp
-	|aEmptyStack aStackWithASentence aStackWithASentenceWithSpaces|
+	|aEmptyStack aStackWithASentence aStackWithASentenceWithSpaces aStackComplex|
 	
 	aEmptyStack := OOStack new.
 	aStackWithASentence:= OOStack new.
 	aStackWithASentenceWithSpaces:= OOStack new.
+	aStackComplex:= OOStack new.
 	
 	aStackWithASentence push: 'Winter'.
+	
 	aStackWithASentenceWithSpaces push: 'Wi n t er'.
+	
+	aStackComplex push: 'Winter'.
+	aStackComplex push: 'Wi n ter'.
+	aStackComplex push: 'Wi n ter lalala'.
 	
 	AnEmptyStack :=aEmptyStack.
 	aStackWithOneSentence := aStackWithASentence .
 	aStackWithOneSentenceThatIncludeSpaces :=aStackWithASentenceWithSpaces.
+	aStackWithSeveralSentences:=aStackComplex.
 	
 	sentenceFinderByPrefix := SentenceFinderByPrefix new.! !
 
@@ -270,32 +277,41 @@ should: aBlockToRun raise: anExceptionType asserting: aVerificationBlock
 		on: anExceptionType 
 		do: aVerificationBlock ! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 01:52:52'!
-test01NoPuedoEncontrarPrefijosEnUnaPilaVacia
-	|prefix prefixes|
-	prefix := 'Wint'.
-	prefixes := sentenceFinderByPrefix find: prefix on: AnEmptyStack .
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:10:01'!
+test01NonExistPrefixIfThereAreNotSentences
+	|cant|
 	
-	self assert: prefixes size = 0.
-	! !
+	cant :=  [|prefix prefixes|
+			 prefix := 'Win'.
+			 prefixes := sentenceFinderByPrefix find: prefix on: AnEmptyStack .
+			 prefixes size] value.	
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 01:53:05'!
-test02PuedoEncontrarFraseQueEsPrefijoEnUnaPilaQueContieneUnSoloElemento
-	|prefix prefixes|
-	prefix := 'Win'.
-	prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentence.
-	
-	self assert: prefixes size = 1.
-	! !
+	self assert: cant = 0.
+! !
 
-!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/18/2019 23:36:08'!
-test03NoPuedoEncontrarFraseQueEsPrefijoEnUnaPilaQueContieneUnSoloElementoQueTieneEspacios
-	|prefix prefijos|
-	prefix := 'Win'.
-	prefijos := sentenceFinderByPrefix find: prefix on: aStackWithOneSentenceThatIncludeSpaces.
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:09:30'!
+test02ExistPrefixInASentenceWithoutSpaces
 	
-	self assert: prefijos size = 0.
-	! !
+	|cant|
+	
+	cant := [|prefix prefixes|
+			prefix := 'Win'.
+			prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentence.
+			prefixes size] value. 	
+
+	self assert: cant = 1.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:10:37'!
+test03NonExistPrefixInASentenceWithSpaces
+	
+	|cant|
+	
+	cant := [|prefix prefixes|
+			prefix := 'Win'.
+			prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentenceThatIncludeSpaces.
+			prefixes size] value .	
+
+	self assert: cant = 0.! !
 
 !SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:28:13'!
 test04CanNotFinderSentenceByPrefixEmptyInAStackEmpty
@@ -314,6 +330,72 @@ test05CanNotFinderSentenceByPrefixEmptyInAStackNotEmpty
 		raise: Error
 		asserting: [ :anError |  
 			self assert: anError messageText = SentenceFinderByPrefix prefixEmptyErrorDescription]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:34:16'!
+test05CanNotFinderSentenceByPrefixWithSpacesInAStackNotEmpty
+
+	self
+		should: [ sentenceFinderByPrefix find: ' ' on: aStackWithOneSentence ]
+		raise: Error
+		asserting: [ :anError |  
+			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpacesErrorDescription ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:12:46'!
+test06ExistPrefixInASentenceWithSpaces
+	
+	|cant|
+	
+	cant :=  [|prefix prefixes|
+			  prefix := 'Wi'.
+			  prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentenceThatIncludeSpaces.
+			  prefixes size] value.	
+
+	self assert: cant = 1.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:13:10'!
+test07NonExistPrefixInASentenceWithoutSpaces
+	
+	|cant|
+	
+	cant := [|prefix prefixes|
+			prefix := 'Wit'.
+			prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentence.
+			prefixes size] value.	
+
+	self assert: cant = 0.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:13:31'!
+test08NonExistPrefixInASentenceWithCaseSensetive
+	
+	|cant|
+	
+	cant := [|prefix prefixes|
+			prefix := 'win'.
+			prefixes := sentenceFinderByPrefix find: prefix on: aStackWithOneSentence.
+			prefixes size] value.	
+
+	self assert: cant = 0.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 14:56:03'!
+test09TheSentenceFinderByPrefixNotChangeTheOrderOfTheSentencesInTheStackAndTheyAreTheSameSentences 
+	|stack prefix|
+	
+	stack := aStackWithSeveralSentences.
+	prefix := 'Win'.
+	sentenceFinderByPrefix find: prefix on: AnEmptyStack .
+	
+	self assert: stack  = aStackWithSeveralSentences.
+	
+! !
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:35:33'!
+test10CanNotFinderSentenceByPrefixWithSpacesInAStackEmpty
+
+	self
+		should: [ sentenceFinderByPrefix find: ' ' on: AnEmptyStack ]
+		raise: Error
+		asserting: [ :anError |  
+			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpacesErrorDescription ]! !
 
 
 !classDefinition: #Element category: #'Stack-Exercise'!
@@ -443,10 +525,10 @@ popAnElementWithoutMeaning: anElement
 
 	^self error: OOStack stackEmptyErrorDescription ! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:01:38'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 12:55:14'!
 printAnElementWithMeaning: anElement
 
-	^store last value.
+	^anElement value.
 	! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'lf 9/17/2019 22:02:21'!
@@ -496,12 +578,23 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 03:21:35'!
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:32:09'!
 find: prefix on: aStack
 	
-	|prefixes elements|
+	|prefixes|
 	
 	(prefix = '') ifTrue:[ self signalPrefixEmptyErrorDescription ].
+	
+	(prefix includesSubString: ' ') ifTrue:[ self signalPrefixWithSpacesErrorDescription ].
+	
+	prefixes := self prefixesThatStartWithThe: prefix andTheyAreStoredIn: aStack.
+	
+	^prefixes.! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 11:13:03'!
+prefixesThatStartWithThe: prefix andTheyAreStoredIn: aStack
+	
+	|prefixes elements|
 	
 	prefixes := OrderedCollection new.
 	
@@ -528,6 +621,11 @@ signalPrefixEmptyErrorDescription
 
 	self error: self class prefixEmptyErrorDescription! !
 
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:29:56'!
+signalPrefixWithSpacesErrorDescription 
+
+	self error: self class prefixWithSpacesErrorDescription ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
@@ -538,3 +636,8 @@ SentenceFinderByPrefix class
 prefixEmptyErrorDescription
 	
 	^ 'Prefix cannot be empty'! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'car 9/19/2019 16:29:22'!
+prefixWithSpacesErrorDescription
+	
+	^ 'Prefix cannot has spaces'! !
