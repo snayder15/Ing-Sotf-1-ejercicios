@@ -451,10 +451,34 @@ yyyF: aObject
 
 !classDefinition: #MarsRover category: #'MarsRover-Ejercicio'!
 Object subclass: #MarsRover
-	instanceVariableNames: 'position direction'
+	instanceVariableNames: 'position direction allowedMovements'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'MarsRover-Ejercicio'!
+
+!MarsRover methodsFor: 'as yet unclassified' stamp: 'a 10/5/2019 13:04:21'!
+move: aSetOfInstructions
+	
+	| initialPosition initialDirection |
+
+	initialPosition := position.
+	initialDirection := direction.
+
+	aSetOfInstructions do: [
+		:instruction |
+		instruction = $f ifTrue: [self moveForward ] ifFalse: [
+			instruction = $b ifTrue: [self moveBackward ] ifFalse: [
+				instruction = $r ifTrue: [self rotateRight ] ifFalse: [
+					instruction = $l ifTrue: [self rotateLeft ] ifFalse: [
+						position := initialPosition.
+						direction := initialDirection.
+						^self error: MarsRover uknownInstruction.
+					]
+				]
+			]			
+		]
+	].! !
+
 
 !MarsRover methodsFor: 'Private-move' stamp: 'car 10/7/2019 11:12:06'!
 moveBackwardEast
@@ -497,14 +521,20 @@ moveForwardWest
 	position := position - (1@0)! !
 
 
-!MarsRover methodsFor: 'initialization' stamp: 'a 10/3/2019 21:07:04'!
+!MarsRover methodsFor: 'initialization' stamp: 'a 10/8/2019 23:54:33'!
 initializeWithInitialPosition: aPosition andDirection: aDirection
 
 	position := aPosition.
-	direction := aDirection.! !
+	direction := aDirection.
+	
+	allowedMovements := Dictionary new.
+  	allowedMovements at: $f put: [self moveForward].
+  	allowedMovements at: $b put: [self moveBackward].
+  	allowedMovements at: $r put: [self rotateRight].
+  	allowedMovements at: $l put: [self rotateLeft].! !
 
 
-!MarsRover methodsFor: 'actions' stamp: 'car 10/7/2019 12:28:37'!
+!MarsRover methodsFor: 'actions' stamp: 'a 10/8/2019 23:54:49'!
 execute: aSetOfInstructions
 	
 	| initialPosition initialDirection |
@@ -514,18 +544,12 @@ execute: aSetOfInstructions
 
 	aSetOfInstructions do: [
 		:instruction |
-		instruction = $f ifTrue: [self moveForward ] ifFalse: [
-			instruction = $b ifTrue: [self moveBackward ] ifFalse: [
-				instruction = $r ifTrue: [self rotateRight ] ifFalse: [
-					instruction = $l ifTrue: [self rotateLeft ] ifFalse: [
+		allowedMovements at: instruction value ifAbsent: [
 						position := initialPosition.
 						direction := initialDirection.
 						^self error: MarsRover uknownInstruction.
-					]
-				]
-			]			
-		]
-	].! !
+					].
+		].! !
 
 !MarsRover methodsFor: 'actions' stamp: 'car 10/7/2019 11:22:05'!
 moveBackward
