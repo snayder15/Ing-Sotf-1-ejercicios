@@ -271,19 +271,19 @@ moveForwardWest
 	position := position - (1@0)! !
 
 
-!MarsRover methodsFor: 'initialization' stamp: 'car 10/9/2019 10:15:40'!
-configuringAllowedMovements
+!MarsRover methodsFor: 'initialization' stamp: 'ns 10/10/2019 07:57:57'!
+configureAllowedMovements
 
  	allowedMovements := Dictionary new.
 	allowedMovements add: $f->[self moveForward]; add: $b->[self moveBackward]; 
 						 add: $l->[self rotateLeft]; add: $r->[self rotateRight].! !
 
-!MarsRover methodsFor: 'initialization' stamp: 'car 10/9/2019 11:16:22'!
+!MarsRover methodsFor: 'initialization' stamp: 'ns 10/10/2019 07:58:19'!
 initializeWithInitialPosition: aPosition andDirection: aDirection
 
 	position := aPosition.
 	direction := aDirection.
-	self configuringAllowedMovements! !
+	self configureAllowedMovements! !
 
 
 !MarsRover methodsFor: 'error signal' stamp: 'car 10/9/2019 11:17:52'!
