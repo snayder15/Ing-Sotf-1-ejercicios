@@ -390,7 +390,7 @@ test22OCantMoveTwoTimesInARow
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:06:18'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:16:22'!
 test23XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
 
 	| juegoTerniLapilli |
@@ -402,9 +402,10 @@ test23XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
 	juegoTerniLapilli putXAt: 0@2.
 	
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:07:27'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:36:55'!
 test24XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowTwo
 
 	| juegoTerniLapilli |
@@ -416,9 +417,10 @@ test24XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowTwo
 	juegoTerniLapilli putXAt: 1@2.
 	
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:10:38'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:37:03'!
 test25XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowThree
 
 	| juegoTerniLapilli |
@@ -430,9 +432,10 @@ test25XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowThree
 	juegoTerniLapilli putXAt: 2@2.
 	
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:42:54'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:37:08'!
 test26XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnOne
 
 	| juegoTerniLapilli |
@@ -444,9 +447,10 @@ test26XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnOne
 	juegoTerniLapilli putXAt: 2@0.
 	
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:44:37'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:37:12'!
 test27XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnTwo
 
 	| juegoTerniLapilli |
@@ -458,9 +462,10 @@ test27XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnTwo
 	juegoTerniLapilli putXAt: 2@1.
 	
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:13:07'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:37:16'!
 test28XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
 
 	| juegoTerniLapilli |
@@ -472,9 +477,10 @@ test28XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
 	juegoTerniLapilli putXAt: 2@2.
 	
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:22:16'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:38:26'!
 test29OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
 
 	| juegoTerniLapilli |
@@ -486,9 +492,10 @@ test29OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
 	juegoTerniLapilli putXAt: 2@2.
 	juegoTerniLapilli putOAt: 0@2.
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerOWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:25:24'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:19'!
 test30OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowTwo
 
 	| juegoTerniLapilli |
@@ -500,9 +507,10 @@ test30OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowTwo
 	juegoTerniLapilli putXAt: 2@2.
 	juegoTerniLapilli putOAt: 1@2.
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerOWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:28:07'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:25'!
 test31OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowThree
 
 	| juegoTerniLapilli |
@@ -514,9 +522,10 @@ test31OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowThree
 	juegoTerniLapilli putXAt: 0@2.
 	juegoTerniLapilli putOAt: 2@2.
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerOWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:33:10'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:29'!
 test32OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnOne
 
 	| juegoTerniLapilli |
@@ -528,9 +537,9 @@ test32OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnOne
 	juegoTerniLapilli putXAt: 0@2.
 	juegoTerniLapilli putOAt: 2@0.
 	self assert: juegoTerniLapilli isOver.
-	! !
+	self assert: juegoTerniLapilli hasPlayerOWon.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:37:12'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:32'!
 test33OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnTwo
 
 	| juegoTerniLapilli |
@@ -542,9 +551,9 @@ test33OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnTwo
 	juegoTerniLapilli putXAt: 0@2.
 	juegoTerniLapilli putOAt: 2@1.
 	self assert: juegoTerniLapilli isOver.
-	! !
+	self assert: juegoTerniLapilli hasPlayerOWon.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:40:03'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:35'!
 test34OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
 
 	| juegoTerniLapilli |
@@ -556,9 +565,9 @@ test34OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
 	juegoTerniLapilli putXAt: 1@1.
 	juegoTerniLapilli putOAt: 2@2.
 	self assert: juegoTerniLapilli isOver.
-	! !
+	self assert: juegoTerniLapilli hasPlayerOWon.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:48:06'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:43'!
 test35XWinsByPlacingTheLastTileAndBuildingAMainDiagonal
 
 	| juegoTerniLapilli |
@@ -569,9 +578,9 @@ test35XWinsByPlacingTheLastTileAndBuildingAMainDiagonal
 	juegoTerniLapilli putOAt: 1@2.
 	juegoTerniLapilli putXAt: 2@2.
 	self assert: juegoTerniLapilli isOver.
-	! !
+	self assert: juegoTerniLapilli hasPlayerXWon.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:57:13'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:49'!
 test36XWinsByPlacingTheLastTileAndBuildingASecondaryDiagonal
 
 	| juegoTerniLapilli |
@@ -582,9 +591,9 @@ test36XWinsByPlacingTheLastTileAndBuildingASecondaryDiagonal
 	juegoTerniLapilli putOAt: 2@2.
 	juegoTerniLapilli putXAt: 2@0.
 	self assert: juegoTerniLapilli isOver.
-	! !
+	self assert: juegoTerniLapilli hasPlayerXWon.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 04:01:39'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:53'!
 test37OWinsByPlacingTheLastTileAndBuildingAMainDiagonal
 
 	| juegoTerniLapilli |
@@ -596,9 +605,9 @@ test37OWinsByPlacingTheLastTileAndBuildingAMainDiagonal
 	juegoTerniLapilli putXAt: 1@2.
 	juegoTerniLapilli putOAt: 2@2.
 	self assert: juegoTerniLapilli isOver.
-	! !
+	self assert: juegoTerniLapilli hasPlayerOWon.! !
 
-!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 04:04:16'!
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:39:58'!
 test38OWinsByPlacingTheLastTileAndBuildingASecondaryDiagonal
 
 	| juegoTerniLapilli |
@@ -610,12 +619,94 @@ test38OWinsByPlacingTheLastTileAndBuildingASecondaryDiagonal
 	juegoTerniLapilli putXAt: 1@2.
 	juegoTerniLapilli putOAt: 2@0.
 	self assert: juegoTerniLapilli isOver.
+	self assert: juegoTerniLapilli hasPlayerOWon.
 	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:08:47'!
+test39OCantPlaceTileIfXPlacesTheLastTileAndWins
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 2@1.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 2@2.
+	
+	self should: [juegoTerniLapilli putOAt: 2@0.] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorOCantPlaceTileIfTheGameIsOver.
+							self deny: (juegoTerniLapilli isOAt: 2@0).
+							self assert: juegoTerniLapilli hasPlayerXWon.].! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:07:58'!
+test40XCantMoveTilesIfOPlacesTheLastTileAndWins
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 2@1.
+	juegoTerniLapilli putOAt: 2@2.
+	
+	self should: [juegoTerniLapilli  moveXFrom: 0@1 to: 0@2.] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorXCantMoveTilesIfTheGameIsOver.
+							self deny: (juegoTerniLapilli isXAt: 0@2).
+							self assert: (juegoTerniLapilli isXAt: 0@1).
+							self assert: juegoTerniLapilli hasPlayerOWon.].! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:30:32'!
+test41XCantMoveTilesIfOWon
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 2@1.
+	juegoTerniLapilli putOAt: 2@2.
+	juegoTerniLapilli  moveXFrom: 2@1 to: 2@0.
+	juegoTerniLapilli  moveOFrom: 2@2 to: 2@1.
+	
+	self should: [juegoTerniLapilli  moveXFrom: 0@2 to: 1@2.] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorXCantMoveTilesIfTheGameIsOver.
+							self deny: (juegoTerniLapilli isXAt: 1@2).
+							self assert: (juegoTerniLapilli isXAt: 0@2).
+							self assert: juegoTerniLapilli hasPlayerOWon.].! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:46:10'!
+test42OCantMoveTilesIfXWon
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 1@2.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 2@1.
+	juegoTerniLapilli putOAt: 2@0.
+	juegoTerniLapilli  moveXFrom: 2@1 to: 2@2.
+	
+	self should: [juegoTerniLapilli  moveOFrom: 1@1 to: 1@0.] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorOCantMoveTilesIfTheGameIsOver.
+							self deny: (juegoTerniLapilli isOAt: 1@0).
+							self assert: (juegoTerniLapilli isOAt: 1@1).
+							self assert: juegoTerniLapilli hasPlayerXWon.].! !
 
 
 !classDefinition: #TerniLapilli category: #'TerniLapilli-ejercicio'!
 Object subclass: #TerniLapilli
-	instanceVariableNames: 'positionsX positionsO playing'
+	instanceVariableNames: 'positionsX positionsO playing winner'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilli-ejercicio'!
@@ -674,6 +765,14 @@ areStillTilesToPlace
 
 	^ positionsX size < 3 or: positionsO size < 3.! !
 
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:38:49'!
+hasPlayerOWon
+	^winner = #O! !
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:26:23'!
+hasPlayerXWon
+	^winner = #X! !
+
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/12/2019 21:24:07'!
 initializeStartGame
 
@@ -718,8 +817,9 @@ isXAt: aPosition
 
 	^ positionsX includes: aPosition.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:47:21'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:43:56'!
 moveOFrom: aPosition to: anotherPosition
+	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorOCantMoveTilesIfTheGameIsOver].
 	self isPlayingO ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveTwoTimesInARow ].
 	(self areStillTilesToPlace) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced].
 	(self isInvalid: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorInvalidPosition ].
@@ -727,10 +827,12 @@ moveOFrom: aPosition to: anotherPosition
 	(self isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorCantMoveMoreThanOneStep].
 	positionsO remove: aPosition.
 	positionsO add: anotherPosition.
-	playing := #O.! !
+	playing := #O.
+	(self isOver ) ifTrue: [winner := #O].! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:07:11'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:41:56'!
 moveXFrom: aPosition to: anotherPosition
+	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorXCantMoveTilesIfTheGameIsOver].
 	self isPlayingX ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveTwoTimesInARow ].
 	(self areStillTilesToPlace) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced].
 	(self isInvalid: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorInvalidPosition ].
@@ -738,7 +840,8 @@ moveXFrom: aPosition to: anotherPosition
 	(self isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorCantMoveMoreThanOneStep].
 	positionsX remove: aPosition.
 	positionsX add: anotherPosition.
-	playing := #X.! !
+	playing := #X.
+	(self isOver ) ifTrue: [winner := #X].! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/11/2019 01:28:13'!
 positionsO
@@ -750,21 +853,24 @@ positionsX
 
 	^positionsX! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:48:50'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:08:47'!
 putOAt: aPosition
+	(self isOver ) ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlaceTileIfTheGameIsOver].
 	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
 	positionsX isEmpty ifTrue: [^ TerniLapilli error: TerniLapilli errorOCantPlayBeforeX ].
 	self isPlayingO ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlayTwoTimesInARow].
 	positionsO add: aPosition .
-	playing := #O.! !
+	playing := #O.
+	(self isOver ) ifTrue: [winner := #O]! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:50:02'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:36:34'!
 putXAt: aPosition
 	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
 	positionsX size = 3 ifTrue: [^TerniLapilli error: TerniLapilli errorXCantPlaceMoreThanThreeTiles]. 
 	self isPlayingX ifTrue: [^TerniLapilli error: TerniLapilli errorXCantPlayTwoTimesInARow].
 	positionsX add: aPosition .
-	playing := #X.! !
+	playing := #X.
+	(self isOver ) ifTrue: [winner := #X]! !
 
 
 !TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 03:23:24'!
@@ -811,6 +917,16 @@ errorInvalidPosition
 	
 	^'Invalid position'! !
 
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:43:19'!
+errorOCantMoveTilesIfTheGameIsOver
+	
+	^'O cant move tiles if the game is over'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:08:47'!
+errorOCantPlaceTileIfTheGameIsOver
+
+	^'O cant place tile if the gama is over'! !
+
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 20:23:32'!
 errorOCantPlayBeforeX
 	^'O can not play before X'! !
@@ -823,6 +939,11 @@ errorOCantPlayTwoTimesInARow
 errorPositionNotEmpty
 	
 	^'Position is not empty'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:07:57'!
+errorXCantMoveTilesIfTheGameIsOver
+
+	^'X cant move tiles if the game is over'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/11/2019 01:36:52'!
 errorXCantPlaceMoreThanThreeTiles
