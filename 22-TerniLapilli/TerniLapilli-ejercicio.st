@@ -390,59 +390,308 @@ test22OCantMoveTwoTimesInARow
 	
 ! !
 
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:06:18'!
+test23XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 1@0.
+	juegoTerniLapilli putXAt: 0@2.
+	
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:07:27'!
+test24XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowTwo
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 2@0.
+	juegoTerniLapilli putXAt: 1@2.
+	
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:10:38'!
+test25XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowThree
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 2@0.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 2@1.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 2@2.
+	
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:42:54'!
+test26XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnOne
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 2@2.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 1@2.
+	juegoTerniLapilli putXAt: 2@0.
+	
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 02:44:37'!
+test27XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnTwo
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 2@2.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 2@1.
+	
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:13:07'!
+test28XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 1@2.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 2@2.
+	
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:22:16'!
+test29OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 2@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 2@2.
+	juegoTerniLapilli putOAt: 0@2.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:25:24'!
+test30OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowTwo
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 1@0.
+	juegoTerniLapilli putXAt: 2@0.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 2@2.
+	juegoTerniLapilli putOAt: 1@2.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:28:07'!
+test31OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowThree
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 2@0.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 2@1.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 2@2.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:33:10'!
+test32OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnOne
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 1@0.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 2@0.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:37:12'!
+test33OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnTwo
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 2@1.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:40:03'!
+test34OWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 1@2.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 2@2.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:48:06'!
+test35XWinsByPlacingTheLastTileAndBuildingAMainDiagonal
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 1@2.
+	juegoTerniLapilli putXAt: 2@2.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 03:57:13'!
+test36XWinsByPlacingTheLastTileAndBuildingASecondaryDiagonal
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@2.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 1@1.
+	juegoTerniLapilli putOAt: 2@2.
+	juegoTerniLapilli putXAt: 2@0.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 04:01:39'!
+test37OWinsByPlacingTheLastTileAndBuildingAMainDiagonal
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@0.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 1@2.
+	juegoTerniLapilli putOAt: 2@2.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
+!TerniLapilliTest methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 04:04:16'!
+test38OWinsByPlacingTheLastTileAndBuildingASecondaryDiagonal
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 0@1.
+	juegoTerniLapilli putOAt: 1@1.
+	juegoTerniLapilli putXAt: 1@2.
+	juegoTerniLapilli putOAt: 2@0.
+	self assert: juegoTerniLapilli isOver.
+	! !
+
 
 !classDefinition: #TerniLapilli category: #'TerniLapilli-ejercicio'!
 Object subclass: #TerniLapilli
-	instanceVariableNames: 'positionsX positionsO allowedMovements playing'
+	instanceVariableNames: 'positionsX positionsO playing'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilli methodsFor: 'finish-private' stamp: 'car 10/13/2019 03:40:27'!
+OBuiltAColumn
+
+	^(positionsO select: [:aPosition| (aPosition y) = 0]) size = 3 or:
+	  (positionsO select: [:aPosition| (aPosition y) = 1]) size = 3 or:
+	  (positionsO select: [:aPosition| (aPosition y) = 2]) size = 3! !
+
+!TerniLapilli methodsFor: 'finish-private' stamp: 'car 10/13/2019 04:05:15'!
+OBuiltADiagonal
+
+	^(positionsO select: [:aPosition| (aPosition x) = (aPosition y)]) size = 3 or:
+	  (positionsO select: [:aPosition| (aPosition x) + (aPosition y) = 2]) size = 3 ! !
+
+!TerniLapilli methodsFor: 'finish-private' stamp: 'car 10/13/2019 03:29:36'!
+OBuiltARow
+
+	^(positionsO select: [:aPosition| (aPosition x) = 0]) size = 3 or:
+	  (positionsO select: [:aPosition| (aPosition x) = 1]) size = 3 or:
+	  (positionsO select: [:aPosition| (aPosition x) = 2]) size = 3! !
+
+!TerniLapilli methodsFor: 'finish-private' stamp: 'car 10/13/2019 03:12:28'!
+XBuiltAColumn
+
+	^ (positionsX select: [:aPosition| (aPosition y) = 0]) size = 3 or: 
+	   (positionsX select: [:aPosition| (aPosition y) = 1]) size = 3 or:
+	   (positionsX select: [:aPosition| (aPosition y) = 2]) size = 3 
+	! !
+
+!TerniLapilli methodsFor: 'finish-private' stamp: 'car 10/13/2019 03:58:06'!
+XBuiltADiagonal
+
+	^ (positionsX select: [:aPosition| (aPosition x) = (aPosition y)]) size = 3 or:
+	   (positionsX select: [:aPosition| (aPosition x) + (aPosition y) = 2]) size = 3
+	! !
+
+!TerniLapilli methodsFor: 'finish-private' stamp: 'car 10/13/2019 03:11:50'!
+XBuiltARow
+
+	^ (positionsX select: [:aPosition| (aPosition x) = 0]) size = 3 or: 
+	   (positionsX select: [:aPosition| (aPosition x) = 1]) size = 3 or:
+	   (positionsX select: [:aPosition| (aPosition x) = 2]) size = 3 
+	! !
+
+
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/12/2019 21:29:01'!
+allowedPositionsOf: aPosition 
+
+	^(aPosition eightNeighbors select: [:aNeighbor| (self isInvalid: aNeighbor) not])! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:15:54'!
 areStillTilesToPlace
 
 	^ positionsX size < 3 or: positionsO size < 3.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:55:51'!
-initializeAllowedMovements
-
-	| allMovements |
-	allMovements := OrderedCollection with: 0@0 with: 0@1 with: 0@2 with: 1@0 with: 1@2 with: 2@0.
-	allMovements add: 2@1.
-	allMovements add: 2@2.
-	
-	allowedMovements := Dictionary new.
-	allowedMovements at: 0@0 put: (OrderedCollection with: 0@1 with: 1@0 with: 1@1).
-	allowedMovements at: 0@1 put: (OrderedCollection with: 0@0 with: 0@2 with: 1@1 with: 1@0 with: 1@2).
-	allowedMovements at: 0@2 put: (OrderedCollection with: 0@1 with: 1@2 with: 1@1).
-	allowedMovements at: 1@0 put: (OrderedCollection with: 0@0 with: 2@0 with: 1@1 with: 0@1 with: 2@1).
-	allowedMovements at: 1@1 put: allMovements.
-	allowedMovements at: 1@2 put: (OrderedCollection with: 0@2 with: 2@2 with: 1@1 with: 0@1 with: 2@1).	
-	allowedMovements at: 2@0 put: (OrderedCollection with: 1@0 with: 2@1 with: 1@1).
-	allowedMovements at: 2@1 put: (OrderedCollection with: 2@0 with: 2@2 with: 1@1 with: 1@0 with: 1@2).
-	allowedMovements at: 2@2 put: (OrderedCollection with: 2@1 with: 1@2 with: 1@1).
-! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:47:12'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/12/2019 21:24:07'!
 initializeStartGame
 
 	positionsX:= OrderedCollection new.
-	positionsO:= OrderedCollection new.
-	self initializeAllowedMovements.! !
+	positionsO:= OrderedCollection new.! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 20:33:25'!
 isInvalid: aPosition
 
 	^ (aPosition x > 2 or: aPosition x < 0) or: (aPosition y > 2 or: aPosition y < 0).! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:02:16'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/12/2019 21:29:41'!
 isNotAllowedFrom: aPosition to: anotherPosition
+
+	^((self allowedPositionsOf: aPosition) includes: anotherPosition) not. 
 	
-	| allowedMovementsForPosition |
-	allowedMovementsForPosition := allowedMovements at: aPosition.
-	(allowedMovementsForPosition includes: anotherPosition) ifTrue: [^ false].
-	^ true.
- ! !
+	
+! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/11/2019 02:02:57'!
 isOAt: aPosition
@@ -517,11 +766,30 @@ putXAt: aPosition
 	positionsX add: aPosition .
 	playing := #X.! !
 
+
+!TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 03:23:24'!
+isOver
+	
+	^ self isTheWinnerX or: self isTheWinnerO
+	
+	! !
+
+!TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 04:03:05'!
+isTheWinnerO
+	
+	^ self OBuiltARow or: self OBuiltAColumn or:  self OBuiltADiagonal! !
+
+!TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 03:50:09'!
+isTheWinnerX 
+	
+	^ self XBuiltARow or: self XBuiltAColumn or: self XBuiltADiagonal
+	! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TerniLapilli class' category: #'TerniLapilli-ejercicio'!
 TerniLapilli class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'allowedPositions'!
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:12:15'!
 errorCantMoveBeforeAllTilesArePlaced
