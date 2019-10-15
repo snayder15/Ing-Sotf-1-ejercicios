@@ -198,7 +198,7 @@ test13XCantMoveToAPositionWithAnOTile
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/12/2019 12:28:22'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/15/2019 17:38:28'!
 test14XCantMoveMoreThanOneStep
 
 	| juegoTerniLapilli |
@@ -212,7 +212,7 @@ test14XCantMoveMoreThanOneStep
 	
 	self should: [juegoTerniLapilli  moveXFrom: 0@2 to: 2@2.] 
 		 raise: Error - MessageNotUnderstood 
-		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorCantMoveMoreThanOneStep.
+		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorCantMakeThatMove.
 							self assert: (juegoTerniLapilli isXAt: 0@2).
 							self deny: (juegoTerniLapilli isXAt: 2@2)
 							]
@@ -343,7 +343,7 @@ test20OCantMoveToAPositionWithAnXTile
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/12/2019 13:44:37'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/15/2019 17:38:28'!
 test21OCantMoveMoreThanOneStep
 
 	| juegoTerniLapilli |
@@ -358,7 +358,7 @@ test21OCantMoveMoreThanOneStep
 	
 	self should: [juegoTerniLapilli  moveOFrom: 0@1 to: 2@1.] 
 		 raise: Error - MessageNotUnderstood 
-		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorCantMoveMoreThanOneStep.
+		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorCantMakeThatMove.
 							self assert: (juegoTerniLapilli isOAt: 0@1).
 							self deny: (juegoTerniLapilli isOAt: 2@1)
 							]
@@ -703,6 +703,64 @@ test42OCantMoveTilesIfXWon
 							self assert: (juegoTerniLapilli isOAt: 1@1).
 							self assert: juegoTerniLapilli hasPlayerXWon.].! !
 
+!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/15/2019 17:39:46'!
+test43XCantMoveToAPositionThatIsNotOnTheLineOfTheGame
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 2@0.
+	juegoTerniLapilli putXAt: 2@1.
+	juegoTerniLapilli putOAt: 2@2.
+	
+	self should: [juegoTerniLapilli  moveXFrom: 2@1 to: 1@2] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorCantMakeThatMove.
+							self deny: (juegoTerniLapilli isXAt: 1@2).
+							self assert: (juegoTerniLapilli isXAt: 2@1)].! !
+
+!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/15/2019 17:43:22'!
+test44OCantMoveToAPositionThatIsNotOnTheLineOfTheGame
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 2@2.
+	juegoTerniLapilli putOAt: 2@1.
+	juegoTerniLapilli  moveXFrom: 2@2 to: 1@1.
+	
+	self should: [juegoTerniLapilli  moveOFrom: 0@1 to: 1@2] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorCantMakeThatMove.
+							self deny: (juegoTerniLapilli isOAt: 1@2).
+							self assert: (juegoTerniLapilli isOAt: 0@1)].! !
+
+!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/15/2019 17:53:05'!
+test45OCantPlaceTilesWhenTheGameHasSixTiles
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 2@2.
+	juegoTerniLapilli putOAt: 2@1.
+	juegoTerniLapilli  moveXFrom: 2@2 to: 1@1.
+	
+	self should: [juegoTerniLapilli putOAt: 2@2.] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorOCantPlaceMoreThanThreeTiles.
+							self deny: (juegoTerniLapilli isOAt: 2@2)].! !
+
 
 !classDefinition: #TerniLapilli category: #'TerniLapilli-ejercicio'!
 Object subclass: #TerniLapilli
@@ -832,27 +890,27 @@ isXAt: aPosition
 
 	^ positionsX includes: aPosition.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:43:56'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 17:38:28'!
 moveOFrom: aPosition to: anotherPosition
 	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorOCantMoveTilesIfTheGameIsOver].
 	self isPlayingO ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveTwoTimesInARow ].
 	(self areStillTilesToPlace) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced].
 	(self isInvalid: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorInvalidPosition ].
 	(self isPositionNotEmpty: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorPositionNotEmpty].
-	(self isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorCantMoveMoreThanOneStep].
+	(self isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorCantMakeThatMove].
 	positionsO remove: aPosition.
 	positionsO add: anotherPosition.
 	playing := #O.
 	(self isOver ) ifTrue: [winner := #O].! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:41:56'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 17:38:28'!
 moveXFrom: aPosition to: anotherPosition
 	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorXCantMoveTilesIfTheGameIsOver].
 	self isPlayingX ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveTwoTimesInARow ].
 	(self areStillTilesToPlace) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced].
 	(self isInvalid: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorInvalidPosition ].
 	(self isPositionNotEmpty: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorPositionNotEmpty].
-	(self isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorCantMoveMoreThanOneStep].
+	(self isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorCantMakeThatMove].
 	positionsX remove: aPosition.
 	positionsX add: anotherPosition.
 	playing := #X.
@@ -868,10 +926,11 @@ positionsX
 
 	^positionsX! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:08:47'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 18:04:37'!
 putOAt: aPosition
 	(self isOver ) ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlaceTileIfTheGameIsOver].
 	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
+	positionsO size = 3 ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlaceMoreThanThreeTiles]. 
 	positionsX isEmpty ifTrue: [^ TerniLapilli error: TerniLapilli errorOCantPlayBeforeX ].
 	self isPlayingO ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlayTwoTimesInARow].
 	positionsO add: aPosition .
@@ -912,15 +971,15 @@ isTheWinnerX
 TerniLapilli class
 	instanceVariableNames: 'allowedPositions'!
 
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 17:38:28'!
+errorCantMakeThatMove
+	
+	^'Cant move more than one step'! !
+
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:12:15'!
 errorCantMoveBeforeAllTilesArePlaced
 	
 	^'Cant move a tile before all tiles are placed'! !
-
-!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:28:05'!
-errorCantMoveMoreThanOneStep
-	
-	^'Cant move more than one step'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:04:37'!
 errorCantMoveTwoTimesInARow
@@ -936,6 +995,10 @@ errorInvalidPosition
 errorOCantMoveTilesIfTheGameIsOver
 	
 	^'O cant move tiles if the game is over'! !
+
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 18:04:02'!
+errorOCantPlaceMoreThanThreeTiles
+	^ 'O cant place more than three tiles'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:08:47'!
 errorOCantPlaceTileIfTheGameIsOver
