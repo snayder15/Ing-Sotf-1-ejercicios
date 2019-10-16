@@ -63,7 +63,7 @@ test05OCantPlayTwoTimesInARow
 		 withExceptionDo: [:anError| self assert: anError messageText  equals: TerniLapilli errorOCantPlayTwoTimesInARow.
 						      self deny: (juegoTerniLapilli isOAt: 0@0)]! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/11/2019 02:06:59'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/16/2019 20:37:26'!
 test06XCantPlaceMoreThanThreeTiles
 
 	| juegoTerniLapilli |
@@ -73,7 +73,7 @@ test06XCantPlaceMoreThanThreeTiles
 	juegoTerniLapilli putXAt: 1@0.
 	juegoTerniLapilli putOAt: 1@1.
 	juegoTerniLapilli putXAt: 1@2.
-	juegoTerniLapilli putOAt: 2@0.
+	juegoTerniLapilli putOAt: 2@2.
 
 	self should: [juegoTerniLapilli putXAt: 0@0] 
 		 raise: Error - MessageNotUnderstood 
@@ -220,7 +220,7 @@ test14XCantMoveMoreThanOneStep
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/12/2019 13:04:25'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/16/2019 20:28:01'!
 test15XCantMoveTwoTimesInARow
 
 	| juegoTerniLapilli |
@@ -235,7 +235,7 @@ test15XCantMoveTwoTimesInARow
 	
 	self should: [juegoTerniLapilli  moveXFrom: 1@1 to: 2@2.] 
 		 raise: Error - MessageNotUnderstood 
-		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorCantMoveTwoTimesInARow.
+		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorXCantPlayTwoTimesInARow.
 							self assert: (juegoTerniLapilli isXAt: 1@1).
 							self deny: (juegoTerniLapilli isXAt: 2@2)
 							]
@@ -366,7 +366,7 @@ test21OCantMoveMoreThanOneStep
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/12/2019 13:47:04'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/16/2019 20:28:08'!
 test22OCantMoveTwoTimesInARow
 
 	| juegoTerniLapilli |
@@ -382,7 +382,7 @@ test22OCantMoveTwoTimesInARow
 	
 	self should: [juegoTerniLapilli  moveOFrom: 2@2 to: 1@1.] 
 		 raise: Error - MessageNotUnderstood 
-		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorCantMoveTwoTimesInARow.
+		 withExceptionDo: [:anError| self assert: anError messageText equals: TerniLapilli errorOCantPlayTwoTimesInARow.
 							self assert: (juegoTerniLapilli isOAt: 2@2).
 							self deny: (juegoTerniLapilli isOAt: 1@1)
 							]
@@ -390,7 +390,7 @@ test22OCantMoveTwoTimesInARow
 	
 ! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/13/2019 16:16:22'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/16/2019 20:33:43'!
 test23XWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
 
 	| juegoTerniLapilli |
@@ -480,7 +480,7 @@ test28XWinsByPlacingTheLastTileAndBuildingAStraightLineInColumnThree
 	self assert: juegoTerniLapilli hasPlayerXWon.
 	! !
 
-!TerniLapilliTest methodsFor: 'test' stamp: 'car 10/13/2019 16:38:26'!
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/16/2019 20:34:36'!
 test29OWinsByPlacingTheLastTileAndBuildingAStraightLineInRowOne
 
 	| juegoTerniLapilli |
@@ -764,7 +764,7 @@ test45OCantPlaceTilesWhenTheGameHasSixTiles
 
 !classDefinition: #TerniLapilli category: #'TerniLapilli-ejercicio'!
 Object subclass: #TerniLapilli
-	instanceVariableNames: 'positionsX allowedMovements positionsO playing winner'
+	instanceVariableNames: 'positionsX allowedMovements positionsO gameState'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilli-ejercicio'!
@@ -813,23 +813,60 @@ XBuiltARow
 	! !
 
 
+!TerniLapilli methodsFor: 'stateChange' stamp: 'a 10/16/2019 20:02:27'!
+changeStateFromMovingO
+
+		self isOTheWinner ifTrue: [
+			^ gameState := TerniLapilliOWon initializeWith: self.
+		].
+		gameState := TerniLapilliXMoving initializeWith: self.
+! !
+
+!TerniLapilli methodsFor: 'stateChange' stamp: 'a 10/16/2019 20:02:24'!
+changeStateFromMovingX
+
+		self isXTheWinner ifTrue: [
+			^ gameState := TerniLapilliXWon initializeWith: self.
+		].
+		gameState := TerniLapilliOMoving initializeWith: self.
+! !
+
+!TerniLapilli methodsFor: 'stateChange' stamp: 'a 10/16/2019 20:35:08'!
+changeStateFromPuttingO
+	self isOTheWinner ifTrue: [
+		^ gameState := TerniLapilliOWon initializeWith: self.
+	].
+	(self positionsO size) = 3 ifTrue: [^gameState := TerniLapilliXMoving initializeWith: self].
+	gameState := TerniLapilliXPutting initializeWith: self.! !
+
+!TerniLapilli methodsFor: 'stateChange' stamp: 'a 10/16/2019 20:31:59'!
+changeStateFromPuttingX
+	
+	self isXTheWinner ifTrue: [
+		^ gameState := TerniLapilliXWon initializeWith: self.
+	].
+	gameState := TerniLapilliOPutting initializeWith: self.! !
+
+!TerniLapilli methodsFor: 'stateChange' stamp: 'a 10/16/2019 13:26:26'!
+changeStateFromStartedWithPosition: aPosition
+
+	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
+	gameState := TerniLapilliXPutting initializeWith: self.
+	gameState putXAt: aPosition.! !
+
+
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/14/2019 21:52:11'!
 allowedPositionsOf: aPosition 
 
 	^allowedMovements at: aPosition.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:15:54'!
-areStillTilesToPlace
-
-	^ positionsX size < 3 or: positionsO size < 3.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:38:49'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:33:59'!
 hasPlayerOWon
-	^winner = #O! !
+	 ^ gameState whoWon = #O! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:26:23'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:34:04'!
 hasPlayerXWon
-	^winner = #X! !
+	 ^ gameState whoWon = #X! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/14/2019 22:07:09'!
 initializeAllowedMovements.
@@ -845,12 +882,14 @@ initializeAllowedMovements.
 	allowedMovements at: 2@1 put: (OrderedCollection with: 2@0 with: 2@2 with: 1@1).
 	allowedMovements at: 2@2 put: (OrderedCollection with: 2@1 with: 1@2 with: 1@1).! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/14/2019 21:47:24'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:27:35'!
 initializeStartGame
 
 	positionsX:= OrderedCollection new.
 	positionsO:= OrderedCollection new.
-	self initializeAllowedMovements.! !
+	self initializeAllowedMovements.
+	
+	gameState := TerniLapilliStarted initializeWith: self.! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 20:33:25'!
 isInvalid: aPosition
@@ -870,29 +909,28 @@ isOAt: aPosition
 
 	^ positionsO includes: aPosition.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:47:28'!
-isPlayingO
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:51:10'!
+isPositionAvailable: aPosition 
 
-	^ playing = #O.! !
+	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
+	(self isPositionUsed: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorPositionNotEmpty].
+	^ true.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:06:32'!
-isPlayingX
-
-	^ playing = #X.! !
-
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 12:25:41'!
-isPositionNotEmpty: anotherPosition
-
-	^ (self isXAt: anotherPosition) or: (self isOAt: anotherPosition).! !
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:45:42'!
+isPositionUsed: aPosition
+	^ (self isXAt: aPosition) or: (self isOAt: aPosition)! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/11/2019 02:03:06'!
 isXAt: aPosition
 
 	^ positionsX includes: aPosition.! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 17:38:28'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:58:03'!
 moveOFrom: aPosition to: anotherPosition
-	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorOCantMoveTilesIfTheGameIsOver].
+
+	gameState moveOFrom: aPosition to: anotherPosition.
+	
+	"(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorOCantMoveTilesIfTheGameIsOver].
 	self isPlayingO ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveTwoTimesInARow ].
 	(self areStillTilesToPlace) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced].
 	(self isInvalid: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorInvalidPosition ].
@@ -901,11 +939,14 @@ moveOFrom: aPosition to: anotherPosition
 	positionsO remove: aPosition.
 	positionsO add: anotherPosition.
 	playing := #O.
-	(self isOver ) ifTrue: [winner := #O].! !
+	(self isOver ) ifTrue: [winner := #O]."! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 17:38:28'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:58:16'!
 moveXFrom: aPosition to: anotherPosition
-	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorXCantMoveTilesIfTheGameIsOver].
+
+	gameState moveXFrom: aPosition to: anotherPosition.
+
+"	(self isOver) ifTrue:[^TerniLapilli error: TerniLapilli errorXCantMoveTilesIfTheGameIsOver].
 	self isPlayingX ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveTwoTimesInARow ].
 	(self areStillTilesToPlace) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced].
 	(self isInvalid: anotherPosition) ifTrue: [TerniLapilli error: TerniLapilli errorInvalidPosition ].
@@ -914,7 +955,7 @@ moveXFrom: aPosition to: anotherPosition
 	positionsX remove: aPosition.
 	positionsX add: anotherPosition.
 	playing := #X.
-	(self isOver ) ifTrue: [winner := #X].! !
+	(self isOver ) ifTrue: [winner := #X]. "! !
 
 !TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/11/2019 01:28:13'!
 positionsO
@@ -926,41 +967,48 @@ positionsX
 
 	^positionsX! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/15/2019 18:04:37'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:58:38'!
 putOAt: aPosition
-	(self isOver ) ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlaceTileIfTheGameIsOver].
+
+	gameState putOAt: aPosition.
+	
+	"(self isOver ) ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlaceTileIfTheGameIsOver].
 	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
 	positionsO size = 3 ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlaceMoreThanThreeTiles]. 
 	positionsX isEmpty ifTrue: [^ TerniLapilli error: TerniLapilli errorOCantPlayBeforeX ].
 	self isPlayingO ifTrue: [^TerniLapilli error: TerniLapilli errorOCantPlayTwoTimesInARow].
 	positionsO add: aPosition .
 	playing := #O.
-	(self isOver ) ifTrue: [winner := #O]! !
+	(self isOver ) ifTrue: [winner := #O]"! !
 
-!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 16:36:34'!
+!TerniLapilli methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:58:52'!
 putXAt: aPosition
-	(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
+
+	gameState putXAt: aPosition.
+
+	"(self isInvalid: aPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorInvalidPosition].
 	positionsX size = 3 ifTrue: [^TerniLapilli error: TerniLapilli errorXCantPlaceMoreThanThreeTiles]. 
 	self isPlayingX ifTrue: [^TerniLapilli error: TerniLapilli errorXCantPlayTwoTimesInARow].
 	positionsX add: aPosition .
 	playing := #X.
-	(self isOver ) ifTrue: [winner := #X]! !
+	(self isOver ) ifTrue: [winner := #X]"! !
 
 
-!TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 03:23:24'!
-isOver
-	
-	^ self isTheWinnerX or: self isTheWinnerO
-	
-	! !
-
-!TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 04:03:05'!
-isTheWinnerO
+!TerniLapilli methodsFor: 'finish' stamp: 'a 10/16/2019 19:50:54'!
+isOTheWinner
 	
 	^ self OBuiltARow or: self OBuiltAColumn or:  self OBuiltADiagonal! !
 
-!TerniLapilli methodsFor: 'finish' stamp: 'car 10/13/2019 03:50:09'!
-isTheWinnerX 
+!TerniLapilli methodsFor: 'finish' stamp: 'a 10/16/2019 20:29:11'!
+isOver
+	
+	^ gameState isOver.
+	"^ self isXTheWinner or: self isOTheWinner"
+	
+	! !
+
+!TerniLapilli methodsFor: 'finish' stamp: 'a 10/16/2019 19:51:23'!
+isXTheWinner 
 	
 	^ self XBuiltARow or: self XBuiltAColumn or: self XBuiltADiagonal
 	! !
@@ -981,11 +1029,6 @@ errorCantMoveBeforeAllTilesArePlaced
 	
 	^'Cant move a tile before all tiles are placed'! !
 
-!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/12/2019 13:04:37'!
-errorCantMoveTwoTimesInARow
-	
-	^'Cant move two times in a row'! !
-
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 20:34:04'!
 errorInvalidPosition
 	
@@ -1000,10 +1043,10 @@ errorOCantMoveTilesIfTheGameIsOver
 errorOCantPlaceMoreThanThreeTiles
 	^ 'O cant place more than three tiles'! !
 
-!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/13/2019 17:08:47'!
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:15:40'!
 errorOCantPlaceTileIfTheGameIsOver
 
-	^'O cant place tile if the gama is over'! !
+	^'O cant place tile if the game is over'! !
 
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 20:23:32'!
 errorOCantPlayBeforeX
@@ -1027,6 +1070,11 @@ errorXCantMoveTilesIfTheGameIsOver
 errorXCantPlaceMoreThanThreeTiles
 	^ 'X cant place more than three tiles'! !
 
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:15:31'!
+errorXCantPlaceTileIfTheGameIsOver
+
+	^'X cant place tile if the game is over'! !
+
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/11/2019 01:37:42'!
 errorXCantPlayTwoTimesInARow
 	^'X cant play two times in a row'! !
@@ -1034,3 +1082,329 @@ errorXCantPlayTwoTimesInARow
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 18:24:39'!
 startGame
 	^self new initializeStartGame! !
+
+
+!classDefinition: #TerniLapilliFinished category: #'TerniLapilli-ejercicio'!
+Object subclass: #TerniLapilliFinished
+	instanceVariableNames: 'ternilapilli'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:19:54'!
+createUsing: aTernilapilli
+
+	ternilapilli := aTernilapilli.! !
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:29:47'!
+isOver
+
+	^ true.! !
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:13:18'!
+moveOFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorOCantMoveTilesIfTheGameIsOver.! !
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:13:23'!
+moveXFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorXCantMoveTilesIfTheGameIsOver.! !
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:13:53'!
+putOAt: aPosition
+
+	^TerniLapilli error: TerniLapilli errorOCantPlaceTileIfTheGameIsOver! !
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:15:06'!
+putXAt: aPosition
+
+	^TerniLapilli error: TerniLapilli errorXCantPlaceTileIfTheGameIsOver! !
+
+!TerniLapilliFinished methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:16:10'!
+whoWon
+
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TerniLapilliFinished class' category: #'TerniLapilli-ejercicio'!
+TerniLapilliFinished class
+	instanceVariableNames: ''!
+
+!TerniLapilliFinished class methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:19:54'!
+initializeWith: aTernilapilli
+	
+	
+	^self new createUsing: aTernilapilli.! !
+
+
+!classDefinition: #TerniLapilliOWon category: #'TerniLapilli-ejercicio'!
+TerniLapilliFinished subclass: #TerniLapilliOWon
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliOWon methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:16:27'!
+whoWon
+
+	^ #O! !
+
+
+!classDefinition: #TerniLapilliXWon category: #'TerniLapilli-ejercicio'!
+TerniLapilliFinished subclass: #TerniLapilliXWon
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliXWon methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:16:33'!
+whoWon
+
+	^ #X! !
+
+
+!classDefinition: #TerniLapilliOnCourse category: #'TerniLapilli-ejercicio'!
+Object subclass: #TerniLapilliOnCourse
+	instanceVariableNames: 'ternilapilli'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:00:17'!
+createUsing: aTernilapilli
+
+	ternilapilli := aTernilapilli.! !
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:29:37'!
+isOver
+
+	^ false.! !
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:11:17'!
+moveOFrom: aPosition to: anotherPosition
+
+	self subclassResponsibility ! !
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:11:19'!
+moveXFrom: aPosition to: anotherPosition
+
+	self subclassResponsibility ! !
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:11:26'!
+putOAt: aPosition
+
+	self subclassResponsibility ! !
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:47:27'!
+putXAt: aPosition
+
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TerniLapilliOnCourse class' category: #'TerniLapilli-ejercicio'!
+TerniLapilliOnCourse class
+	instanceVariableNames: ''!
+
+!TerniLapilliOnCourse class methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:00:02'!
+initializeWith: aTernilapilli
+	
+	
+	^self new createUsing: aTernilapilli.! !
+
+
+!classDefinition: #TerniLapilliOMoving category: #'TerniLapilli-ejercicio'!
+TerniLapilliOnCourse subclass: #TerniLapilliOMoving
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliOMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:50:54'!
+moveOFrom: aPosition to: anotherPosition
+	
+	(ternilapilli isPositionAvailable: anotherPosition) ifTrue: [
+		(ternilapilli isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMakeThatMove].
+		
+		ternilapilli positionsO remove: aPosition.
+		ternilapilli positionsO add: anotherPosition.
+		ternilapilli changeStateFromMovingO.
+	].
+
+	
+	
+	! !
+
+!TerniLapilliOMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:47:29'!
+moveXFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorXCantPlayTwoTimesInARow.! !
+
+!TerniLapilliOMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:47:03'!
+putOAt: aPosition
+	
+	^ TerniLapilli error: TerniLapilli errorOCantPlaceMoreThanThreeTiles.! !
+
+!TerniLapilliOMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:24:50'!
+putXAt: aPosition
+
+	^ TerniLapilli error: TerniLapilli errorXCantPlaceMoreThanThreeTiles.! !
+
+
+!classDefinition: #TerniLapilliOPutting category: #'TerniLapilli-ejercicio'!
+TerniLapilliOnCourse subclass: #TerniLapilliOPutting
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliOPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:37:18'!
+moveOFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced
+! !
+
+!TerniLapilliOPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:37:21'!
+moveXFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced
+! !
+
+!TerniLapilliOPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:52:15'!
+putOAt: aPosition
+
+	(ternilapilli isPositionAvailable: aPosition) ifTrue: [
+		ternilapilli positionsO add: aPosition.
+		ternilapilli changeStateFromPuttingO.
+	].
+	
+	! !
+
+!TerniLapilliOPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:37:00'!
+putXAt: aPosition
+
+	^TerniLapilli error: TerniLapilli errorXCantPlayTwoTimesInARow.! !
+
+
+!classDefinition: #TerniLapilliXMoving category: #'TerniLapilli-ejercicio'!
+TerniLapilliOnCourse subclass: #TerniLapilliXMoving
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliXMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:47:44'!
+moveOFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorOCantPlayTwoTimesInARow.! !
+
+!TerniLapilliXMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:53:07'!
+moveXFrom: aPosition to: anotherPosition
+	
+	(ternilapilli isPositionAvailable: anotherPosition) ifTrue: [
+		(ternilapilli isNotAllowedFrom: aPosition to: anotherPosition) ifTrue: [^TerniLapilli error: TerniLapilli errorCantMakeThatMove].
+		
+		ternilapilli positionsX remove: aPosition.
+		ternilapilli positionsX add: anotherPosition.
+		ternilapilli changeStateFromMovingX.
+	].
+
+! !
+
+!TerniLapilliXMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 19:47:09'!
+putOAt: aPosition
+
+	^ TerniLapilli error: TerniLapilli errorOCantPlaceMoreThanThreeTiles.! !
+
+!TerniLapilliXMoving methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:24:41'!
+putXAt: aPosition
+
+	^ TerniLapilli error: TerniLapilli errorXCantPlaceMoreThanThreeTiles.! !
+
+
+!classDefinition: #TerniLapilliXPutting category: #'TerniLapilli-ejercicio'!
+TerniLapilliOnCourse subclass: #TerniLapilliXPutting
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliXPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:35:43'!
+moveOFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced
+	
+	! !
+
+!TerniLapilliXPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:35:48'!
+moveXFrom: aPosition to: anotherPosition
+	
+	^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced! !
+
+!TerniLapilliXPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:35:16'!
+putOAt: aPosition
+	
+	^TerniLapilli error: TerniLapilli errorOCantPlayTwoTimesInARow.! !
+
+!TerniLapilliXPutting methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:54:11'!
+putXAt: aPosition
+	
+	(ternilapilli isPositionAvailable: aPosition) ifTrue: [
+		ternilapilli positionsX add: aPosition.
+		ternilapilli changeStateFromPuttingX.	
+	].
+
+! !
+
+
+!classDefinition: #TerniLapilliStarted category: #'TerniLapilli-ejercicio'!
+Object subclass: #TerniLapilliStarted
+	instanceVariableNames: 'ternilapilli'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilli-ejercicio'!
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:20:25'!
+createUsing: aTernilapilli
+	
+	
+	ternilapilli := aTernilapilli.! !
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 20:29:42'!
+isOver
+
+	^ false.! !
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:21:31'!
+moveOFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced ! !
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:21:34'!
+moveXFrom: aPosition to: anotherPosition
+
+	^TerniLapilli error: TerniLapilli errorCantMoveBeforeAllTilesArePlaced ! !
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:22:15'!
+putOAt: aPosition
+
+	^TerniLapilli error: TerniLapilli errorOCantPlayBeforeX .! !
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:22:38'!
+putXAt: aPosition
+
+	ternilapilli changeStateFromStartedWithPosition: aPosition.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'TerniLapilliStarted class' category: #'TerniLapilli-ejercicio'!
+TerniLapilliStarted class
+	instanceVariableNames: ''!
+
+!TerniLapilliStarted class methodsFor: 'as yet unclassified' stamp: 'a 10/16/2019 13:20:09'!
+initializeWith: aTernilapilli
+	
+	
+	^self new createUsing: aTernilapilli.! !
