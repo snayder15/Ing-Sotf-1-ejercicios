@@ -761,6 +761,40 @@ test45OCantPlaceTilesWhenTheGameHasSixTiles
 							self assert: anError messageText equals: TerniLapilli errorOCantPlaceMoreThanThreeTiles.
 							self deny: (juegoTerniLapilli isOAt: 2@2)].! !
 
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/17/2019 13:49:31'!
+test46XdidntWinIfGameIsNotOver
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 2@2.
+	juegoTerniLapilli putOAt: 2@1.
+	
+	self should: [juegoTerniLapilli hasPlayerXWon] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorGameIsNotOver].! !
+
+!TerniLapilliTest methodsFor: 'test' stamp: 'a 10/17/2019 13:49:44'!
+test47OdidntWinIfGameIsNotOver
+
+	| juegoTerniLapilli |
+	juegoTerniLapilli :=  TerniLapilli startGame.
+	juegoTerniLapilli putXAt: 0@0.
+	juegoTerniLapilli putOAt: 0@1.
+	juegoTerniLapilli putXAt: 1@0.
+	juegoTerniLapilli putOAt: 0@2.
+	juegoTerniLapilli putXAt: 2@2.
+	juegoTerniLapilli putOAt: 2@1.
+	
+	self should: [juegoTerniLapilli hasPlayerOWon] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError| 
+							self assert: anError messageText equals: TerniLapilli errorGameIsNotOver].! !
+
 
 !classDefinition: #TerniLapilli category: #'TerniLapilli-ejercicio'!
 Object subclass: #TerniLapilli
@@ -1029,6 +1063,10 @@ errorCantMoveBeforeAllTilesArePlaced
 	
 	^'Cant move a tile before all tiles are placed'! !
 
+!TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 13:48:14'!
+errorGameIsNotOver
+	^ 'Game is not over'! !
+
 !TerniLapilli class methodsFor: 'as yet unclassified' stamp: 'car 10/10/2019 20:34:04'!
 errorInvalidPosition
 	
@@ -1201,6 +1239,11 @@ putOAt: aPosition
 putXAt: aPosition
 
 	self subclassResponsibility ! !
+
+!TerniLapilliOnCourse methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 13:48:47'!
+whoWon
+
+	 ^ TerniLapilli error: TerniLapilli errorGameIsNotOver! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1396,6 +1439,11 @@ putOAt: aPosition
 putXAt: aPosition
 
 	ternilapilli changeStateFromStartedWithPosition: aPosition.! !
+
+!TerniLapilliStarted methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 13:48:53'!
+whoWon
+
+	 ^ TerniLapilli error: TerniLapilli errorGameIsNotOver! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
