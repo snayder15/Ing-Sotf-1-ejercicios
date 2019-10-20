@@ -5,7 +5,7 @@ TestCase subclass: #PortfolioTest
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:34:17'!
+!PortfolioTest methodsFor: 'test' stamp: 'a 10/17/2019 20:34:17'!
 test01CreatePortfolio
 	
 	| portfolio |
@@ -15,7 +15,7 @@ test01CreatePortfolio
 	
 	self assert: (portfolio balance) equals: 0.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:34:38'!
+!PortfolioTest methodsFor: 'test' stamp: 'a 10/17/2019 20:34:38'!
 test02AgregarCuenta
 	
 	| portfolio account |
@@ -26,7 +26,7 @@ test02AgregarCuenta
 	
 	self assert: (portfolio balance) equals: 0.! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:34:49'!
+!PortfolioTest methodsFor: 'test' stamp: 'a 10/17/2019 20:34:49'!
 test03AgregarCuentaConDeposito
 	
 	| portfolio account |
@@ -40,7 +40,7 @@ test03AgregarCuentaConDeposito
 	self assert: (portfolio balance) equals: 100.
 ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:39:54'!
+!PortfolioTest methodsFor: 'test' stamp: 'a 10/17/2019 20:39:54'!
 test04AgregarCuentaConDepositoYExtraccion
 	
 	| portfolio account |
@@ -55,33 +55,33 @@ test04AgregarCuentaConDepositoYExtraccion
 	self assert: (portfolio balance) equals: 50.
 ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:41:44'!
+!PortfolioTest methodsFor: 'test' stamp: 'car+ 10/20/2019 18:06:22'!
 test05AgregarCuentaConDepositoYVerSiEstaRegistradaLaTransaccion
 	
-	| portfolio account transaction |
+	| portfolio account deposit |
 	
 	account := ReceptiveAccount new.
-	transaction := Deposit register: 100 on: account.
+	deposit := Deposit register: 100 on: account.
 
 	portfolio := Portfolio new.
 	portfolio add: account.
 	
-	self assert: (portfolio hasRegistered: transaction) equals: true.
+	self assert: (portfolio hasRegistered: deposit)
 ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:45:46'!
+!PortfolioTest methodsFor: 'test' stamp: 'car+ 10/20/2019 18:06:45'!
 test06PortfolioNoPermiteRegistrarTransaccion
 	
-	| portfolio transaction |
+	| portfolio deposit |
 	
 	portfolio := Portfolio new.
-	transaction := Deposit register: 100 on: portfolio.
+	deposit := Deposit register: 100 on: portfolio.
 
 
-	self deny: (portfolio hasRegistered: transaction).
+	self deny: (portfolio hasRegistered: deposit).
 ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:58:00'!
+!PortfolioTest methodsFor: 'test' stamp: 'car+ 10/20/2019 18:11:52'!
 test07PortfolioConoceSusTransacciones
 
 	| account1 deposit1 portfolio |
@@ -94,33 +94,11 @@ test07PortfolioConoceSusTransacciones
 
 	portfolio add: account1.
 	
-	self assert: 1 equals: portfolio transactions size .
-	self assert: (portfolio transactions includes: deposit1).
+	self assert: 1 equals: (portfolio amountTransactions) .
+	self assert: (portfolio hasRegistered: deposit1).
 ! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/18/2019 00:05:37'!
-test08AgregarPortfolioRepetido
-
-	| account portfolio portfolio1 |
-	
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account.
-
-	portfolio := Portfolio new.
-	portfolio1 := Portfolio new.
-	
-	portfolio add: account.
-	portfolio add: portfolio1.	
-	
-	self should: [portfolio1 add: account] 
-		 raise: Error - MessageNotUnderstood 
-		 withExceptionDo: [:anError |
-			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
-			self assert: (portfolio transactions) size equals: 1.
-		].
-! !
-
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 22:18:50'!
+!PortfolioTest methodsFor: 'test' stamp: 'car+ 10/20/2019 18:14:02'!
 test09AgregarCuentaQueNoEstaEnElArbolAUnPortfolio
 
 	| account1 portfolio1 portfolio2 portfolio3 |
@@ -137,10 +115,35 @@ test09AgregarCuentaQueNoEstaEnElArbolAUnPortfolio
 	portfolio3 add: portfolio2.	
 	portfolio3 add: account1.
 
-	self assert: (portfolio3 transactions size) equals: 1.
+	self assert: portfolio3 amountTransactions equals: 1.
+	self assert: portfolio1 amountTransactions equals: 1.
 	! !
 
-!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 22:24:00'!
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:13:40'!
+test08AgregarUnaCuentaEnUnPortfolioBQueNoTieneCuentasPeroLaCuentaEstaEnUnPortfolioAQueContieneAlPorfolioB
+
+	| account portfolioA portfolioB |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+
+	portfolioA := Portfolio new.
+	portfolioB := Portfolio new.
+	
+	portfolioA add: account.
+	portfolioA add: portfolioB.	
+	
+	self should: [portfolioB add: account] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: portfolioA  amountTransactions equals: 1.
+			self assert: portfolioB  amountTransactions equals: 0.
+		].
+! !
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:14:24'!
 test10AgregarCuentaQueEstaEnElArbolAUnPortfolio
 
 	| account1 portfolio1 portfolio2 portfolio3 portfolio4 |
@@ -163,8 +166,122 @@ test10AgregarCuentaQueEstaEnElArbolAUnPortfolio
 		 raise: Error - MessageNotUnderstood 
 		 withExceptionDo: [:anError |
 			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
-			self assert: (portfolio1 transactions) size equals: 1.
-			self assert: (portfolio3 transactions) size equals: 1.
+			self assert: portfolio1 amountTransactions equals: 1.
+			self assert: portfolio3 amountTransactions equals: 1.
+			self assert: portfolio4 amountTransactions equals: 0.
+		].
+
+	! !
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:14:38'!
+test11AgregarLaMismaCuentaDosVecesAlMismoPortfolio
+
+	| account portfolio |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+
+	portfolio := Portfolio new.
+	portfolio add: account.	
+	
+	self should: [portfolio add: account] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: portfolio amountTransactions equals: 1.
+		].
+! !
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:14:48'!
+test12AgregarUnaCuentaAlPortfolioAElCualContieneUnPortfolioBQueTieneEsaCuenta
+	| account portfolioA portfolioB |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+
+	portfolioA := Portfolio new.
+	portfolioB := Portfolio new.
+	
+	portfolioA add: portfolioB.
+	portfolioB add: account.
+		
+	
+	self should: [portfolioA add: account] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: portfolioA amountTransactions equals: 1.
+		].
+! !
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:15:34'!
+test13AgregoAlPortfolioAElMismoPorfolioA
+	| account portfolioA |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+
+	portfolioA := Portfolio new.
+	
+	portfolioA add: account .	
+	
+	self should: [portfolioA add: portfolioA ] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: portfolioA amountTransactions equals: 1.
+		].
+! !
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:15:56'!
+test14AgregarUnPortfolioQueEstaEnElArbolAUnPortfolio
+
+	| account1 portfolio1 portfolio2 portfolio3 portfolio4 |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 100 on: account1.
+
+	portfolio1 := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	portfolio4 := Portfolio new.
+	
+	portfolio1 add: account1.
+	portfolio1 add: portfolio2.
+	portfolio3 add: portfolio2.	
+	portfolio3 add: account1.
+	portfolio2 add: portfolio4.
+	
+	self should: [portfolio4 add: portfolio1] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: portfolio1 amountTransactions equals: 1.
+			self assert: portfolio3 amountTransactions equals: 1.
+			self assert: portfolio4 amountTransactions equals: 0.
+		].
+
+	! !
+
+!PortfolioTest methodsFor: 'testing - error' stamp: 'car+ 10/20/2019 18:16:45'!
+test15AgregarAlPortfolioAMasDeUnaVezUnPortfioBVacio
+
+	| account1 portfolioA portfolioB |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 100 on: account1.
+
+	portfolioA := Portfolio new.
+	portfolioB := Portfolio new.
+	
+	portfolioA add: account1.
+	portfolioA add: portfolioB.
+
+	self should: [portfolioA add: portfolioB.] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: portfolioA amountTransactions equals: 1.
 		].
 
 	! !
@@ -375,12 +492,7 @@ Object subclass: #BankGroups
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:29:56'!
-balance
-
-	self subclassResponsibility ! !
-
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/18/2019 00:00:30'!
+!BankGroups methodsFor: 'private' stamp: 'a 10/18/2019 00:00:30'!
 hasChild: anAccountOrPortfolio
 	| res  |
 	res := false.
@@ -396,12 +508,7 @@ hasChild: anAccountOrPortfolio
 	
 	! !
 
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:30:06'!
-hasRegistered: aTransaction
-
-	self subclassResponsibility ! !
-
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/18/2019 00:00:49'!
+!BankGroups methodsFor: 'private' stamp: 'a 10/18/2019 00:00:49'!
 isAlreadyAdded: anAccountOrPortfolio
 	| res  |
 	res := false.
@@ -415,17 +522,35 @@ isAlreadyAdded: anAccountOrPortfolio
 	
 	! !
 
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:30:15'!
-register: aTransaction
-
-	self subclassResponsibility ! !
-
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/18/2019 00:01:08'!
+!BankGroups methodsFor: 'private' stamp: 'a 10/18/2019 00:01:08'!
 setParent: aPortfolio
 
 	parents add: aPortfolio.! !
 
-!BankGroups methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 20:30:24'!
+
+!BankGroups methodsFor: 'testing' stamp: 'car+ 10/20/2019 18:10:31'!
+amountTransactions
+
+	self subclassResponsibility ! !
+
+!BankGroups methodsFor: 'testing' stamp: 'a 10/17/2019 20:30:06'!
+hasRegistered: aTransaction
+
+	self subclassResponsibility ! !
+
+
+!BankGroups methodsFor: 'balance' stamp: 'a 10/17/2019 20:29:56'!
+balance
+
+	self subclassResponsibility ! !
+
+
+!BankGroups methodsFor: 'transactions' stamp: 'a 10/17/2019 20:30:15'!
+register: aTransaction
+
+	self subclassResponsibility ! !
+
+!BankGroups methodsFor: 'transactions' stamp: 'a 10/17/2019 20:30:24'!
 transactions
 
 	self subclassResponsibility ! !
@@ -438,24 +563,12 @@ BankGroups subclass: #Portfolio
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 22:18:38'!
-add: anAccountOrPortfolio
+!Portfolio methodsFor: 'testing' stamp: 'car+ 10/20/2019 18:12:48'!
+amountTransactions
 
-	(self isAlreadyAdded: anAccountOrPortfolio) ifTrue: [^ Portfolio error: Portfolio errorCannotAddSameAccountPortfolio].
-	
-	accountsPortfolios add: anAccountOrPortfolio.
-	anAccountOrPortfolio setParent: self.! !
+	^self transactions size! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 23:59:16'!
-balance
-	
-	accountsPortfolios size = 0 ifTrue: [^0].
-	
-	^ accountsPortfolios sum: [
-		:anAccount | anAccount balance.
-	].! !
-
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 23:59:21'!
+!Portfolio methodsFor: 'testing' stamp: 'a 10/17/2019 23:59:21'!
 hasRegistered: aTransaction
 	| res |
 	res := false.
@@ -464,13 +577,15 @@ hasRegistered: aTransaction
 		:anAccount | ^ res or: (anAccount hasRegistered: aTransaction).
 	].! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 23:58:39'!
+
+!Portfolio methodsFor: 'initialization' stamp: 'a 10/17/2019 23:58:39'!
 initialize
 	
 	accountsPortfolios := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 21:40:39'!
+
+!Portfolio methodsFor: 'transactions' stamp: 'a 10/19/2019 21:40:39'!
 transactions
 	
 	| res |
@@ -482,6 +597,25 @@ transactions
 	].
 	
 	^res.! !
+
+
+!Portfolio methodsFor: 'balance' stamp: 'a 10/17/2019 23:59:16'!
+balance
+	
+	accountsPortfolios size = 0 ifTrue: [^0].
+	
+	^ accountsPortfolios sum: [
+		:anAccount | anAccount balance.
+	].! !
+
+
+!Portfolio methodsFor: 'adding' stamp: 'a 10/19/2019 22:18:38'!
+add: anAccountOrPortfolio
+
+	(self isAlreadyAdded: anAccountOrPortfolio) ifTrue: [^ Portfolio error: Portfolio errorCannotAddSameAccountPortfolio].
+	
+	accountsPortfolios add: anAccountOrPortfolio.
+	anAccountOrPortfolio setParent: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -534,6 +668,11 @@ balance
 		aTransaction balanceValue.
 	] ifEmpty: [ 0 ]! !
 
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'car+ 10/20/2019 18:13:03'!
+amountTransactions
+
+	^self transactions size! !
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
