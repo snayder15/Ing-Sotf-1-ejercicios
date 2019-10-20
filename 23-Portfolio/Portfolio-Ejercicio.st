@@ -120,6 +120,55 @@ test08AgregarPortfolioRepetido
 		].
 ! !
 
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 22:18:50'!
+test09AgregarCuentaQueNoEstaEnElArbolAUnPortfolio
+
+	| account1 portfolio1 portfolio2 portfolio3 |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 100 on: account1.
+
+	portfolio1 := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	
+	portfolio1 add: account1.
+	portfolio1 add: portfolio2.
+	portfolio3 add: portfolio2.	
+	portfolio3 add: account1.
+
+	self assert: (portfolio3 transactions size) equals: 1.
+	! !
+
+!PortfolioTest methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 22:24:00'!
+test10AgregarCuentaQueEstaEnElArbolAUnPortfolio
+
+	| account1 portfolio1 portfolio2 portfolio3 portfolio4 |
+	
+	account1 := ReceptiveAccount new.
+	Deposit register: 100 on: account1.
+
+	portfolio1 := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	portfolio4 := Portfolio new.
+	
+	portfolio1 add: account1.
+	portfolio1 add: portfolio2.
+	portfolio3 add: portfolio2.	
+	portfolio3 add: account1.
+	portfolio2 add: portfolio4.
+	
+	self should: [portfolio4 add: account1] 
+		 raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError |
+			self assert: anError messageText equals: Portfolio errorCannotAddSameAccountPortfolio.
+			self assert: (portfolio1 transactions) size equals: 1.
+			self assert: (portfolio3 transactions) size equals: 1.
+		].
+
+	! !
+
 
 !classDefinition: #ReceptiveAccountTest category: #'Portfolio-Ejercicio'!
 TestCase subclass: #ReceptiveAccountTest
@@ -389,7 +438,7 @@ BankGroups subclass: #Portfolio
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/18/2019 00:10:17'!
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 22:18:38'!
 add: anAccountOrPortfolio
 
 	(self isAlreadyAdded: anAccountOrPortfolio) ifTrue: [^ Portfolio error: Portfolio errorCannotAddSameAccountPortfolio].
@@ -421,19 +470,18 @@ initialize
 	accountsPortfolios := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/17/2019 23:59:27'!
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'a 10/19/2019 21:40:39'!
 transactions
 	
 	| res |
 	
 	res := OrderedCollection new.
-	accountsPortfolios size = 0 ifTrue: [
-		^ res.
+	
+	accountsPortfolios do: [
+		:anAccount | res addAll: anAccount transactions.
 	].
 	
-	^ accountsPortfolios do: [
-		:anAccount | ^ res addAll: anAccount transactions.
-	].! !
+	^res.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
