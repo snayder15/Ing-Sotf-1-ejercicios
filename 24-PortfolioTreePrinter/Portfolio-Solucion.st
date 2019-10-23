@@ -330,48 +330,62 @@ test02TransferNetAccountWithDeposit
 	
 	self assert: (report printReport) equals: 0.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:03:27'!
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:02:32'!
 test03TransferNetAccountWithTransferDeposit
 
 	| report report1 account account1 |
 	account := ReceptiveAccount new.
 	account1 := ReceptiveAccount new.
 	Deposit register: 50 on: account.
-	Transfer from: account  to: account1 value: 30. 
+	Transfer from: account  to: account1 withValue: 30. 
 	report := TransferNetReport with: account.
 	report1 := TransferNetReport with: account1.
 	
 	self assert: (report printReport) equals: -30.
 	self assert: (report1 printReport) equals: 30.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:20:46'!
-test10AccountSummaryReportEmpty
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 21:58:15'!
+test04AccountSummaryReportEmpty
 
 	| report account |
 	account := ReceptiveAccount new.	
 	report := AccountSummaryReport with: account.	
 	
-	self assert: (report printReport) equals: 'balance = 0'.	! !
+	self assert: (report printReport) equals: 'Balance = 0'.	! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:56:53'!
-test10AccountSummaryWithDeposit
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 21:58:20'!
+test05AccountSummaryWithDeposit
 
 	| report account |
 	account := ReceptiveAccount new.
 	Deposit register: 40 on: account.
 	report := AccountSummaryReport with: account.	
 	
-	self assert: (report printReport) equals: 'Deposito por 40 balance = 40'.! !
+	self assert: (report printReport) equals: 'Deposito por 40. Balance = 40'.! !
+
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:02:32'!
+test06AccountSummaryWithTransferTransactions
+
+	| report account account1 |
+	account := ReceptiveAccount new.
+	account1 := ReceptiveAccount new.
+	Deposit register: 40 on: account.
+	Deposit register: 100 on: account1.
+	Transfer from: account to: account1 withValue: 20.
+	Transfer from: account1 to: account withValue: 100.
+	report := AccountSummaryReport with: account.	
+	
+	self assert: (report printReport) equals: 'Deposito por 40. Salida por transferencia de 20. Entrada por transferencia de 100. Balance = 120'.! !
 
 
-!classDefinition: #TransferenciaTest category: #'Portfolio-Solucion'!
-TestCase subclass: #TransferenciaTest
+!classDefinition: #TransferTest category: #'Portfolio-Solucion'!
+TestCase subclass: #TransferTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!TransferenciaTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 20:28:56'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:02:32'!
 test01BasicTransfer
 			
 	| cuenta1 cuenta2 |
@@ -381,12 +395,12 @@ test01BasicTransfer
 	Deposit register: 100 on: cuenta1.
 	Deposit register: 100 on: cuenta2.
 	
-	Transfer from: cuenta1 to: cuenta2 value: 50.
+	Transfer from: cuenta1 to: cuenta2 withValue: 50.
 	
 	self assert: 50 equals: cuenta1 balance. 
 	self assert: 150 equals: cuenta2 balance.	! !
 
-!TransferenciaTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:14:57'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:09:51'!
 test02TransferKnowsFromTo
 			
 	| cuenta1 cuenta2 transfer |
@@ -395,12 +409,12 @@ test02TransferKnowsFromTo
 	
 	Deposit register: 100 on: cuenta1.
 	Deposit register: 100 on: cuenta2.
-	transfer := Transfer from: cuenta1 to: cuenta2 value: 50.
+	transfer := Transfer from: cuenta1 to: cuenta2 withValue: 50.
 	
-	self assert: transfer from equals: cuenta1.
-	self assert: transfer to equals: cuenta2.! !
+	self assert: transfer fromAccount equals: cuenta1.
+	self assert: transfer toAccount equals: cuenta2.! !
 
-!TransferenciaTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:15:24'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:07:44'!
 test03FromKnowsTo
 			
 	| cuenta1 cuenta2 transfer |
@@ -409,12 +423,12 @@ test03FromKnowsTo
 	
 	Deposit register: 100 on: cuenta1.
 	Deposit register: 100 on: cuenta2.
-	transfer := Transfer from: cuenta1 to: cuenta2 value: 50.
+	transfer := Transfer from: cuenta1 to: cuenta2 withValue: 50.
 	
 	self assert: (transfer fromTransaction) otraPata equals: cuenta2.
 	self assert: (transfer toTransaction) otraPata equals: cuenta1.! !
 
-!TransferenciaTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:17:39'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:02:32'!
 test04InvalidTransferInsufficientBalanceOnAccount
 			
 	| cuenta1 cuenta2 |
@@ -424,13 +438,13 @@ test04InvalidTransferInsufficientBalanceOnAccount
 	Deposit register: 40 on: cuenta1.
 	Deposit register: 100 on: cuenta2.
 	
-	self should: [Transfer from: cuenta1 to: cuenta2 value: 50.] raise: Error - MessageNotUnderstood 
+	self should: [Transfer from: cuenta1 to: cuenta2 withValue: 50.] raise: Error - MessageNotUnderstood 
 	withExceptionDo: [ :anError| self assert: anError messageText equals: Transfer errorInsufficientBalance.
 						self assert: 40 equals: cuenta1 balance. 
 						self assert: 100 equals: cuenta2 balance.
 		].! !
 
-!TransferenciaTest methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:18:17'!
+!TransferTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:02:32'!
 test05CannotTransferToSameAccount
 			
 	| cuenta1 |
@@ -438,7 +452,7 @@ test05CannotTransferToSameAccount
 	
 	Deposit register: 100 on: cuenta1.	
 	
-	self should: [Transfer from: cuenta1 to: cuenta1 value: 50.] raise: Error - MessageNotUnderstood 
+	self should: [Transfer from: cuenta1 to: cuenta1 withValue: 50.] raise: Error - MessageNotUnderstood 
 	withExceptionDo: [ :anError| self assert: anError messageText equals: Transfer errorSameAccountTransfer.
 						self assert: 100 equals: cuenta1 balance. 						
 		].! !
@@ -692,6 +706,11 @@ affectTransferBalance: aBalance
 
 	self subclassResponsibility ! !
 
+!AccountTransaction methodsFor: 'value' stamp: 'a 10/22/2019 21:53:25'!
+printValue 
+
+	self subclassResponsibility ! !
+
 !AccountTransaction methodsFor: 'value' stamp: 'HernanWilkinson 9/12/2011 12:25'!
 value 
 
@@ -737,6 +756,11 @@ initializeFor: aValue
 affectTransferBalance: aBalance
 
 	^ aBalance! !
+
+!Deposit methodsFor: 'value' stamp: 'a 10/22/2019 21:57:36'!
+printValue
+
+	^ 'Deposito por ', value asString.! !
 
 !Deposit methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:38'!
 value
@@ -784,10 +808,15 @@ initializeWithTransfer: aTransfer and: anAccount
 	transfer := aTransfer.
 	anAccount register: self.! !
 
-!DepositTransfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:16:22'!
+!DepositTransfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:10:17'!
 otraPata
 
-	^ transfer from.! !
+	^ transfer fromAccount.! !
+
+!DepositTransfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 21:57:41'!
+printValue
+
+	^ 'Entrada por transferencia de ', self value asString.! !
 
 !DepositTransfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:36:06'!
 value
@@ -818,6 +847,11 @@ initializeFor: aValue
 
 	value := aValue ! !
 
+
+!Withdraw methodsFor: 'value' stamp: 'a 10/22/2019 21:57:48'!
+printValue
+
+	^ 'Extraccion por ', value asString.! !
 
 !Withdraw methodsFor: 'value' stamp: 'HernanWilkinson 7/13/2011 18:33'!
 value
@@ -870,10 +904,15 @@ initializeWithTransfer: aTransfer and: anAccount
 	transfer := aTransfer.
 	anAccount register: self.! !
 
-!WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:16:26'!
+!WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:10:25'!
 otraPata
 
-	^ transfer to.! !
+	^ transfer toAccount.! !
+
+!WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 21:57:53'!
+printValue
+
+	^ 'Salida por transferencia de ', self value asString.! !
 
 !WithdrawTransfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:36:10'!
 value
@@ -917,38 +956,22 @@ initializeWith: anAccount
 	
 	account := anAccount.! !
 
-!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:52:29'!
+!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 21:51:26'!
 printBalance
 	
-	^ 'balance = ', account balance asString.! !
+	^ 'Balance = ', account balance asString.! !
 
-!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:57:41'!
+!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:01:19'!
 printReport
 	
-	| transactions transactionsHistory printString |
+	| transactionsHistory |
 	
-	transactions := account transactions.
-	transactionsHistory := ''.	
-	transactions do: [
-		 :currentTransaction |
-		printString := self printValue: currentTransaction.
-		transactionsHistory := transactionsHistory = '' ifTrue: [printString] ifFalse: [' ', printString]  
-	].
-	transactionsHistory = '' ifTrue: [^ self printBalance] ifFalse: [
-		^ (transactionsHistory, ' ', self printBalance).
-	]! !
 
-!AccountSummaryReport methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:51:49'!
-printValue: aTransaction
-	
-	| value |
-	
-	value := aTransaction value asString.
-	
-	(aTransaction isKindOf: Deposit) ifTrue: [^ 'Deposito por ', value ].
-	(aTransaction isKindOf: DepositTransfer ) ifTrue: [^ 'Entrada por transferencia de ', value ].
-	(aTransaction isKindOf: Withdraw) ifTrue: [^ 'Extraccion por ', value ].
-	(aTransaction isKindOf: WithdrawTransfer) ifTrue: [^ 'Salida por transferencia de ', value ].! !
+	transactionsHistory := account transactions 
+		inject: ''
+		into: [ :transactionsReport :currentTransaction | transactionsReport, (currentTransaction printValue), '. ' ].
+		
+	^ (transactionsHistory, self printBalance).! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -995,23 +1018,23 @@ with: anAccount
 
 !classDefinition: #Transfer category: #'Portfolio-Solucion'!
 Object subclass: #Transfer
-	instanceVariableNames: 'value from to fromTransaction toTransaction'
+	instanceVariableNames: 'value fromAccount fromTransaction toTransaction toAccount'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:10:38'!
-from
+!Transfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:08:15'!
+fromAccount
 	
-	^ from! !
+	^ fromAccount! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:15:46'!
+!Transfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:08:59'!
 fromTransaction
 	
 	^ fromTransaction! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:19:25'!
-initializeFrom: anAccount to: anotherAccount value: aValue
+!Transfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:08:46'!
+initializeFrom: anAccount to: anotherAccount withValue: aValue
 	
 	| fromTransfer toTransfer |
 	
@@ -1021,16 +1044,16 @@ initializeFrom: anAccount to: anotherAccount value: aValue
 	toTransfer := DepositTransfer withTransfer: self and: anotherAccount.
 	fromTransaction := fromTransfer.
 	toTransaction := toTransfer.
-	from := anAccount.
-	to := anotherAccount.
+	fromAccount := anAccount.
+	toAccount := anotherAccount.
 	value := aValue.! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:07:50'!
-to
+!Transfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:09:05'!
+toAccount
 	
-	^ to! !
+	^ toAccount! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:15:40'!
+!Transfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:09:09'!
 toTransaction
 	
 	^ toTransaction! !
@@ -1056,8 +1079,8 @@ errorSameAccountTransfer
 
 	^ 'Cannot transfer to same account'! !
 
-!Transfer class methodsFor: 'as yet unclassified' stamp: 'car 10/21/2019 21:08:21'!
-from: anAccount to: anotherAccount value: aValue 
+!Transfer class methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:03:17'!
+from: anAccount to: anotherAccount withValue: aValue 
 	
 	
-	^ self new initializeFrom: anAccount to: anotherAccount value: aValue.! !
+	^ self new initializeFrom: anAccount to: anotherAccount withValue: aValue.! !
