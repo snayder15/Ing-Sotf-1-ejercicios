@@ -363,19 +363,38 @@ test05AccountSummaryWithDeposit
 	
 	self assert: (report printReport) equals: 'Deposito por 40. Balance = 40'.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:02:32'!
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'car 10/24/2019 17:13:25'!
 test06AccountSummaryWithTransferTransactions
 
-	| report account account1 |
+	| report account account1 report1 |
 	account := ReceptiveAccount new.
 	account1 := ReceptiveAccount new.
 	Deposit register: 40 on: account.
 	Deposit register: 100 on: account1.
 	Transfer from: account to: account1 withValue: 20.
 	Transfer from: account1 to: account withValue: 100.
-	report := AccountSummaryReport with: account.	
+	report := AccountSummaryReport with: account.
+	report1 := AccountSummaryReport with: account1.	
 	
-	self assert: (report printReport) equals: 'Deposito por 40. Salida por transferencia de 20. Entrada por transferencia de 100. Balance = 120'.! !
+	self assert: (report printReport) equals: 'Deposito por 40. Salida por transferencia de 20. Entrada por transferencia de 100. Balance = 120'.
+	self assert: (report1 printReport) equals: 'Deposito por 100. Entrada por transferencia de 20. Salida por transferencia de 100. Balance = 20'.! !
+
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'car 10/24/2019 17:11:55'!
+test07AccountSummaryWithWithdraw
+
+	| report account account1 report1 |
+	account := ReceptiveAccount new.
+	account1 := ReceptiveAccount new.
+	Deposit register: 40 on: account.
+	Deposit register: 100 on: account1.
+	Transfer from: account to: account1 withValue: 20.
+	Withdraw register: 20 on: account.
+	
+	report := AccountSummaryReport with: account.
+	report1 := AccountSummaryReport with: account1.	
+	
+	self assert: (report printReport) equals: 'Deposito por 40. Salida por transferencia de 20. Extraccion por 20. Balance = 0'.
+	self assert: (report1 printReport) equals: 'Deposito por 100. Entrada por transferencia de 20. Balance = 120'.! !
 
 
 !classDefinition: #TransferTest category: #'Portfolio-Solucion'!
@@ -1033,17 +1052,13 @@ fromTransaction
 	
 	^ fromTransaction! !
 
-!Transfer methodsFor: 'as yet unclassified' stamp: 'a 10/22/2019 22:08:46'!
+!Transfer methodsFor: 'as yet unclassified' stamp: 'car 10/24/2019 17:14:27'!
 initializeFrom: anAccount to: anotherAccount withValue: aValue
-	
-	| fromTransfer toTransfer |
 	
 	(anAccount balance < aValue ) ifTrue: [^ Transfer error: Transfer errorInsufficientBalance ].
 	(anAccount = anotherAccount ) ifTrue: [^ Transfer error: Transfer errorSameAccountTransfer ].
-	fromTransfer := WithdrawTransfer withTransfer: self and: anAccount.
-	toTransfer := DepositTransfer withTransfer: self and: anotherAccount.
-	fromTransaction := fromTransfer.
-	toTransaction := toTransfer.
+	fromTransaction := WithdrawTransfer withTransfer: self and: anAccount.
+	toTransaction := DepositTransfer withTransfer: self and: anotherAccount.
 	fromAccount := anAccount.
 	toAccount := anotherAccount.
 	value := aValue.! !
