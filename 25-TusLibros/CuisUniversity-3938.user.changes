@@ -292,3 +292,261 @@ PASSED!
 ----SNAPSHOT----(31 October 2019 02:02:43) CuisUniversity-3938.image priorSource: 14369307!
 
 ----QUIT----(31 October 2019 02:03:03) CuisUniversity-3938.image priorSource: 14369400!
+
+----STARTUP---- (31 October 2019 16:40:37) as /Users/nsoberon/Documents/Ingenieria 1/macos64/CuisUniversity-3938.image!
+
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:42:16'!
+test04AgregarMasDeUnaVezUnMismoItemAlCarrito
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 1.
+	unCarrito agregar: 'tipo A' con: 2.
+	
+	self assert: (unCarrito estaEsteItem: 'tipo A').
+	self assert: 3 = (unCarrito cantidadDe: 'tipo A') ! !
+
+!methodRemoval: TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'ns 10/31/2019 16:42:16'!
+test04AgragarMasDeUnaVezUnMismoItemAlCarrito
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 1.
+	unCarrito agregar: 'tipo A' con: 2.
+	
+	self assert: (unCarrito estaEsteItem: 'tipo A').
+	self assert: 3 = (unCarrito cantidadDe: 'tipo A') !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:44:49'!
+test05RemoverDeUnCarritoVacio
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	
+	self should: [unCarrito remover: 'tipo A' cantidad: 1] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError | 
+							self assert: anError messageText equals: Carrito errorCannotRemoveFromCart].! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:46:14'!
+remover: unItem cantidad: unaCantidad 
+	
+	self estaVacio ifTrue: [^ Carrito error: Carrito errorCannotRemoveFromEmptyCart]
+	! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:46:23' prior: 50780739!
+remover: unItem cantidad: unaCantidad 
+	
+	self estaVacio ifTrue: [^ Carrito error: Carrito errorCannotRemoveFromCart]
+	! !
+!Carrito class methodsFor: 'nil' stamp: 'ns 10/31/2019 16:46:39'!
+errorCannotRemoveFromCart
+
+	^'Cannot remove item from cart'! !
+
+!testRun: #TestCarrito #test05RemoverDeUnCarritoVacio stamp: 'ns 10/31/2019 16:46:53'!
+PASSED!
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:47:14'!
+test06RemoverDeUnCarritoUnItemAgregado
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito
+	self should: [unCarrito remover: 'tipo A' cantidad: 1] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError | 
+							self assert: anError messageText equals: Carrito errorCannotRemoveFromCart].! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:47:50' prior: 50780760!
+test06RemoverDeUnCarritoUnItemAgregado
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 3.
+	unCarrito remover: 'tipo A' cantidad: 1.
+	
+	self assert: (unCarrito estaEsteItem: 'tipo A').
+	self assert: 2 = (unCarrito cantidadDe: 'tipo A') 
+! !
+
+!testRun: #TestCarrito #test06RemoverDeUnCarritoUnItemAgregado stamp: 'ns 10/31/2019 16:47:52'!
+FAILURE!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:49:19' prior: 50780746!
+remover: unItem cantidad: unaCantidad 
+	| cantidad |
+	
+	(self estaEsteItem: unItem) ifFalse: [^ Carrito error: Carrito errorCannotRemoveFromCart] 
+	ifTrue: [cantidad  := elementos at: unItem.
+			 elementos at: unItem put: (cantidad - unaCantidad).].! !
+
+!testRun: #TestCarrito #test06RemoverDeUnCarritoUnItemAgregado stamp: 'ns 10/31/2019 16:49:23'!
+PASSED!
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:49:57'!
+test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 1.
+	unCarrito remover: 'tipo A' cantidad: 3.
+	
+
+! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:50:13' prior: 50780802!
+test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 1.
+	
+	self should: [unCarrito remover: 'tipo A' cantidad: 3] 
+	       raise: Error - MessageNotUnderstood 
+		 withExceptionDo: [:anError | 
+							self assert: anError messageText equals: Carrito errorCannotRemoveFromCart].
+! !
+
+!testRun: #TestCarrito #test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem stamp: 'ns 10/31/2019 16:50:15'!
+FAILURE!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:50:42' prior: 50780788!
+remover: unItem cantidad: unaCantidad 
+	| cantidad |
+	
+	(self estaEsteItem: unItem) ifFalse: [^ Carrito error: Carrito errorCannotRemoveFromCart] 
+	ifTrue: [cantidad  := elementos at: unItem.
+			cantidad < unaCantidad ifTrue: [^ Carrito error: Carrito errorCannotRemoveFromCart].
+			 elementos at: unItem put: (cantidad - unaCantidad).].! !
+
+!testRun: #TestCarrito #test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test04AgregarMasDeUnaVezUnMismoItemAlCarrito stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test05RemoverDeUnCarritoVacio stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test06RemoverDeUnCarritoUnItemAgregado stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem stamp: 'ns 10/31/2019 16:50:49'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+
+!testRun: #TestCarrito #test04AgregarMasDeUnaVezUnMismoItemAlCarrito stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+
+!testRun: #TestCarrito #test05RemoverDeUnCarritoVacio stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+
+!testRun: #TestCarrito #test06RemoverDeUnCarritoUnItemAgregado stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+
+!testRun: #TestCarrito #test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem stamp: 'ns 10/31/2019 16:50:53'!
+PASSED!
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:51:47'!
+test08RemoverDeUnCarritoTodosLosElementosDeUnItem
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 2.
+	unCarrito remover: 'tipo A' cantidad: 2.	
+
+	
+! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:51:58' prior: 50780895!
+test08RemoverDeUnCarritoTodosLosElementosDeUnItem
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 2.
+	unCarrito remover: 'tipo A' cantidad: 2.	
+	
+	self deny: (unCarrito estaEsteItem: 'tipo A').
+
+	
+! !
+
+!testRun: #TestCarrito #test08RemoverDeUnCarritoTodosLosElementosDeUnItem stamp: 'ns 10/31/2019 16:51:59'!
+FAILURE!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'ns 10/31/2019 16:53:21' prior: 50780830!
+remover: unItem cantidad: unaCantidad 
+	| cantidad |
+	
+	(self estaEsteItem: unItem) ifFalse: [^ Carrito error: Carrito errorCannotRemoveFromCart] 
+	ifTrue: [cantidad  := elementos at: unItem.
+			cantidad < unaCantidad ifTrue: [^ Carrito error: Carrito errorCannotRemoveFromCart].
+			cantidad = unaCantidad ifTrue: [
+				elementos removeKey: unItem.
+			] ifFalse: [
+				elementos at: unItem put: (cantidad - unaCantidad).
+			]
+		].! !
+
+!testRun: #TestCarrito #test08RemoverDeUnCarritoTodosLosElementosDeUnItem stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test04AgregarMasDeUnaVezUnMismoItemAlCarrito stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test05RemoverDeUnCarritoVacio stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test06RemoverDeUnCarritoUnItemAgregado stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test08RemoverDeUnCarritoTodosLosElementosDeUnItem stamp: 'ns 10/31/2019 16:53:27'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test04AgregarMasDeUnaVezUnMismoItemAlCarrito stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test05RemoverDeUnCarritoVacio stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test06RemoverDeUnCarritoUnItemAgregado stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test07RemoverDeUnCarritoUnaCantidadMayorALaAgregadaDeUnItem stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+!testRun: #TestCarrito #test08RemoverDeUnCarritoTodosLosElementosDeUnItem stamp: 'ns 10/31/2019 16:53:30'!
+PASSED!
+
+----SNAPSHOT----(31 October 2019 16:53:35) CuisUniversity-3938.image priorSource: 14369493!
+
+----SNAPSHOT----(31 October 2019 16:53:39) CuisUniversity-3938.image priorSource: 14378933!
+
+----QUIT----(31 October 2019 16:53:45) CuisUniversity-3938.image priorSource: 14379026!
