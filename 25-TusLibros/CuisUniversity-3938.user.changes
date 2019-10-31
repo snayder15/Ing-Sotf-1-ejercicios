@@ -1,0 +1,294 @@
+
+
+----STARTUP---- (31 October 2019 01:05:23) as C:\Users\jhumpiri\Desktop\windows64\CuisUniversity-3938.image!
+
+
+TestCase subclass: #TestCarrito
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ejercicio'!
+
+!classDefinition: #TestCarrito category: #Ejercicio stamp: 'car 10/31/2019 01:06:03'!
+TestCase subclass: #TestCarrito
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ejercicio'!
+
+!classDefinition: #Carrito category: #Ejercicio stamp: 'car 10/31/2019 01:07:41'!
+Object subclass: #Carrito
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ejercicio'!
+!TestCarrito methodsFor: 'no messages' stamp: 'car 10/31/2019 01:07:37'!
+test01CrearUnCarritoQueEstaVacio
+
+	| unCarrito |
+	unCarrito := Carrito
+	
+	self assert: unCarrito estaVacio.! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:08:08' prior: 50777377!
+test01CrearUnCarritoQueEstaVacio
+
+	| unCarrito |
+	unCarrito := Carrito.
+	
+	self assert: unCarrito estaVacio.! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:08:44' prior: 50777384!
+test01CrearUnCarritoQueEstaVacio
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	
+	self assert: unCarrito estaVacio.! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:09:22'!
+estaVacio
+	self shouldBeImplemented.! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:09:34' prior: 50777398!
+estaVacio
+	
+	^true.! !
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:09:36'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:09:36'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:09:39'!
+PASSED!
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:15:18'!
+test02AlCarritoLeAgregamosUnItem
+
+	| unCarrito unItem unaCantidad |
+	unCarrito := Carrito new.
+	unaCantidad := 1.
+	unItem := 'tipo A.'
+	unCarrito agregar: unItem con: unaCantidad.
+	
+	self deny: unCarrito estaVacio .! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:15:52' prior: 50777416!
+test02AlCarritoLeAgregamosUnItem
+
+	| unCarrito unItem unaCantidad |
+	unCarrito := Carrito new.
+	unaCantidad := 1.
+	unItem := 'tipo A'.
+	unCarrito agregar: unItem con: unaCantidad.
+	
+	self deny: unCarrito estaVacio .! !
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:16:11'!
+ERROR!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:16:16'!
+agregar: aString con: aSmallInteger 
+	self shouldBeImplemented.! !
+
+----End fileIn of C:\Users\jhumpiri\Desktop\windows64\Packages\TerseGuide.pck.st----!
+
+!classDefinition: #Carrito category: #Ejercicio stamp: 'car 10/31/2019 01:18:39'!
+Object subclass: #Carrito
+	instanceVariableNames: 'elementos'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Ejercicio'!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:18:38' prior: 50777439!
+agregar: unItem con: unaCantidad 
+	
+	elementos at: unItem put: unaCantidad.! !
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:18:46'!
+ERROR!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:19:59'!
+initialize
+	
+	elementos := Dictionary new.! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:20:30' prior: 50777403!
+estaVacio
+	
+	^ elementos isEmpty.! !
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:20:38'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:20:39'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:20:39'!
+PASSED!
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:27:31'!
+test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo
+
+	| unCarrito unItem unaCantidad |
+	unCarrito := Carrito new.
+	unaCantidad := 5.
+	unItem := 'tipo A'.
+	unCarrito agregar: unItem con: unaCantidad.
+	
+	self assert: (unCarrito estaEsteItem: unItem).
+	self assert: (5 = unCarrito cantidadDe: unItem) ! !
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:27:58'!
+ERROR!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:28:02'!
+estaEsteItem: aString 
+	self shouldBeImplemented.! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:28:31' prior: 50780505!
+estaEsteItem: unItem 
+	
+	^ true! !
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:28:48' prior: 50780489!
+test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo
+
+	| unCarrito unItem unaCantidad |
+	unCarrito := Carrito new.
+	unaCantidad := 5.
+	unItem := 'tipo A'.
+	unCarrito agregar: unItem con: unaCantidad.
+	
+	self assert: (unCarrito estaEsteItem: unItem).
+	self assert: 5 = (unCarrito cantidadDe: unItem) ! !
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:29:01'!
+ERROR!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:29:05'!
+cantidadDe: aString 
+	self shouldBeImplemented.! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:29:23' prior: 50780531!
+cantidadDe: unCantidad 
+	
+	^5! !
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:29:25'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:29:26'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:29:26'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:29:26'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:29:26'!
+PASSED!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:32:45' prior: 50780510!
+estaEsteItem: unItem 
+	
+	^ elementos includesKey: unItem ! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:35:43' prior: 50780536!
+cantidadDe: unItem 
+	
+	^elementos at: unItem ifAbsent: [''].! !
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:35:49'!
+PASSED!
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:35:49'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:35:49'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:35:49'!
+PASSED!
+!TestCarrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:38:31'!
+test04AgragarMasDeUnaVezUnMismoItemAlCarrito
+
+	| unCarrito |
+	unCarrito := Carrito new.
+	unCarrito agregar: 'tipo A' con: 1.
+	unCarrito agregar: 'tipo A' con: 2.
+	
+	self assert: (unCarrito estaEsteItem: 'tipo A').
+	self assert: 3 = (unCarrito cantidadDe: 'tipo A') ! !
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:41:22' prior: 50780462!
+agregar: unItem con: unaCantidad 
+
+	|cantidad|
+	cantidad  := elementos at: unItem ifAbsent: [''].
+	elementos at: unItem put: (unaCantidad + cantidad).! !
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:41:32'!
+PASSED!
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:41:34'!
+ERROR!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:43:33' prior: 50780594!
+agregar: unItem con: unaCantidad 
+
+	|cantidad|
+	cantidad  := elementos at: unItem.
+	elementos removeKey: unItem.
+	elementos at: unItem put: (unaCantidad + cantidad).! !
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:43:36'!
+ERROR!
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:43:44'!
+ERROR!
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:43:48'!
+ERROR!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:45:19' prior: 50780609!
+agregar: unItem con: unaCantidad 
+
+	|cantidad|
+	
+	(self estaEsteItem: unItem) ifFalse: [elementos at: unItem put: unaCantidad].
+	cantidad  := elementos at: unItem.
+	elementos at: unItem put: (unaCantidad + cantidad).! !
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:45:22'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:45:22'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:45:22'!
+FAILURE!
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:45:22'!
+FAILURE!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:45:34'!
+FAILURE!
+!Carrito methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 01:46:47' prior: 50780628!
+agregar: unItem con: unaCantidad 
+
+	|cantidad|
+	
+	(self estaEsteItem: unItem) ifFalse: [elementos at: unItem put: unaCantidad] 
+	ifTrue: [cantidad  := elementos at: unItem.
+			 elementos at: unItem put: (unaCantidad + cantidad).].
+	! !
+
+!testRun: #TestCarrito #test01CrearUnCarritoQueEstaVacio stamp: 'car 10/31/2019 01:46:52'!
+PASSED!
+
+!testRun: #TestCarrito #test02AlCarritoLeAgregamosUnItem stamp: 'car 10/31/2019 01:46:52'!
+PASSED!
+
+!testRun: #TestCarrito #test03AlCarritoLeAgregamosMasDeUnElementoDelMismoTipo stamp: 'car 10/31/2019 01:46:52'!
+PASSED!
+
+!testRun: #TestCarrito #test04AgragarMasDeUnaVezUnMismoItemAlCarrito stamp: 'car 10/31/2019 01:46:52'!
+PASSED!
+
+----SNAPSHOT----(31 October 2019 01:51:07) CuisUniversity-3938.image priorSource: 14319118!
+
+----SNAPSHOT----(31 October 2019 01:51:08) CuisUniversity-3938.image priorSource: 14368924!
+
+----SNAPSHOT----(31 October 2019 01:51:09) CuisUniversity-3938.image priorSource: 14369017!
+
+----STARTUP---- (31 October 2019 02:02:27) as /home/juan/Descargas/linux64/CuisUniversity-3938.image!
+
+
+----SNAPSHOT----(31 October 2019 02:02:41) CuisUniversity-3938.image priorSource: 14369110!
+
+----SNAPSHOT----(31 October 2019 02:02:43) CuisUniversity-3938.image priorSource: 14369307!
+
+----QUIT----(31 October 2019 02:03:03) CuisUniversity-3938.image priorSource: 14369400!
