@@ -1,0 +1,418 @@
+
+
+----STARTUP---- (31 October 2019 21:16:20) as /media/libre/linux64/CuisUniversity-3938.image!
+
+
+----End fileIn of /media/libre/linux64/Libros-18.st----!
+
+TestCase subclass: #CashierTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #CashierTest category: #TusLibros stamp: 'car 10/31/2019 21:17:34'!
+TestCase subclass: #CashierTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+----End fileIn of /media/libre/linux64/Packages/TerseGuide.pck.st----!
+
+test := Bag new.
+test add: 1.
+test add: 2.
+test add: 1.
+tests occurrencesOf: 1.
+!
+
+test := Bag new.
+test add: 1.
+test add: 2.
+test add: 1.
+test occurrencesOf: 1.
+!
+
+!classDefinition: #Cashier category: #TusLibros stamp: 'car 10/31/2019 21:32:07'!
+Object subclass: #Cashier
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!CashierTest methodsFor: 'nil' stamp: 'car 10/31/2019 21:32:01'!
+test01
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	
+	self should: [aCashier checkoutWith: Cart new]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+		self assert: anError messageText equals: 'Cannot do checkout from an empty cart'
+		]! !
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:33:14'!
+ERROR!
+!Cashier class methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:33:18'!
+with: aDictionary 
+	self shouldBeImplemented.! !
+!Cashier class methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:33:54' prior: 50780593!
+with: aCatalog
+
+	^ self new  initializeWith: aCatalog 
+	! !
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:33:56'!
+ERROR!
+
+!classDefinition: #Cashier category: #TusLibros stamp: 'car 10/31/2019 21:33:59'!
+Object subclass: #Cashier
+	instanceVariableNames: 'catalog'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!Cashier methodsFor: 'initialization' stamp: 'car 10/31/2019 21:33:59'!
+initializeWith: aCatalog 
+	self shouldBeImplemented.
+	catalog := aCatalog.! !
+!Cashier methodsFor: 'initialization' stamp: 'car 10/31/2019 21:34:04' prior: 50780612!
+initializeWith: aCatalog 
+	catalog := aCatalog.! !
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:34:07'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:34:11'!
+checkoutWith: aCart 
+	self shouldBeImplemented.! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:34:34' prior: 50780625!
+checkoutWith: aCart 
+	
+	^'Cannot do checkout from an empty cart'! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:35:12' prior: 50780630!
+checkoutWith: aCart 
+	
+	^ Cashier error: 'Cannot do checkout from an empty cart'.! !
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:35:14'!
+PASSED!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:35:17'!
+PASSED!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:35:17'!
+PASSED!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:35:55'!
+test02CheckoutWithCartWithOneItem
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	
+	self should: [aCashier checkoutWith: Cart new]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+		self assert: anError messageText equals: 'Cannot do checkout from an empty cart'
+		]! !
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:43:22' prior: 50780649!
+test02CheckoutWithCartWithOneItem
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	aCart := Cart acceptingItemsOf: (Array with: 'itemA').
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.
+	
+	aCashier checkoutWith: aCart.
+	
+	self assert: aCart isEmpty.  
+	
+	self assert: (aCashier didCheckoutWith: 10).  
+	! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:43:31'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:43:49'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:45:24' prior: 50780636!
+checkoutWith: aCart 
+	
+	(aCart isEmpty ) ifTrue: [Cashier error: 'Cannot do checkout from an empty cart'].
+	
+	aCart getProducts: self.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:45:28'!
+ERROR!
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:45:31'!
+getProducts: aCashier 
+	self shouldBeImplemented.! !
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:46:57' prior: 50780698!
+getProducts: aCashier 
+	
+	items do: [
+		:item | 
+		aCashier seeProduct: item.
+	]! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:47:03'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:47:08'!
+seeProduct: aString 
+	self shouldBeImplemented.! !
+
+!classDefinition: #Cashier category: #TusLibros stamp: 'car 10/31/2019 21:48:28'!
+Object subclass: #Cashier
+	instanceVariableNames: 'catalog checkoutTotal'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:48:21' prior: 50780712!
+seeProduct: aProduct 
+	
+	| productValue |
+	productValue = catalog at: aProduct.
+	checkoutTotal := checkoutTotal + productValue.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:48:36'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:49:36' prior: 50780724!
+seeProduct: aProduct 
+	
+	| productValue |	
+	productValue = catalog at: aProduct ifAbsent: [].
+	checkoutTotal := checkoutTotal + productValue.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:49:42'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:50:01'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:50:52' prior: 50780735!
+seeProduct: aProduct 
+	
+	| productValue |	
+	productValue := catalog at: aProduct ifAbsent: [].
+	checkoutTotal := checkoutTotal + productValue.! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:50:58' prior: 50780749!
+seeProduct: aProduct 
+	
+	| productValue |	
+	productValue := catalog at: aProduct.
+	checkoutTotal := checkoutTotal + productValue.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:51:06'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:51:07'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:51:31' prior: 50780757!
+seeProduct: aProduct 
+	
+	| productValue |	
+	productValue := catalog at: aProduct ifAbsent: [0].
+	checkoutTotal := checkoutTotal + productValue.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:51:36'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:51:36'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:52:30'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:53:07' prior: 50780688!
+checkoutWith: aCart 
+	
+	(aCart isEmpty ) ifTrue: [Cashier error: 'Cannot do checkout from an empty cart'].
+	checkoutTotal  := 0.
+	aCart getProducts: self.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:53:11'!
+FAILURE!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:53:11'!
+FAILURE!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:53:17'!
+FAILURE!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:53:18'!
+ERROR!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:53:24'!
+didCheckoutWith: aSmallInteger 
+	self shouldBeImplemented.! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:53:45' prior: 50780809!
+didCheckoutWith: aTotal 
+	aTotal = checkoutTotal .! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:53:46' prior: 50780814!
+didCheckoutWith: aTotal 
+	aTotal = checkoutTotal.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:53:56'!
+FAILURE!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:53:56'!
+FAILURE!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:54:10'!
+FAILURE!
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:55:02' prior: 50780703!
+getProducts: aCashier 
+	
+	items do: [
+		:item | 
+		aCashier seeProduct: item.
+	]! !
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:55:50' prior: 50780834!
+getProducts: aCashier 
+	
+	items do: [
+		:item | 
+		aCashier seeProduct: item.
+		items remove: item.
+	]! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:56:21'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:56:21'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:56:30'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:56:30'!
+ERROR!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:57:09' prior: 50780665!
+test02CheckoutWithCartWithOneItem
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	aCart := Cart acceptingItemsOf: (Array with: 'itemA').
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.
+	
+	aCashier checkoutWith: aCart.
+	
+	self assert: aCart isEmpty.  
+	
+	self assert: (aCashier didCheckoutWith) equals: 10.  
+	! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:57:28'!
+didCheckoutWith
+	^ checkoutTotal.! !
+
+!methodRemoval: Cashier #didCheckoutWith: stamp: 'car 10/31/2019 21:57:32'!
+didCheckoutWith: aTotal 
+	aTotal = checkoutTotal.!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:57:38'!
+PASSED!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:57:42'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 21:57:42'!
+PASSED!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:57:42'!
+ERROR!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:57:50'!
+ERROR!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:57:50'!
+ERROR!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:58:38'!
+ERROR!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:58:38'!
+ERROR!
+
+self isEmpty!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 21:59:45' prior: 50780576!
+test01
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	
+	self should: [aCashier checkoutWith: (Cart initializeAcceptingItemsOf: Array new)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+		self assert: anError messageText equals: 'Cannot do checkout from an empty cart'
+		]! !
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:59:47'!
+ERROR!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 21:59:47'!
+ERROR!
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'car 10/31/2019 22:00:31' prior: 50780904!
+test01
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	
+	self should: [aCashier checkoutWith: (Cart acceptingItemsOf: Array new)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+		self assert: anError messageText equals: 'Cannot do checkout from an empty cart'
+		]! !
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 22:00:34'!
+PASSED!
+
+!testRun: #CashierTest #test01 stamp: 'car 10/31/2019 22:00:37'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 10/31/2019 22:00:37'!
+PASSED!
+
+----SNAPSHOT----(31 October 2019 22:00:41) CuisUniversity-3938.image priorSource: 14319118!
+
+----SNAPSHOT----(31 October 2019 22:00:46) CuisUniversity-3938.image priorSource: 14377501!
+
+----SNAPSHOT----(31 October 2019 22:01:30) CuisUniversity-3938.image priorSource: 14377594!
+
+----SNAPSHOT----(31 October 2019 22:01:39) CuisUniversity-3938.image priorSource: 14377687!
+
+----QUIT----(31 October 2019 22:01:41) CuisUniversity-3938.image priorSource: 14377780!
