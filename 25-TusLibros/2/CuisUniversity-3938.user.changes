@@ -416,3 +416,95 @@ PASSED!
 ----SNAPSHOT----(31 October 2019 22:01:39) CuisUniversity-3938.image priorSource: 14377687!
 
 ----QUIT----(31 October 2019 22:01:41) CuisUniversity-3938.image priorSource: 14377780!
+
+----STARTUP---- (4 November 2019 00:01:33) as /Users/nsoberon/Documents/Ingenieria 1/macos64/CuisUniversity-3938.image!
+
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ns 11/4/2019 00:03:03'!
+test03CheckoutWithCartWithItemNotOnCatalog
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	aCart := Cart acceptingItemsOf: (Array with: 'itemC').
+	
+	aCart add: 'itemC'.
+	
+	aCashier checkoutWith: aCart.
+	
+	self deny: aCart isEmpty.
+	! !
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ns 11/4/2019 00:04:03' prior: 50780966!
+test03CheckoutWithCartWithItemNotOnCatalog
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	aCart := Cart acceptingItemsOf: (Array with: 'itemC').
+	
+	aCart add: 'itemC'.
+	
+	self should: [aCashier checkoutWith: aCart]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+		self assert: anError messageText equals: 'Cannot do checkout with an item not present on catalog'.
+		self deny: aCart isEmpty.
+	]
+	
+	! !
+
+!testRun: #CashierTest #test03CheckoutWithCartWithItemNotOnCatalog stamp: 'ns 11/4/2019 00:04:16'!
+FAILURE!
+
+!testRun: #CashierTest #test03CheckoutWithCartWithItemNotOnCatalog stamp: 'ns 11/4/2019 00:04:16'!
+FAILURE!
+!Cashier methodsFor: 'as yet unclassified' stamp: 'ns 11/4/2019 00:06:05' prior: 50780771!
+seeProduct: aProduct 
+	
+	| productValue |
+	productValue := catalog at: aProduct ifAbsent: [^ Cashier error: Cashier errorItemNotInCatalog].
+	checkoutTotal := checkoutTotal + productValue.! !
+!Cashier methodsFor: 'as yet unclassified' stamp: 'ns 11/4/2019 00:06:30' prior: 50781007!
+seeProduct: aProduct 
+	
+	| productValue |
+	productValue := catalog at: aProduct ifAbsent: [^ Cashier error: 'Item not in Catalog'].
+	checkoutTotal := checkoutTotal + productValue.! !
+!CashierTest methodsFor: 'as yet unclassified' stamp: 'ns 11/4/2019 00:06:38' prior: 50780980!
+test03CheckoutWithCartWithItemNotOnCatalog
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := Cashier with: aCatalogo.
+	
+	aCart := Cart acceptingItemsOf: (Array with: 'itemC').
+	
+	aCart add: 'itemC'.
+	
+	self should: [aCashier checkoutWith: aCart]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+		self assert: anError messageText equals: 'Item not in Catalog'.
+		self deny: aCart isEmpty.
+	]
+	
+	! !
+
+!testRun: #CashierTest #test03CheckoutWithCartWithItemNotOnCatalog stamp: 'ns 11/4/2019 00:06:42'!
+PASSED!
+
+----SNAPSHOT----(4 November 2019 00:07:27) CuisUniversity-3938.image priorSource: 14377873!
+
+----QUIT----(4 November 2019 00:07:30) CuisUniversity-3938.image priorSource: 14380666!
