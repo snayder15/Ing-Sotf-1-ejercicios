@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 TestCase subclass: #CartTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -116,43 +116,48 @@ itemSellByTheStore
 	^ 'validBook'! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 TestCase subclass: #CashierTest
-	instanceVariableNames: 'hasDebit action'
+	instanceVariableNames: 'hasDebit'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 21:35:41'!
-debit
-	
-	action value! !
+!CashierTest methodsFor: 'support' stamp: 'car 11/11/2019 20:44:24'!
+defaultCart
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 21:35:53'!
-debitWith: anAction
+	| aCatalog |
 	
-	action := anAction! !
-
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 21:31:40'!
-defaultCashier		
+	aCatalog := Dictionary new.
 	
-	^ Cashier with: OrderedCollection new using: self.! !
+	aCatalog add: 'itemA'->10; add: 'itemB'->3.
+	
+	^ Cart acceptingItemsOf: aCatalog.
+	
+	! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 19:42:57'!
+!CashierTest methodsFor: 'support' stamp: 'car 11/11/2019 17:57:12'!
+defaultCashierWith: anAction
+	| mockMerchantProcessor |
+
+	mockMerchantProcessor := MockMerchantProcessor debitWith: anAction.	
+
+	^ Cashier with: OrderedCollection new using: mockMerchantProcessor .! !
+
+!CashierTest methodsFor: 'support' stamp: 'car 11/4/2019 19:42:57'!
 defaultCreditCard
 	
 	^ CreditCard withName: 'Juan Lopez' andNumber: 1234567891234567 andExpiration: (GregorianMonthOfYear yearNumber: 2020 monthNumber: 4).! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 20:43:02'!
+
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:44:16'!
 test01CheckoutWithEmptyCart
 
-	| aCashier aCatalogo |
-	aCatalogo := Dictionary new.
+	| aCashier |
 	
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
-	aCashier := self defaultCashier.
+	aCashier := self defaultCashierWith: [].
 		
-	self should: [aCashier checkoutWith: (Cart acceptingItemsOf: aCatalogo) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	self should: [aCashier checkoutWith: (self defaultCart) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
 	raise: Error - MessageNotUnderstood 
 	withExceptionDo: [
 		:anError | 
@@ -160,17 +165,14 @@ test01CheckoutWithEmptyCart
 			self deny: (aCashier didSell: 0).
 		]! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 20:01:35'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:44:42'!
 test02CheckoutWithCartWithOneItem
 
-	| aCashier aCatalogo aCart |
-	aCatalogo := Dictionary new.
-	
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	| aCashier aCart |	
 
-	aCashier := self defaultCashier.
+	aCashier := self defaultCashierWith: [].
 	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	
@@ -180,17 +182,14 @@ test02CheckoutWithCartWithOneItem
 	
 	self assert: aCart isEmpty.! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 20:01:40'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:01'!
 test03CheckoutWithValidCreditCard
 
-	| aCashier aCatalogo aCart |
-	aCatalogo := Dictionary new.
+	| aCashier aCart |
 
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
-
-	aCashier := self defaultCashier.
+	aCashier := self defaultCashierWith: [].
 	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	
@@ -200,17 +199,16 @@ test03CheckoutWithValidCreditCard
 	
 	self assert: aCart isEmpty.! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 20:01:47'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:14'!
 test04CheckoutWithExpiredCreditCard
 
-	| aCashier aCatalogo aCart dateToCheck |
-	aCatalogo := Dictionary new.
-	dateToCheck := FixedGregorianDate fromDate: (Date newDay: 12 month: #December year: 2021).
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	| aCashier aCart dateToCheck |
 
-	aCashier := self defaultCashier.
+	dateToCheck := FixedGregorianDate fromDate: (Date newDay: 12 month: #December year: 2021).
 	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	
@@ -221,17 +219,14 @@ test04CheckoutWithExpiredCreditCard
 			self assert: anError messageText equals: 'Credit Card is expired'
 		]! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 20:01:51'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:26'!
 test05CheckoutWithValidCreditCardMultipleItems
 
-	| aCashier aCatalogo aCart |
-	aCatalogo := Dictionary new.
+	| aCashier aCart |
 
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
-
-	aCashier := self defaultCashier.
+	aCashier := self defaultCashierWith: [].
 	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	aCart add: 'itemB'.
@@ -241,17 +236,14 @@ test05CheckoutWithValidCreditCardMultipleItems
 	self assert: aCart isEmpty.
 ! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 20:01:55'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:39'!
 test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout
 
-	| aCashier aCatalogo aCart |
-	aCatalogo := Dictionary new.
+	| aCashier aCart |
 
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
-
-	aCashier := self defaultCashier.
+	aCashier := self defaultCashierWith: [].
 	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	aCart add: 'itemB'.
@@ -263,19 +255,14 @@ test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout
 	self assert: aCart isEmpty.
 ! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 21:39:08'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:52'!
 test07CheckoutWithOkFromMerchantProcessor
 
-	| aCashier aCatalogo aCart |
-	self debitWith: [hasDebit := true].
+	| aCashier aCart |
 
-	aCatalogo := Dictionary new.	
+	aCashier := self defaultCashierWith: [hasDebit := true].
 	
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
-
-	aCashier := self defaultCashier.
-	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	aCart add: 'itemB'.
@@ -288,20 +275,14 @@ test07CheckoutWithOkFromMerchantProcessor
 
 	self assert: hasDebit! !
 
-!CashierTest methodsFor: 'test' stamp: 'car 11/4/2019 21:38:49'!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:46:05'!
 test08CheckoutWithErrorFromMerchantProcessor
 
-	| aCashier aCatalogo aCart |
-	
-	self debitWith: [self class error: 'Error'].
-	
-	aCatalogo := Dictionary new.	
-	
-	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	| aCashier aCart |
 
-	aCashier := self defaultCashier .
+	aCashier := self defaultCashierWith: [self class error: 'Error'].
 	
-	aCart := Cart acceptingItemsOf: (aCatalogo).
+	aCart := self defaultCart.
 	
 	aCart add: 'itemA'.
 	aCart add: 'itemB'.
@@ -320,107 +301,287 @@ test08CheckoutWithErrorFromMerchantProcessor
 ! !
 
 
-!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 TestCase subclass: #RestInterfaceInternalPartTest
-	instanceVariableNames: 'testRestInterface mockClock'
+	instanceVariableNames: 'testRestInterface mockClock hasDebit'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 21:15:00'!
+!RestInterfaceInternalPartTest methodsFor: 'support' stamp: 'car 11/11/2019 18:34:36'!
+defaultClientId
+	
+	^ 'Test Client ID'! !
+
+!RestInterfaceInternalPartTest methodsFor: 'support' stamp: 'car 11/11/2019 18:35:05'!
+defaultClientPassword
+	
+	^ 'Test password'! !
+
+!RestInterfaceInternalPartTest methodsFor: 'support' stamp: 'car 11/7/2019 21:15:00'!
 defaultCreditCard
 	
 	^ CreditCard withName: 'Juan Lopez' andNumber: 1234567891234567 andExpiration: (GregorianMonthOfYear yearNumber: 2020 monthNumber: 4).! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:39:08'!
+!RestInterfaceInternalPartTest methodsFor: 'support' stamp: 'car 11/11/2019 20:47:30'!
+defaultInterfaceCartId
+	
+	^ testRestInterface createCartWith: self defaultClientId and: self defaultClientPassword! !
+
+
+!RestInterfaceInternalPartTest methodsFor: 'setup' stamp: 'car 11/11/2019 20:52:57'!
 setUp
 
-mockClock := MockClock create.
+	mockClock := MockClock create.
 
-testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.! !
+	testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.
+	
+	testRestInterface register: self defaultClientId with: self defaultClientPassword.
+	
+	hasDebit := false.! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:39:47'!
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:47:30'!
 test01ListEmptyCart
 
-| aCartID |
+	| aCartID |
 
-aCartID := testRestInterface createCart.
+	aCartID := self defaultInterfaceCartId.
 
-self assert: (testRestInterface listCart: aCartID) size equals: 0! !
+	self assert: (testRestInterface listCart: aCartID) size equals: 0! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:40:01'!
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:47:30'!
 test02ListCartWithOneItem
 
-| aCartID |
+	| aCartID |
 
-aCartID := testRestInterface createCart.
+	aCartID := self defaultInterfaceCartId.
 
-testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
 
-self assert: (testRestInterface listCart: aCartID) size equals: 1! !
+	self assert: (testRestInterface listCart: aCartID) size equals: 1! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:40:10'!
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 19:09:04'!
 test03ListInvalidCart
 
 
-self should: [testRestInterface listCart: 80 ] 
+	self should: [testRestInterface listCart: 80 ] 
 		raise:  Error - MessageNotUnderstood 
 		withExceptionDo:[:anError | 
 			self assert: anError messageText equals: 'Cart ID is invalid'.] 
 
 ! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:40:27'!
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:47:30'!
 test04ListExpiredCart
 
-| aCartID |
+	| aCartID |
 
-aCartID := testRestInterface createCart.
+	aCartID := self defaultInterfaceCartId.
 
-mockClock addMinutes: 31.
+	mockClock addMinutes: 31.
 
-self should: [testRestInterface listCart: aCartID ] 
+	self should: [testRestInterface listCart: aCartID ] 
 		raise:  Error - MessageNotUnderstood 
 		withExceptionDo:[:anError | 
 			self assert: anError messageText equals: 'Cart ID is invalid'.] 
 
 ! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:51:29'!
-test05AddToExpiredCart
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:47:30'!
+test05ListCartWithMoreThanOneElement
 
-| aCartID |
+	| aCartID |
 
-aCartID := testRestInterface createCart.
+	aCartID := self defaultInterfaceCartId.
 
-mockClock addMinutes: 29.
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
 
-testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+	testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
 
-mockClock addMinutes: 3.
+	self assert: (testRestInterface listCart: aCartID) size equals: 6! !
 
-self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
-		raise:  Error - MessageNotUnderstood 
-		withExceptionDo:[:anError | 
-			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:47:30'!
+test06AddToExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	mockClock addMinutes: 29.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 3.
+
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
 
 ! !
 
-!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 21:09:12'!
-test06ListCartWithMoreThanOneElement
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:53:58'!
+test07AddToInvalidCart
 
-| aCartID |
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+	
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: 'Invalid Cart'.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.				
+				]
+! !
 
-aCartID := testRestInterface createCart.
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:50:29'!
+test08CheckoutCartWithOneElement
 
-testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+	| aCartID |
 
-testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
+	aCartID := self defaultInterfaceCartId.
 
-self assert: (testRestInterface listCart: aCartID) size equals: 6! !
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:50:14'!
+test09CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:58'!
+test10CheckoutInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:53'!
+test11ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) keys size) equals: 0.
+
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:47'!
+test12ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultInterfaceCartId.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:42'!
+test13ListValidClientInvalidPasswordPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+	
+	testRestInterface  register: aClientId with: aClientPassword , 'test'.
+	
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:36'!
+test14ListInvalidClientPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: 'Invalid Client' and: self defaultClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:22'!
+test15CreateCartInvalidClient
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: 'Invalid Client' and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:02'!
+test16CreateCartInvalidPassword
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: self defaultClientId and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
 
 
-!classDefinition: #Cart category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #Cart category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -507,7 +668,7 @@ emptyCart
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -517,15 +678,21 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 Object subclass: #Cashier
 	instanceVariableNames: 'catalog salesBook merchantProcessor'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
+!Cashier methodsFor: 'initialization' stamp: 'car 11/4/2019 20:14:48'!
+initializeWith: aSalesBook using: aMerchantProcessor
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 21:34:59'!
+	salesBook := aSalesBook.
+	merchantProcessor := aMerchantProcessor.! !
+
+
+!Cashier methodsFor: 'checkout' stamp: 'car 11/4/2019 21:34:59'!
 checkoutWith: aCart and: aCreditCard on: aDate
 	
 	| cartTotal |
@@ -539,25 +706,15 @@ checkoutWith: aCart and: aCreditCard on: aDate
 	salesBook add: cartTotal.
 	^ cartTotal.! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 19:59:11'!
+
+!Cashier methodsFor: 'queries' stamp: 'car 11/4/2019 19:59:11'!
 didSell: aSale
 
 	^ salesBook includes: aSale! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 19:59:24'!
-initializeWith: aSalesBook
-
-	salesBook := aSalesBook.! !
-
-!Cashier methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 20:14:48'!
-initializeWith: aSalesBook using: aMerchantProcessor
-
-	salesBook := aSalesBook.
-	merchantProcessor := aMerchantProcessor.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -572,27 +729,14 @@ with: aSalesBook using: aMerchantProcessor
 	^ self new initializeWith: aSalesBook using: aMerchantProcessor.! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'name number expirationDate'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 20:17:51'!
-expiration
-
-	^ expirationDate
-	! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 19:30:50'!
-initializeWithName: aName andNumber: aNumber andExpiration: aGregorianDate.
-
-	name := aName.
-	number := aNumber.
-	expirationDate := aGregorianDate.	! !
-
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 19:39:45'!
+!CreditCard methodsFor: 'queries' stamp: 'car 11/4/2019 19:39:45'!
 isExpiredOn: aDate
 	| dateYear dateMonth |
 	dateYear := aDate year.
@@ -600,13 +744,28 @@ isExpiredOn: aDate
 	^ expirationDate year < dateYear or: (expirationDate year = dateYear and: expirationDate month < dateMonth).		
 	! !
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 20:17:35'!
+
+!CreditCard methodsFor: 'initialization' stamp: 'car 11/4/2019 19:30:50'!
+initializeWithName: aName andNumber: aNumber andExpiration: aGregorianDate.
+
+	name := aName.
+	number := aNumber.
+	expirationDate := aGregorianDate.	! !
+
+
+!CreditCard methodsFor: 'accessing' stamp: 'car 11/4/2019 20:17:51'!
+expiration
+
+	^ expirationDate
+	! !
+
+!CreditCard methodsFor: 'accessing' stamp: 'car 11/4/2019 20:17:35'!
 name
 
 	^ name
 	! !
 
-!CreditCard methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 20:18:02'!
+!CreditCard methodsFor: 'accessing' stamp: 'car 11/4/2019 20:18:02'!
 number
 
 	^ number
@@ -614,85 +773,177 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'as yet unclassified' stamp: 'car 11/4/2019 19:34:34'!
+!CreditCard class methodsFor: 'instance creation' stamp: 'car 11/4/2019 19:34:34'!
 withName: aName andNumber: aNumber andExpiration: aGregorianDate
 
 	^ self new initializeWithName: aName andNumber: aNumber andExpiration: aGregorianDate.! !
 
 
-!classDefinition: #MockClock category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: #MockClock category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 Object subclass: #MockClock
 	instanceVariableNames: 'time'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!MockClock methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:27:05'!
-addMinutes: aQuantity
-
-	time := time + aQuantity ! !
-
-!MockClock methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:27:22'!
-getTime
-
-	^time ! !
-
-!MockClock methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:26:28'!
+!MockClock methodsFor: 'initialization' stamp: 'car 11/7/2019 20:26:28'!
 initialize
 
 	time := 0.! !
 
+
+!MockClock methodsFor: 'accessing' stamp: 'car 11/7/2019 20:27:22'!
+getTime
+
+	^time ! !
+
+
+!MockClock methodsFor: 'adding' stamp: 'car 11/7/2019 20:27:05'!
+addMinutes: aQuantity
+
+	time := time + aQuantity ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockClock class' category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: 'MockClock class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 MockClock class
 	instanceVariableNames: ''!
 
-!MockClock class methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:26:08'!
+!MockClock class methodsFor: 'instance creation' stamp: 'car 11/7/2019 20:26:08'!
 create
 
 	^ self new initialize ! !
 
 
-!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
-Object subclass: #RestInterfaceInternalPart
-	instanceVariableNames: 'cartNumber cartDB clock cartClocks'
+!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+Object subclass: #MockMerchantProcessor
+	instanceVariableNames: 'behavior'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:53:26'!
+!MockMerchantProcessor methodsFor: 'debit' stamp: 'car 11/11/2019 17:43:47'!
+debit
+	
+	behavior value! !
+
+
+!MockMerchantProcessor methodsFor: 'initialization' stamp: 'car 11/11/2019 17:40:40'!
+initializeDebitWith: aClosure
+
+	behavior := aClosure 
+	
+	! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+MockMerchantProcessor class
+	instanceVariableNames: ''!
+
+!MockMerchantProcessor class methodsFor: 'instance creation' stamp: 'car 11/11/2019 17:39:58'!
+debitWith: aClosure
+
+	^self new initializeDebitWith: aClosure
+	
+	! !
+
+
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientsPurchasesTotals clientDB'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!RestInterfaceInternalPart methodsFor: 'private' stamp: 'car 11/11/2019 18:26:17'!
+checkCartExpiration: aCartId
+	| now aCartTime |
+	now := clock getTime.
+	aCartTime := cartClocks at: aCartId ifAbsent:  [^ RestInterfaceInternalPart error: 'Cart ID is invalid'].
+	now - aCartTime > 30 ifTrue: [
+		^ RestInterfaceInternalPart error: 'Cart ID is invalid'
+	].! !
+
+!RestInterfaceInternalPart methodsFor: 'private' stamp: 'car 11/11/2019 19:26:59'!
+checkClientInformationWith: aClientId and: aClientPassword
+	
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [^ self class error: 'Invalid Client ID or Password'].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Invalid Client ID or Password'].! !
+
+!RestInterfaceInternalPart methodsFor: 'private' stamp: 'car 11/11/2019 21:01:19'!
+initializeInterfaceWith: aClock.
+
+	cartNumber := 0.
+	cartDB := Dictionary new.
+	clientPurchases := Dictionary new.
+	clientsPurchasesTotals := Dictionary new.
+	clientDB := Dictionary new.
+	clock := aClock .
+	cartClocks := Dictionary new.! !
+
+!RestInterfaceInternalPart methodsFor: 'private' stamp: 'car 11/11/2019 18:09:51'!
+linkMerchantProcessor: aMerchantProcessor
+
+	merchantProcessor := aMerchantProcessor 
+
+	! !
+
+!RestInterfaceInternalPart methodsFor: 'private' stamp: 'car 11/11/2019 19:07:04'!
+register: aClientId with: aPassword
+
+	clientDB at: aClientId put: aPassword.! !
+
+
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 21:00:20'!
 add: anItem  withQuantity: aQuantity to: aCartID
 
 	|aCart |
 	
 	self checkCartExpiration: aCartID.
 	
-	aCart := cartDB at: aCartID ifAbsent: [^ RestInterfaceInternalPart error: 'Cart ID is invalid'].
+	aCart := cartDB at: aCartID.
 	
 	aCart add: aQuantity of: anItem! !
 
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:53:05'!
-checkCartExpiration: aCartId
-	| now aCartTime |
-	now := clock getTime.
-	aCartTime := cartClocks at: aCartId ifAbsent:  [^ RestInterfaceInternalPart error: 'Cart ID is invalid'].
-	now - aCartTime > 30 ifTrue: [
-		cartDB removeKey: aCartId.
-		cartClocks removeKey: aCartId.
-	].! !
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 18:58:34'!
+checkoutWith: aCartID and: aCreditCard and: aClientId
 
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 21:21:07'!
-checkOutCart: aSmallInteger with: aCreditCard 
-	self shouldBeImplemented.! !
+	| clientPurchasesQty aCart anItemQty clientPurchasesAmount |
+	
+	self checkCartExpiration: aCartID.
 
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 21:08:46'!
-createCart
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			clientPurchasesQty at: anItem put: anItemQty + 1.
+	].
+
+	clientPurchases at: aClientId put: clientPurchasesQty.
+
+	clientPurchasesAmount := clientsPurchasesTotals at: aClientId ifAbsent: [0].
+	clientsPurchasesTotals at: aClientId put: clientPurchasesAmount  + (aCart getProductsTotalCost).! !
+
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 19:29:10'!
+createCartWith: aClientId and: aClientPassword
+	
 	| catalog |
+	
+	self checkClientInformationWith: aClientId  and: aClientPassword.
+	
 	catalog := Dictionary new.
 	catalog add: 'Valid item'->10; add: 'Valid item B'->8.
 
@@ -700,42 +951,30 @@ createCart
 	cartClocks at: cartNumber put: (clock getTime).	
 	^ cartNumber.! !
 
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 19:33:59'!
-initializeInterface
-
-	cartNumber := 0.
-	cartDB := Dictionary new.! !
-
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:35:51'!
-initializeInterfaceWith: aClock.
-
-	self initializeInterface .
-	clock := aClock .
-	cartClocks := Dictionary new.! !
-
-!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:54:51'!
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 18:27:04'!
 listCart: aCartId
 	
 	| aCart |
 	
 	self checkCartExpiration: aCartId.
 	
-	aCart := cartDB at: aCartId ifAbsent: [^ RestInterfaceInternalPart error: 'Cart ID is invalid'].
+	aCart := cartDB at: aCartId ifAbsent: [].
 	
 	^ aCart products.! !
 
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 19:28:08'!
+listPurchasesFor: aClientId and: aClientPassword
+	
+	self checkClientInformationWith: aClientId and: aClientPassword.
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'car 11/7/2019 21:53:22'!
+!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
 RestInterfaceInternalPart class
 	instanceVariableNames: 'cartNumber cartDB'!
 
-!RestInterfaceInternalPart class methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 19:37:04'!
-createInterface
-
-	^ self new initializeInterface.! !
-
-!RestInterfaceInternalPart class methodsFor: 'as yet unclassified' stamp: 'car 11/7/2019 20:27:58'!
+!RestInterfaceInternalPart class methodsFor: 'instance creation' stamp: 'car 11/7/2019 20:27:58'!
 createInterfaceWith: aClock
 
 	^ self new initializeInterfaceWith: aClock.! !

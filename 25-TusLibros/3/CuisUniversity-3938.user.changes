@@ -4653,3 +4653,4441 @@ self assert: (testRestInterface checkOutCart: aCartID  with: self defaultCreditC
 ----SNAPSHOT----(7 November 2019 21:53:13) CuisUniversity-3938.image priorSource: 14521021!
 
 ----QUIT----(7 November 2019 21:53:25) CuisUniversity-3938.image priorSource: 14521114!
+
+----STARTUP---- (11 November 2019 17:01:14) as /media/libre/linux64/CuisUniversity-3938.image!
+
+
+----QUIT----(11 November 2019 17:01:38) CuisUniversity-3938.image priorSource: 14521207!
+
+----STARTUP---- (11 November 2019 17:06:33) as /media/libre/linux64/CuisUniversity-3938.image!
+
+
+Object subclass: #MockMerchantProcessor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'car 11/11/2019 17:38:46'!
+Object subclass: #MockMerchantProcessor
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+Object subclass: #MockMerchantProcessor
+	instanceVariableNames: 'behavior'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'car 11/11/2019 17:39:05'!
+Object subclass: #MockMerchantProcessor
+	instanceVariableNames: 'behavior'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!MockMerchantProcessor class methodsFor: 'no messages' stamp: 'car 11/11/2019 17:39:58'!
+debitWith: aClosure
+
+	^self new initializeDebitWith: aClosure
+	
+	! !
+!MockMerchantProcessor methodsFor: 'no messages' stamp: 'car 11/11/2019 17:40:40'!
+initializeDebitWith: aClosure
+
+	behavior := aClosure 
+	
+	! !
+!MockMerchantProcessor methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 17:43:47'!
+debit
+	
+	behavior value! !
+
+!methodRemoval: RestInterfaceInternalPart #checkOutCart:with: stamp: 'car 11/11/2019 17:45:54'!
+checkOutCart: aSmallInteger with: aCreditCard 
+	self shouldBeImplemented.!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:54:44'!
+defaultCashierWith: anAction
+	| mockMerchantProcessor |
+
+	mockMerchantProcessor := MockMerchantProcessor.	
+
+		^ Cashier with: OrderedCollection new using: self.! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:55:26' prior: 50785493!
+defaultCashierWith: anAction
+	| mockMerchantProcessor |
+
+	mockMerchantProcessor := MockMerchantProcessor initializeDebitWith: anAction.	
+
+	^ Cashier with: OrderedCollection new using: mockMerchantProcessor .! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:55:41' prior: 50783217!
+test01CheckoutWithEmptyCart
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	aCashier := self defaultCashier.
+		
+	self should: [aCashier checkoutWith: (Cart acceptingItemsOf: aCatalogo) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.
+			self deny: (aCashier didSell: 0).
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:56:09' prior: 50785511!
+test01CheckoutWithEmptyCart
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	aCashier := self defaultCashierWith: MockMerchantProcessor new.
+		
+	self should: [aCashier checkoutWith: (Cart acceptingItemsOf: aCatalogo) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.
+			self deny: (aCashier didSell: 0).
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:56:15' prior: 50782536!
+test02CheckoutWithCartWithOneItem
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: MockMerchantProcessor new.
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.	
+
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 10.  
+	
+	self assert: aCart isEmpty.! !
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:56:19'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:56:19'!
+ERROR!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:56:19'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:56:19'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:56:19'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:56:19'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:56:19'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:56:19'!
+PASSED!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:56:25'!
+ERROR!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:56:25'!
+ERROR!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:56:39' prior: 50785530!
+test01CheckoutWithEmptyCart
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	aCashier := self defaultCashierWith: [].
+		
+	self should: [aCashier checkoutWith: (Cart acceptingItemsOf: aCatalogo) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.
+			self deny: (aCashier didSell: 0).
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:56:44' prior: 50785550!
+test02CheckoutWithCartWithOneItem
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.	
+
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 10.  
+	
+	self assert: aCart isEmpty.! !
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:56:49'!
+ERROR!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:56:49'!
+ERROR!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:56:49'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:56:49'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:56:49'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:56:49'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:56:49'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:56:49'!
+PASSED!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:56:53'!
+ERROR!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:56:53'!
+ERROR!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:57:12' prior: 50785501!
+defaultCashierWith: anAction
+	| mockMerchantProcessor |
+
+	mockMerchantProcessor := MockMerchantProcessor debitWith: anAction.	
+
+	^ Cashier with: OrderedCollection new using: mockMerchantProcessor .! !
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:57:17'!
+PASSED!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:57:25' prior: 50782553!
+test03CheckoutWithValidCreditCard
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.	
+
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 10.  
+	
+	self assert: aCart isEmpty.! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:57:29' prior: 50782570!
+test04CheckoutWithExpiredCreditCard
+
+	| aCashier aCatalogo aCart dateToCheck |
+	aCatalogo := Dictionary new.
+	dateToCheck := FixedGregorianDate fromDate: (Date newDay: 12 month: #December year: 2021).
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	
+	self should: [aCashier checkoutWith: aCart and: self defaultCreditCard on: dateToCheck]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Credit Card is expired'
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:57:32' prior: 50782592!
+test05CheckoutWithValidCreditCardMultipleItems
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.  
+	
+	self assert: aCart isEmpty.
+! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:57:36' prior: 50782609!
+test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout
+
+	| aCashier aCatalogo aCart |
+	aCatalogo := Dictionary new.
+
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.
+	
+	self assert: (aCashier didSell: 13).
+	
+	self assert: aCart isEmpty.
+! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:57:40' prior: 50784142!
+test07CheckoutWithOkFromMerchantProcessor
+
+	| aCashier aCatalogo aCart |
+	self debitWith: [hasDebit := true].
+
+	aCatalogo := Dictionary new.	
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.
+	
+	self assert: (aCashier didSell: 13).
+	
+	self assert: aCart isEmpty.
+
+	self assert: hasDebit! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:58:30' prior: 50785781!
+test07CheckoutWithOkFromMerchantProcessor
+
+	| aCashier aCatalogo aCart |
+
+	aCatalogo := Dictionary new.	
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [hasDebit := true].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.
+	
+	self assert: (aCashier didSell: 13).
+	
+	self assert: aCart isEmpty.
+
+	self assert: hasDebit! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:58:44' prior: 50784093!
+test08CheckoutWithErrorFromMerchantProcessor
+
+	| aCashier aCatalogo aCart |
+	
+	self debitWith: [self class error: 'Error'].
+	
+	aCatalogo := Dictionary new.	
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [self class error: 'Error'].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self should: [aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Error'.
+			self deny: (aCashier didSell: 13).
+			self deny: aCart isEmpty.
+		].
+	
+	
+	
+! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 17:58:47' prior: 50785821!
+test08CheckoutWithErrorFromMerchantProcessor
+
+	| aCashier aCatalogo aCart |
+	
+	aCatalogo := Dictionary new.	
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+
+	aCashier := self defaultCashierWith: [self class error: 'Error'].
+	
+	aCart := Cart acceptingItemsOf: (aCatalogo).
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self should: [aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Error'.
+			self deny: (aCashier didSell: 13).
+			self deny: aCart isEmpty.
+		].
+	
+	
+	
+! !
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:58:54'!
+PASSED!
+
+!methodRemoval: CashierTest #defaultCashier stamp: 'car 11/11/2019 17:58:59'!
+defaultCashier		
+	
+	^ Cashier with: OrderedCollection new using: self.!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:59:02'!
+PASSED!
+
+!methodRemoval: CashierTest #debitWith: stamp: 'car 11/11/2019 17:59:08'!
+debitWith: anAction
+	
+	action := anAction!
+
+!methodRemoval: CashierTest #debit stamp: 'car 11/11/2019 17:59:12'!
+debit
+	
+	action value!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:59:14'!
+PASSED!
+
+TestCase subclass: #CashierTest
+	instanceVariableNames: 'hasDebit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #CashierTest category: #TusLibros stamp: 'car 11/11/2019 17:59:24'!
+TestCase subclass: #CashierTest
+	instanceVariableNames: 'hasDebit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 17:59:30'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 17:59:36) CuisUniversity-3938.image priorSource: 14521393!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 17:59:50'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 17:59:50'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 17:59:50'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 17:59:50'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 17:59:50'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 17:59:50'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:04:29'!
+test07CheckoutEmptyCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+	  raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.].! !
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:05:31'!
+ERROR!
+
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/11/2019 18:08:41'!
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:08:38'!
+checkoutWith: aCartID and: aCreditCard
+
+	merchantProcessor debitWith: aCartID  and: aCreditCard ! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:09:51'!
+linkMerchantProcessor: aMerchantProcessor
+
+	merchantProcessor := aMerchantProcessor 
+
+	! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:12:20' prior: 50786024!
+test07CheckoutEmptyCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [^ self error : 'Cannot do checkout from an empty cart']).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+	  raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.].! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:12:32' prior: 50786066!
+test07CheckoutEmptyCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [^ self error : 'Cannot do checkout from an empty cart']).
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+	  raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.].! !
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:13:02'!
+ERROR!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:13:33' prior: 50786052!
+checkoutWith: aCartID and: aCreditCard
+
+	merchantProcessor debit! !
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:13:38'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:14:09' prior: 50786087!
+test07CheckoutEmptyCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [^ self class error : 'Cannot do checkout from an empty cart']).
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+	  raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.].! !
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:14:12'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:14:20'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:14:20'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:15:35'!
+test07CheckoutCartWithOneElement
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [^ self class error : 'Cannot do checkout from an empty cart']).
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+	  raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.].! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test07CheckoutEmptyCart stamp: 'car 11/11/2019 18:15:35'!
+test07CheckoutEmptyCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [^ self class error : 'Cannot do checkout from an empty cart']).
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+	  raise: Error - MessageNotUnderstood 
+	  withExceptionDo: [:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.].!
+
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/11/2019 18:16:55'!
+TestCase subclass: #RestInterfaceInternalPartTest
+	instanceVariableNames: 'testRestInterface mockClock hasDebit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:16:52' prior: 50786147!
+test07CheckoutCartWithOneElement
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:18:36' prior: 50786193!
+test07CheckoutCartWithOneElement
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard.
+
+self assert: hasDebit.
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 18:18:38'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 18:18:40'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 18:19:05) CuisUniversity-3938.image priorSource: 14539176!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:19:17'!
+test08CheckoutExpiredCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard.
+
+self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:21:19' prior: 50786252!
+test08CheckoutExpiredCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: [].
+
+mockClock addMinutes: 29.
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+mockClock addMinutes: 3.
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:21:19'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:22:09' prior: 50786267!
+test08CheckoutExpiredCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+mockClock addMinutes: 29.
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+mockClock addMinutes: 3.
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:22:10'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:22:58' prior: 50786109!
+checkoutWith: aCartID and: aCreditCard
+
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit! !
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:23:02'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:23:45' prior: 50786289!
+test08CheckoutExpiredCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+mockClock addMinutes: 31.
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:23:58'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:23:58'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:26:17' prior: 50785211!
+checkCartExpiration: aCartId
+	| now aCartTime |
+	now := clock getTime.
+	aCartTime := cartClocks at: aCartId ifAbsent:  [^ RestInterfaceInternalPart error: 'Cart ID is invalid'].
+	now - aCartTime > 30 ifTrue: [
+		^ RestInterfaceInternalPart error: 'Cart ID is invalid'
+	].! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:26:21'!
+PASSED!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 18:26:26'!
+PASSED!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:26:48' prior: 50785224!
+add: anItem  withQuantity: aQuantity to: aCartID
+
+	|aCart |
+	
+	self checkCartExpiration: aCartID.
+	
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart add: aQuantity of: anItem! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:27:04' prior: 50785235!
+listCart: aCartId
+	
+	| aCart |
+	
+	self checkCartExpiration: aCartId.
+	
+	aCart := cartDB at: aCartId ifAbsent: [].
+	
+	^ aCart products.! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:27:07'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:31:28'!
+test10ListValidClientAndPasswordNoPurchases
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: (testRestInterface listPurchasesFor: aClientId and: aClientPassword size) equals: 0.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:31:48'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:31:48'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:32:30' prior: 50786463!
+test10ListValidClientAndPasswordNoPurchases
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: (testRestInterface listPurchasesFor: aClientId and: aClientPassword size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:32:42' prior: 50786485!
+test10ListValidClientAndPasswordNoPurchases
+
+| aClientId aClientPassword |
+
+testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: (testRestInterface listPurchasesFor: aClientId and: aClientPassword size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:32:46' prior: 50786501!
+test10ListValidClientAndPasswordNoPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: (testRestInterface listPurchasesFor: aClientId and: aClientPassword size) equals: 0.
+
+
+
+! !
+
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/11/2019 18:33:27'!
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:33:25'!
+listPurchasesFor: aClientId and: aClientPassword
+
+	^ clientPurchases at: aClientId ifAbsent: [].! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:34:10' prior: 50786541!
+listPurchasesFor: aClientId and: aClientPassword
+
+	^ clientPurchases at: aClientId ifAbsent: [OrderedCollection new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:34:14'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:34:14'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:34:29'!
+defaultClientName
+	
+	^ 'Test Client'! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:34:36'!
+defaultClientId
+	
+	^ 'Test Client ID'! !
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:34:41'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:34:41'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:34:58'!
+defaultClientPassword
+	
+	^ 'Test Client'! !
+
+!methodRemoval: RestInterfaceInternalPartTest #defaultClientName stamp: 'car 11/11/2019 18:34:58'!
+defaultClientName
+	
+	^ 'Test Client'!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:35:05' prior: 50786581!
+defaultClientPassword
+	
+	^ 'Test password'! !
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:35:10'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:35:10'!
+ERROR!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:35:47' prior: 50784326!
+initializeInterface
+
+	cartNumber := 0.
+	cartDB := Dictionary new.
+	clientPurchases := Dictionary new.! !
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:35:51'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:35:51'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:36:02' prior: 50786517!
+test10ListValidClientAndPasswordNoPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 0.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:36:05'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:36:17'!
+test11ListValidClientAndPasswordOnePurchase
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:36:20' prior: 50786665!
+test11ListValidClientAndPasswordOnePurchase
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:36:23'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:36:23'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:36:36' prior: 50786680!
+test11ListValidClientAndPasswordOnePurchase
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:37:12' prior: 50786703!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := self createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard.
+
+
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:37:16' prior: 50786718!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := self createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:37:19'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:37:19'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:37:38' prior: 50786738!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:37:42'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:37:42'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:39:07'!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [].
+	! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:39:28' prior: 50786794!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [0].
+	! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:40:03' prior: 50786805!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [0].
+	
+	clientPurchasesQty at: aClientId put: clientPurchasesQty + 1.! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:40:15' prior: 50786816!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [OrderedCollection new].
+	
+	clientPurchasesQty at: aClientId put: clientPurchasesQty + 1.! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:43:38' prior: 50786829!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+	
+		
+"	clientPurchasesQty at: aClientId put: clientPurchasesQty add: Argument expected ->."! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:46:46' prior: 50786842!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty aCart anItemQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+	
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			 
+	]! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:47:05' prior: 50786856!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty aCart anItemQty |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+	
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			clientPurchasesQty at: anItem put: anItemQty + 1.
+	]! !
+
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/11/2019 18:52:27'!
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientsPurchasesTotals'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:52:34' prior: 50786872!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty aCart anItemQty clientPurchasesAmount |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			clientPurchasesQty at: anItem put: anItemQty + 1.
+	].
+
+	clientPurchasesAmount := clientsPurchasesTotals at: aClientId ifAbsent: [0].
+	clientsPurchasesTotals at: aClientId put: clientPurchasesAmount  + (aCart getProductsTotalCost).! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:53:05' prior: 50786604!
+initializeInterface
+
+	cartNumber := 0.
+	cartDB := Dictionary new.
+	clientPurchases := Dictionary new.
+	clientsPurchasesTotals := Dictionary new.	! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:54:08' prior: 50786548!
+listPurchasesFor: aClientId and: aClientPassword
+
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:54:51' prior: 50786619!
+test10ListValidClientAndPasswordNoPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:54:54' prior: 50786766!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 18:54:59'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:55:03'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:55:03'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:55:42' prior: 50786956!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:56:21' prior: 50786989!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:56:23'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:56:23'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:56:32'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:56:32'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:58:34' prior: 50786900!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty aCart anItemQty clientPurchasesAmount |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			clientPurchasesQty at: anItem put: anItemQty + 1.
+	].
+
+	clientPurchases at: aClientId put: clientPurchasesQty.
+
+	clientPurchasesAmount := clientsPurchasesTotals at: aClientId ifAbsent: [0].
+	clientsPurchasesTotals at: aClientId put: clientPurchasesAmount  + (aCart getProductsTotalCost).! !
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 18:58:43'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 18:58:47) CuisUniversity-3938.image priorSource: 14547124!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:59:23'!
+test12ListInvalidClientAndPasswordPurchases
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 18:59:36' prior: 50787079!
+test12ListInvalidClientAndPasswordPurchases
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:00:16' prior: 50787100!
+test12ListInvalidClientAndPasswordPurchases
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:00:24' prior: 50787117!
+test12ListInvalidClientAndPasswordPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientAndPasswordPurchases stamp: 'car 11/11/2019 19:00:27'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientAndPasswordPurchases stamp: 'car 11/11/2019 19:00:27'!
+FAILURE!
+
+!methodRemoval: RestInterfaceInternalPart #checkoutWith:and: stamp: 'car 11/11/2019 19:00:41'!
+checkoutWith: aCartID and: aCreditCard
+
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:01:08' prior: 50786203!
+test07CheckoutCartWithOneElement
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:01:19' prior: 50786324!
+test08CheckoutExpiredCart
+
+| aCartID |
+
+aCartID := testRestInterface createCart.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+mockClock addMinutes: 31.
+
+self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/11/2019 19:02:35'!
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientsPurchasesTotals clientDB'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:02:32' prior: 50786933!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: ['']
+
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:02:39' prior: 50787218!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [''].
+
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:03:10'!
+test12ListInvalidClientPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test12ListInvalidClientAndPasswordPurchases stamp: 'car 11/11/2019 19:03:10'!
+test12ListInvalidClientAndPasswordPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:04:35' prior: 50787228!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [''].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Client or Password is invalid'].
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:04:41'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:04:41'!
+ERROR!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:05:07' prior: 50786924!
+initializeInterface
+
+	cartNumber := 0.
+	cartDB := Dictionary new.
+	clientPurchases := Dictionary new.
+	clientsPurchasesTotals := Dictionary new.
+	clientDB := Dictionary new.
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:05:15'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:05:15'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:05:31' prior: 50787276!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [''].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Client ID or Password is invalid'].
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:05:36'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:05:39'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:05:39'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:05:39'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:06:17' prior: 50786941!
+test10ListValidClientAndPasswordNoPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface register: aClientId with: aClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:06:27' prior: 50787010!
+test11ListValidClientAndPasswordOnePurchase
+
+| aCartID aClientId aClientPassword |
+
+aCartID := testRestInterface createCart.
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface register: aClientId with: aClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:06:36' prior: 50787387!
+test11ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := testRestInterface createCart.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface register: aClientId with: aClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:07:04'!
+register: aClientId with: aPassword
+
+	clientDB at: aClientId put: aPassword.! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:07:09'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 19:07:12) CuisUniversity-3938.image priorSource: 14573596!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:07:40'!
+test12ListValidClientInvalidPasswordPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test12ListInvalidClientPurchases stamp: 'car 11/11/2019 19:07:40'!
+test12ListInvalidClientPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:07:58'!
+test13ListInvalidClientPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:08:48' prior: 50784841!
+setUp
+
+	mockClock := MockClock create.
+
+	testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:08:53' prior: 50784849!
+test01ListEmptyCart
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 0! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:08:58' prior: 50784858!
+test02ListCartWithOneItem
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 1! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:09:04' prior: 50784869!
+test03ListInvalidCart
+
+
+	self should: [testRestInterface listCart: 80 ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:09:09' prior: 50784880!
+test04ListExpiredCart
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface listCart: aCartID ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:09:17' prior: 50785168!
+test05AddToExpiredCart
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	mockClock addMinutes: 29.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 3.
+
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:09:24' prior: 50785336!
+test06ListCartWithMoreThanOneElement
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 6! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:09:28' prior: 50787171!
+test07CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:09:36' prior: 50787187!
+test08CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:10:19' prior: 50787482!
+test12ListValidClientInvalidPasswordPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+	
+	testRestInterface  register: aClientId with: aClientPassword , 'test'.
+	
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:10:23'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:10:48' prior: 50787519!
+test13ListInvalidClientPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface  register: aClientId with: aClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:10:52'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:10:52'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:11:01'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:11:01'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:11:15' prior: 50787313!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [^ self class error: 'Client ID or Password is invalid'].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Client ID or Password is invalid'].
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:11:18'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:11:18'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:11:18'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:11:30' prior: 50787724!
+test13ListInvalidClientPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:11:39'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 19:11:56) CuisUniversity-3938.image priorSource: 14586464!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:12:15' prior: 50787760!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [^ self class error: 'Client ID or Password is invalid'].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Client ID or Password is invalid'].
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:12:20'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 19:12:24) CuisUniversity-3938.image priorSource: 14598156!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:12:58'!
+test05ListCartWithMoreThanOneElement
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 6! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test06ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:12:58'!
+test06ListCartWithMoreThanOneElement
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 6!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:13:04'!
+test06AddToExpiredCart
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	mockClock addMinutes: 29.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 3.
+
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test05AddToExpiredCart stamp: 'car 11/11/2019 19:13:04'!
+test05AddToExpiredCart
+
+	| aCartID |
+
+	aCartID := testRestInterface createCart.
+
+	mockClock addMinutes: 29.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 3.
+
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:16:34'!
+test14CreateCartInvalidClient
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: aClientId and: aClientPassword ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Client ID or Password is invalid'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:16:45'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:16:45'!
+ERROR!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:17:14'!
+createCartWith: aClientId and: aClientPassword
+	
+	| catalog |
+	catalog := Dictionary new.
+	catalog add: 'Valid item'->10; add: 'Valid item B'->8.
+
+	cartDB at: cartNumber put: (Cart acceptingItemsOf: catalog).
+	cartClocks at: cartNumber put: (clock getTime).	
+	^ cartNumber.! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:19:00' prior: 50787993!
+createCartWith: aClientId and: aClientPassword
+	
+	| catalog |
+	
+	clientDB at: aClientId ifAbsent: [^ self class error: 'Invalid Client ID or Password'].
+	
+	catalog := Dictionary new.
+	catalog add: 'Valid item'->10; add: 'Valid item B'->8.
+
+	cartDB at: cartNumber put: (Cart acceptingItemsOf: catalog).
+	cartClocks at: cartNumber put: (clock getTime).	
+	^ cartNumber.! !
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:19:06'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:19:06'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:19:21' prior: 50787968!
+test14CreateCartInvalidClient
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: aClientId and: aClientPassword ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:19:26' prior: 50787822!
+test13ListInvalidClientPurchases
+
+| aClientId aClientPassword |
+
+aClientId := self defaultClientId.
+aClientPassword := self defaultClientPassword.
+
+testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:19:31' prior: 50787659!
+test12ListValidClientInvalidPasswordPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+	
+	testRestInterface  register: aClientId with: aClientPassword , 'test'.
+	
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:19:50' prior: 50788006!
+createCartWith: aClientId and: aClientPassword
+	
+	| catalog |
+	
+	clientDB at: aClientId ifAbsent: [^ self class error: 'Invalid Client ID or Password'].
+	
+	catalog := Dictionary new.
+	catalog add: 'Valid item'->10; add: 'Valid item B'->8.
+
+	cartDB at: cartNumber put: (Cart acceptingItemsOf: catalog).
+	cartClocks at: cartNumber put: (clock getTime).	
+	^ cartNumber.! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:20:03' prior: 50787847!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [^ self class error: 'Invalid Client ID or Password'].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Invalid Client ID or Password'].
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:20:09'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:20:55' prior: 50787538!
+setUp
+
+	mockClock := MockClock create.
+
+	testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.
+	
+	testRestInterface register: self defaultClientId with: self defaultClientPassword .! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:21:45' prior: 50787546!
+test01ListEmptyCart
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 0! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:21:54'!
+defaultCart
+	
+	^ testRestInterface createCartWith: self defaultClientId and: self defaultClientPassword! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:04' prior: 50787555!
+test02ListCartWithOneItem
+
+	| aCartID |
+
+		aCartID := self defaultCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 1! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:11' prior: 50788149!
+test02ListCartWithOneItem
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 1! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:18' prior: 50787577!
+test04ListExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface listCart: aCartID ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:22' prior: 50787908!
+test05ListCartWithMoreThanOneElement
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 6! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:27' prior: 50787934!
+test06AddToExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	mockClock addMinutes: 29.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 3.
+
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:31' prior: 50787623!
+test07CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:36' prior: 50787639!
+test08CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:45' prior: 50787410!
+test11ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultCart.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface register: aClientId with: aClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:22:54' prior: 50788048!
+test13ListInvalidClientPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:23:12' prior: 50787370!
+test10ListValidClientAndPasswordNoPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:23:31' prior: 50788292!
+test10ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) keys size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:23:46' prior: 50788250!
+test11ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultCart.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:24:12' prior: 50788273!
+test13ListInvalidClientPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:24:20' prior: 50788340!
+test13ListInvalidClientPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:25:01' prior: 50788029!
+test14CreateCartInvalidClient
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: 'Invalid Client' and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:25:04'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:25:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:25:04'!
+FAILURE!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:25:29' prior: 50788360!
+test13ListInvalidClientPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: 'Invalid Client' and: self defaultClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:25:32'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:25:35'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 19:25:39) CuisUniversity-3938.image priorSource: 14600112!
+
+!methodRemoval: RestInterfaceInternalPart #createCart stamp: 'car 11/11/2019 19:25:47'!
+createCart
+	| catalog |
+	catalog := Dictionary new.
+	catalog add: 'Valid item'->10; add: 'Valid item B'->8.
+
+	cartDB at: cartNumber put: (Cart acceptingItemsOf: catalog).
+	cartClocks at: cartNumber put: (clock getTime).	
+	^ cartNumber.!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:26:24'!
+checkClientInformationWith: aClientId and: aPassword
+	! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:26:25' prior: 50788521!
+checkClientInformationWith: aClientId and: aPassword
+	
+	! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:26:59' prior: 50788527!
+checkClientInformationWith: aClientId and: aClientPassword
+	
+	| clientPassword |
+	
+	clientPassword := clientDB at: aClientId ifAbsent: [^ self class error: 'Invalid Client ID or Password'].
+	
+	clientPassword = aClientPassword ifFalse: [^ self class error: 'Invalid Client ID or Password'].! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:28:03' prior: 50788105!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| |
+	
+	self checkClientInformationWith: aClientId and: aClientPassword.
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:28:08' prior: 50788546!
+listPurchasesFor: aClientId and: aClientPassword
+	
+	self checkClientInformationWith: aClientId and: aClientPassword.
+	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:28:13'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:28:36'!
+test14CreateCartInvalidPassword
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: self defaultClientId and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidPassword stamp: 'car 11/11/2019 19:28:40'!
+FAILURE!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidPassword stamp: 'car 11/11/2019 19:28:40'!
+FAILURE!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:29:10' prior: 50788089!
+createCartWith: aClientId and: aClientPassword
+	
+	| catalog |
+	
+	self checkClientInformationWith: aClientId  and: aClientPassword.
+	
+	catalog := Dictionary new.
+	catalog add: 'Valid item'->10; add: 'Valid item B'->8.
+
+	cartDB at: cartNumber put: (Cart acceptingItemsOf: catalog).
+	cartClocks at: cartNumber put: (clock getTime).	
+	^ cartNumber.! !
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidPassword stamp: 'car 11/11/2019 19:29:17'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:29:29'!
+test15CreateCartInvalidPassword
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: self defaultClientId and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test14CreateCartInvalidPassword stamp: 'car 11/11/2019 19:29:29'!
+test14CreateCartInvalidPassword
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: self defaultClientId and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+!
+
+----SNAPSHOT----(11 November 2019 19:29:32) CuisUniversity-3938.image priorSource: 14619413!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 19:29:51' prior: 50784781!
+initializeInterfaceWith: aClock.
+
+	self initializeInterface .
+	clock := aClock .
+	cartClocks := Dictionary new.! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidPassword stamp: 'car 11/11/2019 19:30:00'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 19:30:04) CuisUniversity-3938.image priorSource: 14625005!
+
+----SNAPSHOT----(11 November 2019 19:30:06) CuisUniversity-3938.image priorSource: 14626958!
+
+Object subclass: #TestFactory
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #TestFactory category: #TusLibros stamp: 'car 11/11/2019 19:59:31'!
+Object subclass: #TestFactory
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!TestFactory methodsFor: 'nil' stamp: 'car 11/11/2019 19:59:54'!
+defaultCreditCard
+	
+	^ CreditCard withName: 'Juan Lopez' andNumber: 1234567891234567 andExpiration: (GregorianMonthOfYear yearNumber: 2020 monthNumber: 4).! !
+!TestFactory methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:00:40'!
+defaultMerchantProcessorWith: anAction.
+	
+	^MockMerchantProcessor debitWith: anAction! !
+!TestFactory methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:01:16'!
+defaultClientId
+	
+	^ 'Test Client ID'! !
+!TestFactory methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:01:28'!
+defaultClientPassword
+	
+	^ 'Test password'! !
+
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/11/2019 20:02:36'!
+TestCase subclass: #RestInterfaceInternalPartTest
+	instanceVariableNames: 'testRestInterface mockClock hasDebit testFactory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:02:35' prior: 50788123!
+setUp
+
+	mockClock := MockClock create.
+
+	testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.
+	
+	testRestInterface register: self defaultClientId with: self defaultClientPassword .
+	
+	testFactory := TestFactory new.! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:03:28' prior: 50788214!
+test07CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: testFactory defaultCreditCard and: testFactory defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:03:34' prior: 50788230!
+test08CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: testFactory defaultCreditCard and: testFactory defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:03:40' prior: 50788307!
+test10ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: testFactory defaultClientId and: testFactory defaultClientPassword) keys size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:03:52' prior: 50788841!
+test10ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) keys size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:03:59' prior: 50788821!
+test08CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:04:06' prior: 50788805!
+test07CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := self defaultCart.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:04:24' prior: 50788793!
+setUp
+
+	mockClock := MockClock create.
+
+	testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.
+	
+	testRestInterface register: self defaultClientId with: self defaultClientPassword .	! !
+
+TestCase subclass: #RestInterfaceInternalPartTest
+	instanceVariableNames: 'testRestInterface mockClock hasDebit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/11/2019 20:04:30'!
+TestCase subclass: #RestInterfaceInternalPartTest
+	instanceVariableNames: 'testRestInterface mockClock hasDebit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #TestFactory stamp: 'car 11/11/2019 20:04:39'!
+Object subclass: #TestFactory
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'car 11/11/2019 20:04:44'!
+PASSED!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 20:04:49'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidPassword stamp: 'car 11/11/2019 20:04:53'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 20:04:56) CuisUniversity-3938.image priorSource: 14627052!
+
+----SNAPSHOT----(11 November 2019 20:06:42) CuisUniversity-3938.image priorSource: 14636323!
+
+----SNAPSHOT----(11 November 2019 20:06:52) CuisUniversity-3938.image priorSource: 14636417!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:43:16'!
+defaultCart! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:43:52' prior: 50789044!
+defaultCart
+
+	| aCatalog |
+	
+	aCatalog := Dictionary new.
+	
+	aCatalog add: 'itemA'->10; add: 'itemB'->3.
+	
+	! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:44:02' prior: 50785601!
+test01CheckoutWithEmptyCart
+
+	| aCashier aCatalogo |
+	aCatalogo := Dictionary new.
+	
+	aCatalogo add: 'itemA'->10; add: 'itemB'->3.
+	aCashier := self defaultCashierWith: [].
+		
+	self should: [aCashier checkoutWith: (self defaultCart) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.
+			self deny: (aCashier didSell: 0).
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:44:16' prior: 50789055!
+test01CheckoutWithEmptyCart
+
+	| aCashier |
+	
+	aCashier := self defaultCashierWith: [].
+		
+	self should: [aCashier checkoutWith: (self defaultCart) and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Cannot do checkout from an empty cart'.
+			self deny: (aCashier didSell: 0).
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:44:24' prior: 50789048!
+defaultCart
+
+	| aCatalog |
+	
+	aCatalog := Dictionary new.
+	
+	aCatalog add: 'itemA'->10; add: 'itemB'->3.
+	
+	^ Cart acceptingItemsOf: aCatalog.
+	
+	! !
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 20:44:27'!
+PASSED!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:44:42' prior: 50785620!
+test02CheckoutWithCartWithOneItem
+
+	| aCashier aCart |	
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.	
+
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 10.  
+	
+	self assert: aCart isEmpty.! !
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 20:44:44'!
+PASSED!
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:01' prior: 50785706!
+test03CheckoutWithValidCreditCard
+
+	| aCashier aCart |
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	
+	self deny: aCart isEmpty.	
+
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 10.  
+	
+	self assert: aCart isEmpty.! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:14' prior: 50785723!
+test04CheckoutWithExpiredCreditCard
+
+	| aCashier aCart dateToCheck |
+
+	dateToCheck := FixedGregorianDate fromDate: (Date newDay: 12 month: #December year: 2021).
+	
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	
+	self should: [aCashier checkoutWith: aCart and: self defaultCreditCard on: dateToCheck]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Credit Card is expired'
+		]! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:26' prior: 50785745!
+test05CheckoutWithValidCreditCardMultipleItems
+
+	| aCashier aCart |
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.  
+	
+	self assert: aCart isEmpty.
+! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:39' prior: 50785762!
+test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout
+
+	| aCashier aCart |
+
+	aCashier := self defaultCashierWith: [].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.
+	
+	self assert: (aCashier didSell: 13).
+	
+	self assert: aCart isEmpty.
+! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:45:52' prior: 50785801!
+test07CheckoutWithOkFromMerchantProcessor
+
+	| aCashier aCart |
+
+	aCashier := self defaultCashierWith: [hasDebit := true].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self assert: (aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)) equals: 13.
+	
+	self assert: (aCashier didSell: 13).
+	
+	self assert: aCart isEmpty.
+
+	self assert: hasDebit! !
+!CashierTest methodsFor: 'test' stamp: 'car 11/11/2019 20:46:05' prior: 50785846!
+test08CheckoutWithErrorFromMerchantProcessor
+
+	| aCashier aCart |
+
+	aCashier := self defaultCashierWith: [self class error: 'Error'].
+	
+	aCart := self defaultCart.
+	
+	aCart add: 'itemA'.
+	aCart add: 'itemB'.
+	
+	self should: [aCashier checkoutWith: aCart and: self defaultCreditCard on: (FixedGregorianDate fromDate: Date today)]
+	raise: Error - MessageNotUnderstood 
+	withExceptionDo: [
+		:anError | 
+			self assert: anError messageText equals: 'Error'.
+			self deny: (aCashier didSell: 13).
+			self deny: aCart isEmpty.
+		].
+	
+	
+	
+! !
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 20:46:08'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30'!
+defaultInterfaceCartId
+	
+	^ testRestInterface createCartWith: self defaultClientId and: self defaultClientPassword! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788160!
+test02ListCartWithOneItem
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 1! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788319!
+test11ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultInterfaceCartId.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788197!
+test06AddToExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	mockClock addMinutes: 29.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 3.
+
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788184!
+test05ListCartWithMoreThanOneElement
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface add: 'Valid item B'  withQuantity: 5 to: aCartID.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 6! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788886!
+test07CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788171!
+test04ListExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface listCart: aCartID ] 
+		raise:  Error - MessageNotUnderstood 
+		withExceptionDo:[:anError | 
+			self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788134!
+test01ListEmptyCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	self assert: (testRestInterface listCart: aCartID) size equals: 0! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:47:30' prior: 50788866!
+test08CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #defaultCart stamp: 'car 11/11/2019 20:47:30'!
+defaultCart
+	
+	^ testRestInterface createCartWith: self defaultClientId and: self defaultClientPassword!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidPassword stamp: 'car 11/11/2019 20:47:33'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 20:47:36) CuisUniversity-3938.image priorSource: 14636511!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:50:14'!
+test09CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test08CheckoutExpiredCart stamp: 'car 11/11/2019 20:50:14'!
+test08CheckoutExpiredCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.] 
+
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:50:29'!
+test08CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test07CheckoutCartWithOneElement stamp: 'car 11/11/2019 20:50:29'!
+test07CheckoutCartWithOneElement
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: self defaultClientId.
+
+	self assert: hasDebit.
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:51:33'!
+test07AddToInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+
+	testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId.
+
+	self deny: hasDebit.
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:52:36' prior: 50789507!
+test07AddToInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+	
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				]
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 20:52:39'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 20:52:39'!
+ERROR!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:52:57' prior: 50788902!
+setUp
+
+	mockClock := MockClock create.
+
+	testRestInterface := RestInterfaceInternalPart createInterfaceWith: mockClock.
+	
+	testRestInterface register: self defaultClientId with: self defaultClientPassword.
+	
+	hasDebit := false.! !
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 20:53:04'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:53:52' prior: 50789519!
+test07AddToInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+	
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: 'Invalid Cart'.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				]
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:53:58' prior: 50789558!
+test07AddToInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: [hasDebit := true]).
+	
+	self should: [testRestInterface add: 'Valid item'  withQuantity: 1 to: 'Invalid Cart'.] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.				
+				]
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 20:54:03'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutCartWithOneElement stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutExpiredCart stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidPassword stamp: 'car 11/11/2019 20:54:44'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 20:54:48) CuisUniversity-3938.image priorSource: 14649004!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:56:33'!
+test09CheckoutInvalidCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	mockClock addMinutes: 31.
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:56:37' prior: 50789650!
+test09CheckoutInvalidCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.	
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:56:41' prior: 50789672!
+test09CheckoutInvalidCart
+
+	| aCartID |
+
+	aCartID := self defaultInterfaceCartId.
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:56:47' prior: 50789693!
+test09CheckoutInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutInvalidCart stamp: 'car 11/11/2019 20:56:50'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:02'!
+test16CreateCartInvalidPassword
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: self defaultClientId and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test15CreateCartInvalidPassword stamp: 'car 11/11/2019 20:57:02'!
+test15CreateCartInvalidPassword
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: self defaultClientId and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:22'!
+test15CreateCartInvalidClient
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: 'Invalid Client' and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test14CreateCartInvalidClient stamp: 'car 11/11/2019 20:57:22'!
+test14CreateCartInvalidClient
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).	
+
+	self should: [testRestInterface createCartWith: 'Invalid Client' and: 'Any password'] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:36'!
+test14ListInvalidClientPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: 'Invalid Client' and: self defaultClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test13ListInvalidClientPurchases stamp: 'car 11/11/2019 20:57:36'!
+test13ListInvalidClientPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: 'Invalid Client' and: self defaultClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:42'!
+test13ListValidClientInvalidPasswordPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+	
+	testRestInterface  register: aClientId with: aClientPassword , 'test'.
+	
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test12ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 20:57:42'!
+test12ListValidClientInvalidPasswordPurchases
+
+	| aClientId aClientPassword |
+
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+	
+	testRestInterface  register: aClientId with: aClientPassword , 'test'.
+	
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface listPurchasesFor: aClientId and: aClientPassword] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Invalid Client ID or Password'.] 
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:47'!
+test12ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultInterfaceCartId.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test11ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 20:57:47'!
+test11ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultInterfaceCartId.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:53'!
+test11ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) keys size) equals: 0.
+
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test10ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 20:57:53'!
+test10ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) keys size) equals: 0.
+
+
+
+!
+!RestInterfaceInternalPartTest methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 20:57:58'!
+test10CheckoutInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+! !
+
+!methodRemoval: RestInterfaceInternalPartTest #test09CheckoutInvalidCart stamp: 'car 11/11/2019 20:57:58'!
+test09CheckoutInvalidCart
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self should: [testRestInterface checkoutWith: 'Invalid cart' and: self defaultCreditCard and: self defaultClientId ] 
+			raise:  Error - MessageNotUnderstood 
+			withExceptionDo:[:anError | 
+				self assert: anError messageText equals: 'Cart ID is invalid'.
+				self deny: hasDebit.
+				] 
+
+
+
+!
+
+----SNAPSHOT----(11 November 2019 20:58:01) CuisUniversity-3938.image priorSource: 14655842!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutCartWithOneElement stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutExpiredCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10CheckoutInvalidCart stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14ListInvalidClientPurchases stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidClient stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test16CreateCartInvalidPassword stamp: 'car 11/11/2019 20:58:04'!
+PASSED!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 20:58:08'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'car 11/11/2019 20:58:11'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 20:58:13) CuisUniversity-3938.image priorSource: 14666039!
+
+----SNAPSHOT----(11 November 2019 20:58:15) CuisUniversity-3938.image priorSource: 14669675!
+
+----SNAPSHOT----(11 November 2019 20:58:18) CuisUniversity-3938.image priorSource: 14669769!
+
+----SNAPSHOT----(11 November 2019 20:59:12) CuisUniversity-3938.image priorSource: 14669863!
+
+----SNAPSHOT----(11 November 2019 20:59:52) CuisUniversity-3938.image priorSource: 14669957!
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 21:00:20' prior: 50786417!
+add: anItem  withQuantity: aQuantity to: aCartID
+
+	|aCart |
+	
+	self checkCartExpiration: aCartID.
+	
+	aCart := cartDB at: aCartID.
+	
+	aCart add: aQuantity of: anItem! !
+!RestInterfaceInternalPart methodsFor: 'as yet unclassified' stamp: 'car 11/11/2019 21:01:19' prior: 50788686!
+initializeInterfaceWith: aClock.
+
+	cartNumber := 0.
+	cartDB := Dictionary new.
+	clientPurchases := Dictionary new.
+	clientsPurchasesTotals := Dictionary new.
+	clientDB := Dictionary new.
+	clock := aClock .
+	cartClocks := Dictionary new.! !
+
+!methodRemoval: RestInterfaceInternalPart #initializeInterface stamp: 'car 11/11/2019 21:01:25'!
+initializeInterface
+
+	cartNumber := 0.
+	cartDB := Dictionary new.
+	clientPurchases := Dictionary new.
+	clientsPurchasesTotals := Dictionary new.
+	clientDB := Dictionary new.
+!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutCartWithOneElement stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutExpiredCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10CheckoutInvalidCart stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14ListInvalidClientPurchases stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidClient stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test16CreateCartInvalidPassword stamp: 'car 11/11/2019 21:01:27'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 21:01:30) CuisUniversity-3938.image priorSource: 14670051!
+
+!methodRemoval: Cashier #initializeWith: stamp: 'car 11/11/2019 21:02:03'!
+initializeWith: aSalesBook
+
+	salesBook := aSalesBook.!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 21:02:07'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 21:02:10) CuisUniversity-3938.image priorSource: 14672920!
+
+----SNAPSHOT----(11 November 2019 21:02:22) CuisUniversity-3938.image priorSource: 14674013!
+
+----SNAPSHOT----(11 November 2019 21:02:31) CuisUniversity-3938.image priorSource: 14674107!
+
+!methodRemoval: RestInterfaceInternalPart class #createInterface stamp: 'car 11/11/2019 21:14:16'!
+createInterface
+
+	^ self new initializeInterface.!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test01CheckoutWithEmptyCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test02CheckoutWithCartWithOneItem stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test03CheckoutWithValidCreditCard stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutWithExpiredCreditCard stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test05CheckoutWithValidCreditCardMultipleItems stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test06CheckoutWithValidCreditCardMultipleItemsAndRegisterCheckout stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test07CheckoutWithOkFromMerchantProcessor stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #CashierTest #test08CheckoutWithErrorFromMerchantProcessor stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutCartWithOneElement stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutExpiredCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10CheckoutInvalidCart stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordNoPurchases stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientAndPasswordOnePurchase stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListValidClientInvalidPasswordPurchases stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14ListInvalidClientPurchases stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidClient stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test16CreateCartInvalidPassword stamp: 'car 11/11/2019 21:14:27'!
+PASSED!
+
+----SNAPSHOT----(11 November 2019 21:14:32) CuisUniversity-3938.image priorSource: 14674201!
+
+----SNAPSHOT----(11 November 2019 21:14:34) CuisUniversity-3938.image priorSource: 14678095!
