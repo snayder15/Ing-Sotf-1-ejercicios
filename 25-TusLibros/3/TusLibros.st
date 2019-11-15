@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 TestCase subclass: #CartTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -116,7 +116,7 @@ itemSellByTheStore
 	^ 'validBook'! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'hasDebit'
 	classVariableNames: ''
@@ -301,7 +301,7 @@ test08CheckoutWithErrorFromMerchantProcessor
 ! !
 
 
-!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 TestCase subclass: #RestInterfaceInternalPartTest
 	instanceVariableNames: 'testRestInterface mockClock hasDebit'
 	classVariableNames: ''
@@ -581,7 +581,7 @@ test16CreateCartInvalidPassword
 ! !
 
 
-!classDefinition: #Cart category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #Cart category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -668,7 +668,7 @@ emptyCart
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -678,7 +678,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Object subclass: #Cashier
 	instanceVariableNames: 'catalog salesBook merchantProcessor'
 	classVariableNames: ''
@@ -714,7 +714,7 @@ didSell: aSale
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -729,7 +729,7 @@ with: aSalesBook using: aMerchantProcessor
 	^ self new initializeWith: aSalesBook using: aMerchantProcessor.! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'name number expirationDate'
 	classVariableNames: ''
@@ -773,7 +773,7 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -783,7 +783,7 @@ withName: aName andNumber: aNumber andExpiration: aGregorianDate
 	^ self new initializeWithName: aName andNumber: aNumber andExpiration: aGregorianDate.! !
 
 
-!classDefinition: #MockClock category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #MockClock category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Object subclass: #MockClock
 	instanceVariableNames: 'time'
 	classVariableNames: ''
@@ -809,7 +809,7 @@ addMinutes: aQuantity
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockClock class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: 'MockClock class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 MockClock class
 	instanceVariableNames: ''!
 
@@ -819,7 +819,7 @@ create
 	^ self new initialize ! !
 
 
-!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Object subclass: #MockMerchantProcessor
 	instanceVariableNames: 'behavior'
 	classVariableNames: ''
@@ -841,7 +841,7 @@ initializeDebitWith: aClosure
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 MockMerchantProcessor class
 	instanceVariableNames: ''!
 
@@ -853,7 +853,7 @@ debitWith: aClosure
 	! !
 
 
-!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 Object subclass: #RestInterfaceInternalPart
 	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientsPurchasesTotals clientDB'
 	classVariableNames: ''
@@ -970,7 +970,7 @@ listPurchasesFor: aClientId and: aClientPassword
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'car 11/11/2019 21:14:43'!
+!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
 RestInterfaceInternalPart class
 	instanceVariableNames: 'cartNumber cartDB'!
 
