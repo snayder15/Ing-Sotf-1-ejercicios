@@ -9116,3 +9116,280 @@ PASSED!
 ----SNAPSHOT----(14 November 2019 21:50:20) CuisUniversity-3958.image priorSource: 15903782!
 
 ----SNAPSHOT----(14 November 2019 21:50:23) CuisUniversity-3958.image priorSource: 15903876!
+
+----STARTUP---- (15 November 2019 21:56:26) as /Users/nsoberon/Documents/Ingenieria 1/macos64/CuisUniversity-3958.image!
+
+
+----End fileIn of /Users/nsoberon/Documents/Ingenieria 1/macos64/TusLibros.st----!
+
+Object subclass: #Ticket
+	instanceVariableNames: 'total items'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #Ticket category: #TusLibros stamp: 'ns 11/15/2019 21:57:47'!
+Object subclass: #Ticket
+	instanceVariableNames: 'total items'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!Ticket class methodsFor: 'no messages' stamp: 'ns 11/15/2019 21:58:30'!
+withProducts: products andTotal: aTotal
+
+	^ self new initializewithProducts: products andTotal: aTotal! !
+!Ticket methodsFor: 'nil' stamp: 'ns 11/15/2019 21:58:52'!
+initializewithProducts: products andTotal: aTotal
+
+	total := aTotal.
+	items := products.! !
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 21:59:21' prior: 50829584!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesQty aCart anItemQty clientPurchasesAmount |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			clientPurchasesQty at: anItem put: anItemQty + 1.
+	].
+
+	clientPurchases at: aClientId put: clientPurchasesQty.
+
+	clientPurchasesAmount := clientsPurchasesTotals at: aClientId ifAbsent: [0].
+
+	clientsPurchasesTotals at: aClientId put: clientPurchasesAmount  + (aCart getProductsTotalCost).! !
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 22:03:00' prior: 50829633!
+listPurchasesFor: aClientId and: aClientPassword
+	
+	self checkClientInformationWith: aClientId and: aClientPassword.
+	^ clientPurchases at: aClientId ifAbsent: [OrderedCollection new].! !
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 22:05:25' prior: 50829684!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesList aCart aTicket |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesList := clientPurchases at: aClientId ifAbsent: [OrderedCollection new].
+
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aTicket := Ticket withProducts: aCart products andTotal: aCart getProductsTotalCost.
+	
+	"aCart products do: [
+		:anItem |
+			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
+			clientPurchasesQty at: anItem put: anItemQty + 1.
+	]."
+
+	clientPurchasesList add: aTicket.
+
+	clientPurchases at: aClientId put: clientPurchasesList.
+
+	"clientPurchasesAmount := clientsPurchasesTotals at: aClientId ifAbsent: [0]."
+
+	"clientsPurchasesTotals at: aClientId put: clientPurchasesAmount  + (aCart getProductsTotalCost)."
+	
+	^aTicket.! !
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 22:05:46' prior: 50829719!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesList aCart aTicket |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesList := clientPurchases at: aClientId ifAbsent: [OrderedCollection new].
+
+	aCart := cartDB at: aCartID ifAbsent: [].
+	
+	aTicket := Ticket withProducts: aCart products andTotal: aCart getProductsTotalCost.
+
+	clientPurchasesList add: aTicket.
+
+	clientPurchases at: aClientId put: clientPurchasesList.
+	
+	^aTicket.! !
+
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientDB'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'ns 11/15/2019 22:06:31'!
+Object subclass: #RestInterfaceInternalPart
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientDB'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 22:07:06' prior: 50829749!
+checkoutWith: aCartID and: aCreditCard and: aClientId
+
+	| clientPurchasesList aCart aTicket |
+	
+	self checkCartExpiration: aCartID.
+
+	merchantProcessor debit.
+	
+	clientPurchasesList := clientPurchases at: aClientId ifAbsent: [OrderedCollection new].
+
+	aCart := cartDB at: aCartID.
+	
+	aTicket := Ticket withProducts: aCart products andTotal: aCart getProductsTotalCost.
+
+	clientPurchasesList add: aTicket.
+
+	clientPurchases at: aClientId put: clientPurchasesList.
+	
+	^aTicket.! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutCartWithOneElement stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutExpiredCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10CheckoutInvalidCart stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordNoPurchases stamp: 'ns 11/15/2019 22:07:25'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientAndPasswordOnePurchase stamp: 'ns 11/15/2019 22:07:25'!
+ERROR!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListValidClientInvalidPasswordPurchases stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14ListInvalidClientPurchases stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidClient stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test16CreateCartInvalidPassword stamp: 'ns 11/15/2019 22:07:25'!
+PASSED!
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'ns 11/15/2019 22:07:44' prior: 50829122!
+test11ListValidClientAndPasswordNoPurchases
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) size) equals: 0.
+
+
+
+! !
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'ns 11/15/2019 22:07:50' prior: 50829134!
+test12ListValidClientAndPasswordOnePurchase
+
+	| aCartID aClientId aClientPassword |
+
+	aCartID := self defaultInterfaceCartId.
+	aClientId := self defaultClientId.
+	aClientPassword := self defaultClientPassword.
+
+
+	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
+
+	testRestInterface add: 'Valid item'  withQuantity: 1 to: aCartID.
+
+	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
+
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
+
+
+
+! !
+
+!testRun: #RestInterfaceInternalPartTest #test01ListEmptyCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test02ListCartWithOneItem stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test03ListInvalidCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test04ListExpiredCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test05ListCartWithMoreThanOneElement stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test06AddToExpiredCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test07AddToInvalidCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test08CheckoutCartWithOneElement stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test09CheckoutExpiredCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test10CheckoutInvalidCart stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test11ListValidClientAndPasswordNoPurchases stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test12ListValidClientAndPasswordOnePurchase stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test13ListValidClientInvalidPasswordPurchases stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test14ListInvalidClientPurchases stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test15CreateCartInvalidClient stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+!testRun: #RestInterfaceInternalPartTest #test16CreateCartInvalidPassword stamp: 'ns 11/15/2019 22:07:55'!
+PASSED!
+
+----SNAPSHOT----(15 November 2019 22:08:00) CuisUniversity-3958.image priorSource: 15903970!
+
+----SNAPSHOT----(15 November 2019 22:09:19) CuisUniversity-3958.image priorSource: 15945586!
+
+----QUIT----(15 November 2019 22:09:23) CuisUniversity-3958.image priorSource: 15945680!
+
+----STARTUP---- (15 November 2019 22:09:31) as /Users/nsoberon/Documents/Ingenieria 1/macos64/CuisUniversity-3958.image!
+
+
+----QUIT----(15 November 2019 22:09:40) CuisUniversity-3958.image priorSource: 15945774!

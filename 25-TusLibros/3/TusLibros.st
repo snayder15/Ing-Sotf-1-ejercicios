@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 TestCase subclass: #CartTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -116,7 +116,7 @@ itemSellByTheStore
 	^ 'validBook'! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'hasDebit'
 	classVariableNames: ''
@@ -301,7 +301,7 @@ test08CheckoutWithErrorFromMerchantProcessor
 ! !
 
 
-!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 TestCase subclass: #RestInterfaceInternalPartTest
 	instanceVariableNames: 'testRestInterface mockClock hasDebit'
 	classVariableNames: ''
@@ -488,18 +488,18 @@ test10CheckoutInvalidCart
 
 ! !
 
-!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:53'!
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'ns 11/15/2019 22:07:44'!
 test11ListValidClientAndPasswordNoPurchases
 
 	testRestInterface linkMerchantProcessor: (MockMerchantProcessor debitWith: []).
 
-	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) keys size) equals: 0.
+	self assert: ((testRestInterface listPurchasesFor: self defaultClientId and: self defaultClientPassword) size) equals: 0.
 
 
 
 ! !
 
-!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'car 11/11/2019 20:57:47'!
+!RestInterfaceInternalPartTest methodsFor: 'test' stamp: 'ns 11/15/2019 22:07:50'!
 test12ListValidClientAndPasswordOnePurchase
 
 	| aCartID aClientId aClientPassword |
@@ -515,7 +515,7 @@ test12ListValidClientAndPasswordOnePurchase
 
 	testRestInterface checkoutWith: aCartID and: self defaultCreditCard and: aClientId.
 
-	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) keys size) equals: 1.
+	self assert: ((testRestInterface listPurchasesFor: aClientId and: aClientPassword) size) equals: 1.
 
 
 
@@ -581,7 +581,7 @@ test16CreateCartInvalidPassword
 ! !
 
 
-!classDefinition: #Cart category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #Cart category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -668,7 +668,7 @@ emptyCart
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -678,7 +678,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Object subclass: #Cashier
 	instanceVariableNames: 'catalog salesBook merchantProcessor'
 	classVariableNames: ''
@@ -714,7 +714,7 @@ didSell: aSale
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -729,7 +729,7 @@ with: aSalesBook using: aMerchantProcessor
 	^ self new initializeWith: aSalesBook using: aMerchantProcessor.! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'name number expirationDate'
 	classVariableNames: ''
@@ -773,7 +773,7 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -783,7 +783,7 @@ withName: aName andNumber: aNumber andExpiration: aGregorianDate
 	^ self new initializeWithName: aName andNumber: aNumber andExpiration: aGregorianDate.! !
 
 
-!classDefinition: #MockClock category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #MockClock category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Object subclass: #MockClock
 	instanceVariableNames: 'time'
 	classVariableNames: ''
@@ -809,7 +809,7 @@ addMinutes: aQuantity
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockClock class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: 'MockClock class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 MockClock class
 	instanceVariableNames: ''!
 
@@ -819,7 +819,7 @@ create
 	^ self new initialize ! !
 
 
-!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Object subclass: #MockMerchantProcessor
 	instanceVariableNames: 'behavior'
 	classVariableNames: ''
@@ -841,7 +841,7 @@ initializeDebitWith: aClosure
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 MockMerchantProcessor class
 	instanceVariableNames: ''!
 
@@ -853,9 +853,9 @@ debitWith: aClosure
 	! !
 
 
-!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 Object subclass: #RestInterfaceInternalPart
-	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientsPurchasesTotals clientDB'
+	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientDB'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -913,29 +913,26 @@ add: anItem  withQuantity: aQuantity to: aCartID
 	
 	aCart add: aQuantity of: anItem! !
 
-!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 18:58:34'!
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 22:07:06'!
 checkoutWith: aCartID and: aCreditCard and: aClientId
 
-	| clientPurchasesQty aCart anItemQty clientPurchasesAmount |
+	| clientPurchasesList aCart aTicket |
 	
 	self checkCartExpiration: aCartID.
 
 	merchantProcessor debit.
 	
-	clientPurchasesQty := clientPurchases at: aClientId ifAbsent: [Dictionary new].
+	clientPurchasesList := clientPurchases at: aClientId ifAbsent: [OrderedCollection new].
 
-	aCart := cartDB at: aCartID ifAbsent: [].
+	aCart := cartDB at: aCartID.
 	
-	aCart products do: [
-		:anItem |
-			anItemQty := clientPurchasesQty at: anItem ifAbsent: [0].
-			clientPurchasesQty at: anItem put: anItemQty + 1.
-	].
+	aTicket := Ticket withProducts: aCart products andTotal: aCart getProductsTotalCost.
 
-	clientPurchases at: aClientId put: clientPurchasesQty.
+	clientPurchasesList add: aTicket.
 
-	clientPurchasesAmount := clientsPurchasesTotals at: aClientId ifAbsent: [0].
-	clientsPurchasesTotals at: aClientId put: clientPurchasesAmount  + (aCart getProductsTotalCost).! !
+	clientPurchases at: aClientId put: clientPurchasesList.
+	
+	^aTicket.! !
 
 !RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 19:29:10'!
 createCartWith: aClientId and: aClientPassword
@@ -962,15 +959,15 @@ listCart: aCartId
 	
 	^ aCart products.! !
 
-!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'car 11/11/2019 19:28:08'!
+!RestInterfaceInternalPart methodsFor: 'Interface' stamp: 'ns 11/15/2019 22:03:00'!
 listPurchasesFor: aClientId and: aClientPassword
 	
 	self checkClientInformationWith: aClientId and: aClientPassword.
-	^ clientPurchases at: aClientId ifAbsent: [Dictionary new].! !
+	^ clientPurchases at: aClientId ifAbsent: [OrderedCollection new].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'car 11/14/2019 21:50:27'!
+!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
 RestInterfaceInternalPart class
 	instanceVariableNames: 'cartNumber cartDB'!
 
@@ -978,3 +975,28 @@ RestInterfaceInternalPart class
 createInterfaceWith: aClock
 
 	^ self new initializeInterfaceWith: aClock.! !
+
+
+!classDefinition: #Ticket category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
+Object subclass: #Ticket
+	instanceVariableNames: 'total items'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!Ticket methodsFor: 'as yet unclassified' stamp: 'ns 11/15/2019 21:58:52'!
+initializewithProducts: products andTotal: aTotal
+
+	total := aTotal.
+	items := products.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Ticket class' category: #TusLibros stamp: 'ns 11/15/2019 22:09:38'!
+Ticket class
+	instanceVariableNames: ''!
+
+!Ticket class methodsFor: 'as yet unclassified' stamp: 'ns 11/15/2019 21:58:30'!
+withProducts: products andTotal: aTotal
+
+	^ self new initializewithProducts: products andTotal: aTotal! !
