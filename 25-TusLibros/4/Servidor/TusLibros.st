@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 TestCase subclass: #CartTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -116,7 +116,7 @@ itemSellByTheStore
 	^ 'validBook'! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'hasDebit'
 	classVariableNames: ''
@@ -301,7 +301,7 @@ test08CheckoutWithErrorFromMerchantProcessor
 ! !
 
 
-!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #RestInterfaceInternalPartTest category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 TestCase subclass: #RestInterfaceInternalPartTest
 	instanceVariableNames: 'testRestInterface mockClock hasDebit'
 	classVariableNames: ''
@@ -581,7 +581,7 @@ test16CreateCartInvalidPassword
 ! !
 
 
-!classDefinition: #Cart category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #Cart category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -668,7 +668,7 @@ emptyCart
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -678,7 +678,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #Cashier
 	instanceVariableNames: 'catalog salesBook merchantProcessor'
 	classVariableNames: ''
@@ -714,7 +714,7 @@ didSell: aSale
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -729,7 +729,7 @@ with: aSalesBook using: aMerchantProcessor
 	^ self new initializeWith: aSalesBook using: aMerchantProcessor.! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'name number expirationDate'
 	classVariableNames: ''
@@ -773,7 +773,7 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -783,7 +783,7 @@ withName: aName andNumber: aNumber andExpiration: aGregorianDate
 	^ self new initializeWithName: aName andNumber: aNumber andExpiration: aGregorianDate.! !
 
 
-!classDefinition: #MockClock category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #MockClock category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #MockClock
 	instanceVariableNames: 'time'
 	classVariableNames: ''
@@ -809,7 +809,7 @@ addMinutes: aQuantity
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockClock class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'MockClock class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 MockClock class
 	instanceVariableNames: ''!
 
@@ -819,7 +819,7 @@ create
 	^ self new initialize ! !
 
 
-!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #MockMerchantProcessor category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #MockMerchantProcessor
 	instanceVariableNames: 'behavior'
 	classVariableNames: ''
@@ -841,7 +841,7 @@ initializeDebitWith: aClosure
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'MockMerchantProcessor class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 MockMerchantProcessor class
 	instanceVariableNames: ''!
 
@@ -853,7 +853,7 @@ debitWith: aClosure
 	! !
 
 
-!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #RestInterfaceInternalPart category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #RestInterfaceInternalPart
 	instanceVariableNames: 'cartNumber cartDB clock cartClocks merchantProcessor clientPurchases clientDB'
 	classVariableNames: ''
@@ -966,7 +966,7 @@ listPurchasesFor: aClientId and: aClientPassword
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'RestInterfaceInternalPart class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 RestInterfaceInternalPart class
 	instanceVariableNames: 'cartNumber cartDB'!
 
@@ -976,7 +976,7 @@ createInterfaceWith: aClock
 	^ self new initializeInterfaceWith: aClock.! !
 
 
-!classDefinition: #RestInterfaceInternalServer category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #RestInterfaceInternalServer category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #RestInterfaceInternalServer
 	instanceVariableNames: 'restInterface port webServer'
 	classVariableNames: ''
@@ -994,6 +994,15 @@ add: anItem  withQuantity: aQuantity to: aCartID
 	on: Error 
 	do: [ :anError |
 		^ self errorWithMessage: anError messageText.].! !
+
+!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:01:19'!
+create200ResponseWith: aClosure and: aRequest
+		| responseAsJson |
+
+		responseAsJson := WebUtils jsonEncode: (aClosure value).
+		aRequest send200Response: (responseAsJson asUtf8) 
+		contentType: 'application/json; charset=utf-8' do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
 
 !RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/19/2019 22:02:22'!
 createCart
@@ -1017,7 +1026,20 @@ errorWithMessage: anErrorMessage
 
 	^ '1|', anErrorMessage.! !
 
-!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/19/2019 22:29:06'!
+!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:26:12'!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := '0'.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|' products at: aProduct].
+	^ listResult.! !
+
+!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:15:51'!
 initializeWith: aPortNumber
 	
 	restInterface := RestInterfaceInternalPart new.
@@ -1032,119 +1054,88 @@ initializeWith: aPortNumber
 		clientId := request fields at: 'clientId'.
 		password := request fields at: 'password'.
 		restInterface checkClientInformationWith: clientId and: password.
-		responseAsJson := WebUtils jsonEncode: (self createCart).
-		request send200Response: (responseAsJson asUtf8) 
-		contentType: 'application/json; charset=utf-8' do: [:resp | 
-		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]
+		self create200ResponseWith: [self createCart] and: request.
 	 ]
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].
 
 
-	webServer addService: '/addToCart' action:[:request | | responseAsJson bookIsbn bookQuantity cartId |
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
 	
 	[	cartId := request fields at: 'cartId'.
 		bookIsbn := request fields at: 'bookIsbn'.
 		bookQuantity := request fields at: 'bookQuantity'.
 		"TODO VALIDAR PARAMETROS"
-		responseAsJson := WebUtils jsonEncode: (self add: bookIsbn withQuantity: bookQuantity to: cartId).
-		request send200Response: (responseAsJson asUtf8) 
-		contentType: 'application/json; charset=utf-8' do: [:resp | 
-		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]
+		self create200ResponseWith: [self add: bookIsbn withQuantity: bookQuantity to: cartId] and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].
 
 
-	webServer addService: '/listCart' action:[:request | | responseAsJson cartId |
+	webServer addService: '/listCart' action:[:request | | cartId |
 	
 	[
 		cartId := request fields at: 'cartId'.
-		responseAsJson := WebUtils jsonEncode: (self listCart: cartId).
-		request send200Response: (responseAsJson asUtf8) 
-		contentType: 'application/json; charset=utf-8' do: [:resp | 
-		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]
+		self create200ResponseWith: [self listCart: cartId] and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].
 
-	webServer addService: '/checkoutCart' action:[:request | | responseAsJson cartId ccn cced cco |
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
 	
 	[	cartId := request fields at: 'cartId'.
 		ccn := request fields at: 'ccn'.
 		cced := request fields at: 'cced'.
 		cco := request fields at: 'cco'.
 		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
-		responseAsJson := WebUtils jsonEncode: (self checkout).
-		request send200Response: (responseAsJson asUtf8) 
-		contentType: 'application/json; charset=utf-8' do: [:resp | 
-		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]
+		self create200ResponseWith: [self checkout] and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].
 
 
-	webServer addService: '/listPurchases' action:[:request | | responseAsJson clientId password |
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
 	
 	[	clientId := request fields at: 'clientId'.
 		password := request fields at: 'password'.
 		restInterface checkClientInformationWith: clientId and: password.
-		responseAsJson := WebUtils jsonEncode: (self listPurchasesFor: clientId and: password).
-		request send200Response: (responseAsJson asUtf8) 
-		contentType: 'application/json; charset=utf-8' do: [:resp | 
-		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].! !
 
-!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/19/2019 22:17:55'!
+!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:26:57'!
 listCart: aCartID
-	| cartProducts productQuantity products cartList |
-	products := Dictionary new.
-	cartList := '0'.
+	| cartProducts |
 	[
 		cartProducts := restInterface listCart: aCartID.
-		cartProducts do: [
-			:anItem | 
-			productQuantity := products at: anItem ifAbsent: 0.
-			products at: anItem put: (productQuantity + 1).
-		].
-		products keysDo: [:aProduct | cartList := cartList, '|', aProduct , '|' products at: aProduct].
-		^ cartList.
+		self getListFor: cartProducts.
 	] 
 	on: Error 
 	do: [ :anError |
 		^ self errorWithMessage: anError messageText.].! !
 
-!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/19/2019 22:39:22'!
+!RestInterfaceInternalServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:31:12'!
 listPurchasesFor: aClientId and: aClientPassword
 
-	| purchases booksPurchased purchasesTotal bookQuantity ticketProducts booksList |
+	| purchases purchasesTotal ticketProducts |
 	
 	[
-		booksList := '0'.
-		booksPurchased := Dictionary new.
 		purchases := restInterface listPurchasesFor: aClientId and: aClientPassword. 
 		purchasesTotal := 0.
+		ticketProducts := OrderedCollection new.
 		purchases do: [
 			"para cada ticket"
 			:aTicket |
 			purchasesTotal := purchasesTotal + aTicket total.
-			ticketProducts := aTicket products.
-			ticketProducts do: [
-				"para cada producto del ticket"
-				:aProduct |
-				bookQuantity := booksPurchased at: aProduct ifAbsent: 0.
-				booksPurchased at: aProduct put: (bookQuantity + 1).
-			].
+			ticketProducts addAll: aTicket products.
 		].
-		booksPurchased keysDo: [:aBook | booksList := booksList, '|', aBook , '|', booksPurchased at: aBook].
-		^ booksList, '|', purchasesTotal asString.
+		^ self getListFor: ticketProducts, '|', purchasesTotal asString.
 	] 
 	on: Error 
 	do: [ :anError |
@@ -1176,7 +1167,7 @@ stopListening
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'RestInterfaceInternalServer class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'RestInterfaceInternalServer class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 RestInterfaceInternalServer class
 	instanceVariableNames: ''!
 
@@ -1186,7 +1177,7 @@ listeningOn: aPortNumber
 	^self new initializeWith: aPortNumber.! !
 
 
-!classDefinition: #Ticket category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: #Ticket category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Object subclass: #Ticket
 	instanceVariableNames: 'total items'
 	classVariableNames: ''
@@ -1204,9 +1195,14 @@ products
 
 	^ items.! !
 
+!Ticket methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:18:29'!
+total
+
+	^ total.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Ticket class' category: #TusLibros stamp: 'ns 11/19/2019 22:39:57'!
+!classDefinition: 'Ticket class' category: #TusLibros stamp: 'ns 11/20/2019 23:34:26'!
 Ticket class
 	instanceVariableNames: ''!
 
