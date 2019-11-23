@@ -28779,3 +28779,5203 @@ TusLibrosSystemFacadeServer allInstances do: [
 
 
 ----QUIT----(22 November 2019 08:41:41) CuisUniversity-3958.image priorSource: 16083183!
+
+----STARTUP---- (22 November 2019 23:21:18) as /Users/nsoberon/Documents/Ingenieria 1/macos entrega 4/CuisUniversity-3958.image!
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:22:45' prior: 50834137!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		self add: bookQuantity of: bookIsbn toCartIdentifiedAs: cartId.
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		self create200ResponseWith: [self listCart: cartId] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:27:34' prior: 50832781!
+create200ResponseWith: aValue and: aRequest
+		| responseAsJson |
+
+		responseAsJson := WebUtils jsonEncode: (aValue).
+		aRequest send200Response: (responseAsJson asUtf8) 
+		contentType: 'application/json; charset=utf-8' do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
+
+----SNAPSHOT----(22 November 2019 23:27:57) CuisUniversity-3958.image priorSource: 16083404!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:29:43' prior: 50834265!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		self create200ResponseWith: [self listCart: cartId] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+!methodRemoval: TusLibrosSystemFacadeServer #createCartFor:authenticatedWith: stamp: 'ns 11/22/2019 23:32:00'!
+createCartFor: clientId authenticatedWith: password
+	|cartId|
+	
+	[
+		cartId := restInterface createCartFor: clientId authenticatedWith: password.
+		^cartId.
+	] 
+	on: Error 
+	do: [ :anError |
+		^ self error: (self errorWithMessage: anError messageText).].!
+
+!methodRemoval: TusLibrosSystemFacadeServer #add:of:toCartIdentifiedAs: stamp: 'ns 11/22/2019 23:32:05'!
+add: aBookQuantity of: aBook toCartIdentifiedAs: cartId.
+
+	[
+		restInterface add: (aBookQuantity asNumber) of: aBook toCartIdentifiedAs: (cartId asNumber).
+	] 
+	on: Error 
+	do: [ :anError |
+		^ self error: (self errorWithMessage: anError messageText).].!
+
+!methodRemoval: TusLibrosSystemFacadeServer #errorWithMessage: stamp: 'ns 11/22/2019 23:32:13'!
+errorWithMessage: anErrorMessage
+
+	^ '1|', anErrorMessage.!
+
+----SNAPSHOT----(22 November 2019 23:32:50) CuisUniversity-3958.image priorSource: 16086757!
+
+----SNAPSHOT----(22 November 2019 23:33:01) CuisUniversity-3958.image priorSource: 16090717!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:35:16' prior: 50834366!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartList |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartList :=
+		self create200ResponseWith: [self listCart: cartId] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:36:28' prior: 50830349!
+listCart: aCartID
+	| cartProducts |
+	[
+		cartProducts := restInterface listCartIdentifiedAs: aCartID.
+		self getListFor: cartProducts.
+	] 
+	on: Error 
+	do: [ :anError |
+		^ self errorWithMessage: anError messageText.].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:38:04' prior: 50834493!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	]. !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:40:12' prior: 50834588!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:41:22' prior: 50830263!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := '0'.
+"	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|' products at: aProduct]."
+	^ listResult.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:42:21' prior: 50834773!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := '0'.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|' products at: aProduct].
+	^ listResult.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:42:28' prior: 50834795!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := '0'.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|', products at: aProduct].
+	^ listResult.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:44:02' prior: 50834810!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := '0'.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|', (products at: aProduct) asString].
+	^ listResult.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:44:10' prior: 50834831!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := '0'.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|', ((products at: aProduct) asString)].
+	^ listResult.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+
+----SNAPSHOT----(22 November 2019 23:48:11) CuisUniversity-3958.image priorSource: 16090811!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:48:17' prior: 50834847!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := ''.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|', ((products at: aProduct) asString)].
+	^ listResult.! !
+
+!methodRemoval: TusLibrosSystemFacadeServer #listCart: stamp: 'ns 11/22/2019 23:48:25'!
+listCart: aCartID
+	| cartProducts |
+	[
+		cartProducts := restInterface listCartIdentifiedAs: aCartID.
+		self getListFor: cartProducts.
+	] 
+	on: Error 
+	do: [ :anError |
+		^ self errorWithMessage: anError messageText.].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:53:15' prior: 50834680!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface checkOutCartIdentifiedAs: cartId withCreditCardNumbered: ccn ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:55:35' prior: 50834897!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface checkOutCartIdentifiedAs: cartId withCreditCardNumbered: ccn ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:55:42' prior: 50834986!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface checkOutCartIdentifiedAs: cartId withCreditCardNumbered: ccn ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: [self checkout] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/22/2019 23:56:01' prior: 50835076!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: cartId withCreditCardNumbered: ccn ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+----SNAPSHOT----(22 November 2019 23:58:42) CuisUniversity-3958.image priorSource: 16102940!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:06:41' prior: 50835165!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: ccn ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:08:17' prior: 50835264!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:12:35' prior: 50834350!
+create200ResponseWith: aValue and: aRequest
+		| responseAsJson |
+
+		responseAsJson := WebUtils jsonEncode: (aValue).
+		aRequest send200Response: ('asd' asUtf8) 
+		contentType: 'application/json; charset=utf-8' do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:12:44' prior: 50835456!
+create200ResponseWith: aValue and: aRequest
+		| responseAsJson |
+
+		"responseAsJson := WebUtils jsonEncode: (aValue)."
+		aRequest send200Response: ('asd' asUtf8) 
+		contentType: 'application/json; charset=utf-8' do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:13:32' prior: 50835469!
+create200ResponseWith: aValue and: aRequest
+		| responseAsJson |
+
+		responseAsJson := WebUtils jsonEncode: (aValue).
+		aRequest send200Response: (responseAsJson asUtf8) 
+		contentType: 'application/json; charset=utf-8' do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
+
+----SNAPSHOT----(23 November 2019 00:13:39) CuisUniversity-3958.image priorSource: 16115278!
+
+----SNAPSHOT----(23 November 2019 00:14:35) CuisUniversity-3958.image priorSource: 16123301!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:17:36'!
+ssinitializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+!methodRemoval: TusLibrosSystemFacadeServer #ssinitializeWith: stamp: 'ns 11/23/2019 00:17:46'!
+ssinitializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		restInterface checkClientInformationWith: clientId and: password.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:18:09' prior: 50835360!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:18:11' prior: 50835690!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:18:42' prior: 50835778!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:19:27' prior: 50835866!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:20:09' prior: 50835955!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: cartProducts and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:20:45' prior: 50836046!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: cced.
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:29:08' prior: 50790429!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: 10)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut ! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:29:40' prior: 50836235!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut ! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:30:16' prior: 50790516!
+checkOut
+
+	"self createTicket.
+	self debitTotal.
+	self registerSale."
+
+	^ 'asd' ! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:30:54' prior: 50836267!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket ! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:31:27' prior: 50836254!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^ 'asd'
+	"(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut "! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:33:27' prior: 50790943!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+
+	^'asd'.
+	"self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]"
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:33:37' prior: 50836305!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:33:51' prior: 50836319!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: 3
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:33:55' prior: 50836333!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:34:42' prior: 50836347!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | 
+			^'asd'.
+			"checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear" ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:34:48' prior: 50836361!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:35:14' prior: 50836285!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^ 'asw'
+	"(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut "! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:35:28' prior: 50836388!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^ 'asd'
+	"(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut "! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:36:08' prior: 50836402!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+
+	"(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut "! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:36:15' prior: 50836416!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^ 'asd'
+	"(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut "! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:36:31' prior: 50836375!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: 123
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:36:41' prior: 50836443!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: 123
+			ownedBy: 'asd'
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:36:46' prior: 50836457!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: 123
+			ownedBy: 'asd'
+			expiringOn: 12 ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:36:51' prior: 50836471!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: 123
+			ownedBy: 'asd'
+			expiringOn: '12' ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:37:01' prior: 50836484!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | ^'asd' ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:37:05' prior: 50836497!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:37:09' prior: 50836507!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession |  ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:37:14' prior: 50836521!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:37:32' prior: 50836531!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 00:37:46'!
+ERROR!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 00:37:46'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 00:37:46'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 00:37:46'!
+ERROR!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:37:46'!
+PASSED!
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:38:19' prior: 50836429!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:38:36' prior: 50836279!
+checkOut
+
+	"self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket "^'asd'! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:38:43' prior: 50836643!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket ! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:38:48' prior: 50836630!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: 12)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:38:56' prior: 50836655!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: '12')
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:39:02' prior: 50836668!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:39:05' prior: 50836681!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear asNumber)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:39:10' prior: 50836694!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+
+Month month: 12 monthIndex year: 11 yearNumber - 1!
+
+Month month: DateAndTime now monthIndex year: DateAndTime now yearNumber - 1!
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:41:31' prior: 50836708!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: (Month month: DateAndTime now monthIndex year: DateAndTime now yearNumber - 1))
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:41:42' prior: 50836725!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: (Month month: DateAndTime now monthIndex year: DateAndTime now yearNumber + 10))
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:41:59' prior: 50836649!
+checkOut
+
+	"self createTicket.
+	self debitTotal.
+	self registerSale."
+
+	^ 'asd'! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:42:00' prior: 50836755!
+checkOut
+
+	"self createTicket.
+	self debitTotal.
+	self registerSale."
+
+	^ 'asd'! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:42:06' prior: 50836761!
+checkOut
+
+	"self createTicket."
+	self debitTotal.
+	self registerSale.
+
+	^ ticket ! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 00:42:11' prior: 50836767!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket ! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 00:42:33' prior: 50836740!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear )
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 00:43:21' prior: 50836545!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:43:25'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 00:43:30'!
+PASSED!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+----SNAPSHOT----(23 November 2019 00:44:11) CuisUniversity-3958.image priorSource: 16123395!
+
+----QUIT----(23 November 2019 00:44:19) CuisUniversity-3958.image priorSource: 16171099!
+
+----STARTUP---- (23 November 2019 11:14:18) as /Users/nsoberon/Documents/Ingenieria 1/macos entrega 4/CuisUniversity-3958.image!
+
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 11:14:48' prior: 50836793!
+checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^self
+		withCartSessionIdentifiedAs: aCartId
+		do: [ :cartSession | cartSession
+			checkOutCartWithCreditCardNumbered: aCreditCartNumber
+			ownedBy: anOwner
+			expiringOn: anExpirationMonthOfYear ]
+! !
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 11:14:57'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 11:15:21'!
+PASSED!
+
+Month month: 11 year: DateAndTime now yearNumber - 1!
+
+Month month: 11 year: 20!
+
+Month month: 11 year: 2020!
+
+Month month: 11 year: 2020!
+
+----End fileIn of /Users/nsoberon/Documents/Ingenieria 1/macos entrega 4/Packages/TerseGuide.pck.st----!
+
+'2012' copyFrom: 0 to: 2!
+
+'2012' copyFrom: 1 to: 3!
+
+'2012' copyFrom: 1 to: 2!
+
+'2012' copyFrom: 3 to: 4.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:20:28'!
+createDateWith: monthAndYear
+	| month year |
+	month := monthAndYear copyFrom: 1 to: 2.
+	year := '20', monthAndYear copyFrom: 3 to: 4.
+	^ Month month: month asNumber year: year asNumber.! !
+
+'2012'asNumber!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:22:48' prior: 50836142!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: checkoutId and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:23:17' prior: 50836773!
+checkOut
+
+	^ 'llego a cashier'.
+	"self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket "! !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 11:25:34' prior: 50836779!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^'cashier'"(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear )
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut"! !
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 11:25:40' prior: 50840339!
+checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
+
+	^(Cashier
+		toCheckout: cart
+		ownedBy: owner
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear )
+		throught: systemFacade merchantProcessor
+		on: self today
+		registeringOn: systemFacade salesBook) checkOut! !
+
+	month := '1220' copyFrom: 1 to: 2.
+	year := '20', '1220' copyFrom: 3 to: 4.
+	Month month: month asNumber year: year asNumber.!
+
+	month := '1220' copyFrom: 1 to: 2.
+	year := '20', ('1220' copyFrom: 3 to: 4).
+	Month month: month asNumber year: year asNumber.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:27:33' prior: 50840229!
+createDateWith: monthAndYear
+	| month year |
+	month := monthAndYear copyFrom: 1 to: 2.
+	year := '20', (monthAndYear copyFrom: 3 to: 4).
+	^ Month month: month asNumber year: year asNumber.! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:27:50' prior: 50840330!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:28:07' prior: 50840384!
+checkOut
+
+	self createTicket.
+	"self debitTotal.
+	self registerSale.
+
+	^ ticket"
+	
+	^'llego a cashier'! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:28:12' prior: 50840390!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	"self registerSale.
+
+	^ ticket"
+	
+	^'llego a cashier'! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:28:20' prior: 50840396!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	"^ ticket"
+	
+	^'llego a cashier'! !
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:28:31' prior: 50840402!
+checkOut
+
+	self createTicket.
+	self debitTotal.
+	self registerSale.
+
+	^ ticket! !
+!Ticket methodsFor: 'total' stamp: 'ns 11/23/2019 11:29:23'!
+number
+
+	^1! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:29:52' prior: 50840239!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (checkoutId number) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:30:02' prior: 50840417!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: 1 and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:30:11' prior: 50840509!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		"checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced)."
+		self create200ResponseWith: 1 and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:30:26' prior: 50840600!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (checkoutId number) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening.!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+!methodRemoval: Ticket #number stamp: 'ns 11/23/2019 11:31:52'!
+number
+
+	^1!
+!Ticket methodsFor: 'total' stamp: 'ns 11/23/2019 11:32:35'!
+items
+
+	^lineItems! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:33:43' prior: 50840691!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (checkoutId items) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:34:48' prior: 50840798!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco checkoutId |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		checkoutId := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getListFor: checkoutId items) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. 
+!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+!methodRemoval: Ticket #items stamp: 'ns 11/23/2019 11:37:16'!
+items
+
+	^lineItems!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:38:06' prior: 50840900!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self listItemsFromTicket: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		"VALIDATE USER AND PASSWORD"
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:39:23'!
+listItemsFromTicket: ticket
+	| itemsList |
+	itemsList := ''.
+	ticket lineItemsDo: [
+		:anItem | 
+			itemsList := itemsList, anItem
+	]! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:40:51' prior: 50841092!
+listItemsFromTicket: ticket
+	| itemsList |
+	itemsList := ''.
+	ticket lineItemsDo: [
+		:anItem | 
+			itemsList := itemsList, (anItem item), '|', (anItem total asString), '|'.
+	].
+
+	^ itemsList.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!LineItem methodsFor: 'accessing' stamp: 'ns 11/23/2019 11:54:05'!
+quantity
+
+	^ quantity! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:55:08' prior: 50841100!
+listItemsFromTicket: ticket
+	| itemsList |
+	itemsList := ''.
+	ticket lineItemsDo: [
+		:anItem | 
+			itemsList := itemsList, (anItem item), '/', (anItem quantity), '/', (anItem total asString), '|'.
+	].
+
+	^ itemsList.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:55:53' prior: 50841124!
+listItemsFromTicket: ticket
+	| itemsList |
+	itemsList := ''.
+	ticket lineItemsDo: [
+		:anItem | 
+			itemsList := itemsList, (anItem item), '/', (anItem quantity asString), '/', (anItem total asString), '|'.
+	].
+
+	^ itemsList.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:57:21' prior: 50841141!
+listItemsFromTicket: ticket
+	| itemsList |
+	itemsList := ''.
+	ticket lineItemsDo: [
+		:anItem | 
+			itemsList := itemsList, (anItem item), '-', (anItem quantity asString), '-', (anItem total asString), '|'.
+	].
+
+	^ itemsList.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:58:46' prior: 50834872!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := ''.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|', ((products at: aProduct) asString)].
+	^ listResult.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:59:02' prior: 50841163!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := ''.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	products keysDo: [:aProduct | listResult := listResult, aProduct , '-', ((products at: aProduct) asString), '|'].
+	^ listResult.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:02:58' prior: 50841001!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self listItemsFromTicket: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+----SNAPSHOT----(23 November 2019 12:04:29) CuisUniversity-3958.image priorSource: 16171193!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:04:36'!
+PASSED!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:06:02' prior: 50841198!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: cartProducts and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self listItemsFromTicket: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. 
+!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:07:16' prior: 50841179!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := ''.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	"products keysDo: [:aProduct | listResult := listResult, aProduct , '-', ((products at: aProduct) asString), '|']."
+	^ products.! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:08:07' prior: 50841415!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self listItemsFromTicket: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. 
+!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:10:51' prior: 50841508!
+getListFor: aList
+	| products listResult productQuantity |
+	products := Dictionary new.
+	listResult := ''.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	^ products.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:11:00' prior: 50841624!
+getListFor: aList
+	| products productQuantity |
+	products := Dictionary new.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	^ products.! !
+
+!methodRemoval: TusLibrosSystemFacadeServer #listPurchasesFor:and: stamp: 'ns 11/23/2019 12:13:24'!
+listPurchasesFor: aClientId and: aClientPassword
+
+	| purchases purchasesTotal ticketProducts |
+	
+	[
+		purchases := restInterface listPurchasesFor: aClientId and: aClientPassword. 
+		purchasesTotal := 0.
+		ticketProducts := OrderedCollection new.
+		purchases do: [
+			"para cada ticket"
+			:aTicket |
+			purchasesTotal := purchasesTotal + aTicket total.
+			ticketProducts addAll: aTicket products.
+		].
+		^ self getListFor: ticketProducts, '|', purchasesTotal asString.
+	] 
+	on: Error 
+	do: [ :anError |
+		^ self errorWithMessage: anError messageText.].
+	
+	!
+!TusLibrosSystemFacade methodsFor: 'private' stamp: 'ns 11/23/2019 12:20:00' prior: 50790999!
+list: aSale on: salesOrderedByBook
+
+	"Esto es un indicio de que por ahi conviene empezar a pensar en modelar un SaleBook - Hernan"
+	aSale lineItemsDo: [ :aLineItem | | oldTotal newTotal oldQty newQty itemDict |
+		itemDict := salesOrderedByBook at: aLineItem item ifAbsentPut:[Dictionary new].
+		oldTotal := itemDict at: 'total' ifAbsentPut: [ 0 ].
+		newTotal := oldTotal + aLineItem total.
+		oldQty := itemDict at: 'qty' ifAbsentPut: [ 0 ].
+		newQty := oldTotal + aLineItem quantity.
+		itemDict at: 'total' put: newTotal.		
+		itemDict at: 'qty' put: newQty.
+		salesOrderedByBook at: aLineItem item put: itemDict ]! !
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. !
+!TusLibrosSystemFacade methodsFor: 'private' stamp: 'ns 11/23/2019 12:22:17' prior: 50841667!
+list: aSale on: salesOrderedByBook
+
+	"Esto es un indicio de que por ahi conviene empezar a pensar en modelar un SaleBook - Hernan"
+	aSale lineItemsDo: [ :aLineItem | | oldTotal newTotal oldQty newQty itemDict |
+		itemDict := salesOrderedByBook at: aLineItem item ifAbsentPut:[Dictionary new].
+		oldTotal := itemDict at: 'total' ifAbsentPut: [ 0 ].
+		newTotal := oldTotal + aLineItem total.
+		oldQty := itemDict at: 'qty' ifAbsentPut: [ 0 ].
+		newQty := oldQty + aLineItem quantity.
+		itemDict at: 'total' put: newTotal.		
+		itemDict at: 'qty' put: newQty.
+		salesOrderedByBook at: aLineItem item put: itemDict ]! !
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:22:30'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:22:30'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:22:30'!
+PASSED!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:27:03' prior: 50841152!
+listItemsFromTicket: ticket
+	| ticketSummary |
+	ticketSummary := Dictionary new.
+	ticket lineItemsDo: [
+		:anItem | | itemDict |
+			itemDict := Dictionary new.
+			itemDict at: 'total' put: anItem total.
+			itemDict at: 'qty' put: anItem quantity.
+			ticketSummary at: anItem item put: itemDict
+	].
+
+	^ ticketSummary.! !
+
+----SNAPSHOT----(23 November 2019 12:27:26) CuisUniversity-3958.image priorSource: 16308384!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+----SNAPSHOT----(23 November 2019 12:27:39) CuisUniversity-3958.image priorSource: 16326335!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:00'!
+getTicketSummary: ticket
+	| ticketSummary |
+	ticketSummary := Dictionary new.
+	ticket lineItemsDo: [
+		:anItem | | itemDict |
+			itemDict := Dictionary new.
+			itemDict at: 'total' put: anItem total.
+			itemDict at: 'qty' put: anItem quantity.
+			ticketSummary at: anItem item put: itemDict
+	].
+
+	^ ticketSummary.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:00' prior: 50841527!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getListFor: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+!methodRemoval: TusLibrosSystemFacadeServer #listItemsFromTicket: stamp: 'ns 11/23/2019 12:28:00'!
+listItemsFromTicket: ticket
+	| ticketSummary |
+	ticketSummary := Dictionary new.
+	ticket lineItemsDo: [
+		:anItem | | itemDict |
+			itemDict := Dictionary new.
+			itemDict at: 'total' put: anItem total.
+			itemDict at: 'qty' put: anItem quantity.
+			ticketSummary at: anItem item put: itemDict
+	].
+
+	^ ticketSummary.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:30'!
+getCartSummary: aList
+	| products productQuantity |
+	products := Dictionary new.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	^ products.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:30' prior: 50841873!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"TODO VALIDAR PARAMETROS"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+!methodRemoval: TusLibrosSystemFacadeServer #getListFor: stamp: 'ns 11/23/2019 12:28:30'!
+getListFor: aList
+	| products productQuantity |
+	products := Dictionary new.
+	aList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	^ products.!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:40' prior: 50841976!
+getCartSummary: aProductList
+	| products productQuantity |
+	products := Dictionary new.
+	aProductList do: [
+		:anItem | 
+		productQuantity := products at: anItem ifAbsent: 0.
+		products at: anItem put: (productQuantity + 1).
+	].
+	^ products.! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:30:56' prior: 50841987!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"SEGUN EL ENUNCIADO ESTOS DATOS YA SON CONOCIDOS A LA HORA DEL LOGIN, POR LO QUE LOS ASUMIMOS DE FORMATO VALIDO"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:05' prior: 50842100!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"SEGUN EL ENUNCIADO ESTOS DATOS YA SON CONOCIDOS A LA HORA DEL LOGIN, POR LO QUE LOS ASUMIMOS DE FORMATO VALIDO"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:10' prior: 50842194!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"TODO VALIDAR PARAMETROS"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"SEGUN EL ENUNCIADO ESTOS DATOS YA SON CONOCIDOS A LA HORA DEL LOGIN, POR LO QUE LOS ASUMIMOS DE FORMATO VALIDO"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:46' prior: 50842287!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+				"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:48' prior: 50842381!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+			"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:48' prior: 50842476!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].! !
+
+----SNAPSHOT----(23 November 2019 12:31:52) CuisUniversity-3958.image priorSource: 16326544!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:31:56'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:31:56'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:31:56'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:32:14'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:32:14'!
+FAILURE!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - checkout' stamp: 'ns 11/23/2019 12:32:36' prior: 50831446!
+test10CanCheckoutACart
+
+	| cartId purchases |
+
+	cartId := systemFacade createCartFor: testObjectsFactory validUser authenticatedWith: testObjectsFactory validUserPassword.
+	systemFacade add: 1 of: self validBook toCartIdentifiedAs: cartId.
+	systemFacade
+		checkOutCartIdentifiedAs: cartId
+		withCreditCardNumbered: testObjectsFactory notExpiredCreditCardNumber
+		ownedBy: testObjectsFactory notExpiredCreditCardOwner
+		expiringOn: testObjectsFactory notExpiredMonthOfYear.
+
+	purchases := systemFacade listPurchasesOf: testObjectsFactory validUser authenticatingWith: testObjectsFactory validUserPassword.
+
+	self assert: ((purchases at: self validBook) at: 'total') equals: testObjectsFactory itemSellByTheStorePrice.
+! !
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:32:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:32:47'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:32:47'!
+FAILURE!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'ns 11/23/2019 12:33:06' prior: 50831475!
+test14ListPurchasesIncludesBoughtItems
+
+	| cartId purchases |
+
+	cartId := systemFacade createCartFor: testObjectsFactory validUser authenticatedWith: testObjectsFactory validUserPassword.
+	systemFacade add: 2 of: self validBook toCartIdentifiedAs: cartId.
+	systemFacade add: 1 of: self anotherValidBook toCartIdentifiedAs: cartId.
+	systemFacade
+		checkOutCartIdentifiedAs: cartId
+		withCreditCardNumbered: '1111222233334444'
+		ownedBy: 'Juan Perez'
+		expiringOn: testObjectsFactory notExpiredMonthOfYear.
+
+	purchases := systemFacade listPurchasesOf: testObjectsFactory validUser authenticatingWith: testObjectsFactory validUserPassword.
+
+	self assert: (purchases at: self validBook) equals: (testObjectsFactory itemSellByTheStorePrice * 2).
+	self assert: ((purchases at: self anotherValidBook) at: 'total') equals: testObjectsFactory anotherItemSellByTheStorePrice.! !
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:33:09'!
+FAILURE!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:33:09'!
+FAILURE!
+!TusLibrosSystemFacadeTest methodsFor: 'tests - list purchases' stamp: 'ns 11/23/2019 12:33:30' prior: 50842829!
+test14ListPurchasesIncludesBoughtItems
+
+	| cartId purchases |
+
+	cartId := systemFacade createCartFor: testObjectsFactory validUser authenticatedWith: testObjectsFactory validUserPassword.
+	systemFacade add: 2 of: self validBook toCartIdentifiedAs: cartId.
+	systemFacade add: 1 of: self anotherValidBook toCartIdentifiedAs: cartId.
+	systemFacade
+		checkOutCartIdentifiedAs: cartId
+		withCreditCardNumbered: '1111222233334444'
+		ownedBy: 'Juan Perez'
+		expiringOn: testObjectsFactory notExpiredMonthOfYear.
+
+	purchases := systemFacade listPurchasesOf: testObjectsFactory validUser authenticatingWith: testObjectsFactory validUserPassword.
+
+	self assert: ((purchases at: self validBook) at: 'total') equals: (testObjectsFactory itemSellByTheStorePrice * 2).
+	self assert: ((purchases at: self anotherValidBook) at: 'total') equals: testObjectsFactory anotherItemSellByTheStorePrice.! !
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:33:36'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 12:33:40'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:33:41'!
+PASSED!
+
+----SNAPSHOT----(23 November 2019 12:33:43) CuisUniversity-3958.image priorSource: 16352443!
+
+----SNAPSHOT----(23 November 2019 12:33:44) CuisUniversity-3958.image priorSource: 16363776!
+
+----SNAPSHOT----(23 November 2019 12:34:23) CuisUniversity-3958.image priorSource: 16363870!
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. 
+!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+----SNAPSHOT----(23 November 2019 12:38:37) CuisUniversity-3958.image priorSource: 16363964!
+
+----SNAPSHOT----(23 November 2019 12:38:38) CuisUniversity-3958.image priorSource: 16364258!
+
+----SNAPSHOT----(23 November 2019 12:38:39) CuisUniversity-3958.image priorSource: 16364352!
+
+----SNAPSHOT----(23 November 2019 12:40:55) CuisUniversity-3958.image priorSource: 16364446!
+
+----SNAPSHOT----(23 November 2019 12:40:56) CuisUniversity-3958.image priorSource: 16364540!
+
+----SNAPSHOT----(23 November 2019 12:44:20) CuisUniversity-3958.image priorSource: 16364634!
+
+----SNAPSHOT----(23 November 2019 12:45:27) CuisUniversity-3958.image priorSource: 16364728!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CashierTest #test01CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CashierTest #test02CalculatedTotalIsCorrect stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CashierTest #test03CanNotCheckoutWithAnExpiredCreditCart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CashierTest #test04CheckoutRegistersASale stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierChargesCreditCardUsingMerchantProcessor stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #CashierTest #test06CashierDoesNotSaleWhenTheCreditCardHasNoCredit stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test01CanCreateCartWithValidUserAndPassword stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test02CanNotCreateCartWithInvalidUser stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test03CanNotCreateCartWithInvalidPassword stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test04CanAddItemsToACreatedCart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test05CanNotAddItemToNotCreatedCart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test06CanNotAddItemNotSellByTheStore stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test07ListCartOfAnEmptyCartReturnsAnEmptyBag stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test08CanNotListCartOfInvalidCartId stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test09ListCartReturnsTheRightNumberOfItems stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test10CanCheckoutACart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test11CanNotCheckoutANotCreatedCart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test12CanNotCheckoutAnEmptyCart stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test13CanNotCheckoutWithAnExpiredCreditCard stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test14ListPurchasesIncludesBoughtItems stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test15CanNotListPurchasesOfInvalidCustomer stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test16CanNotListPurchasesOfValidCustomerWithInvalidPassword stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test17CanNotAddToCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test18CanNotListCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+!testRun: #TusLibrosSystemFacadeTest #test19CanNotCheckOutCartWhenSessionIsExpired stamp: 'ns 11/23/2019 12:45:32'!
+PASSED!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+----SNAPSHOT----(23 November 2019 12:45:43) CuisUniversity-3958.image priorSource: 16364822!
+
+----QUIT----(23 November 2019 12:45:52) CuisUniversity-3958.image priorSource: 16368766!
+
+----STARTUP---- (23 November 2019 12:49:10) as /Users/nsoberon/Documents/Ingenieria 1/macos entrega 4/CuisUniversity-3958.image!
+
+
+----SNAPSHOT----(23 November 2019 12:49:57) CuisUniversity-3958.image priorSource: 16368860!
+
+----SNAPSHOT----(23 November 2019 12:50:02) CuisUniversity-3958.image priorSource: 16369081!
+
+----QUIT----(23 November 2019 12:50:10) CuisUniversity-3958.image priorSource: 16369175!

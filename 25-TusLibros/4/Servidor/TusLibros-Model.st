@@ -177,16 +177,16 @@ cartContent
 
 	^cart content! !
 
-!CartSession methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2015 20:35'!
+!CartSession methodsFor: 'cart' stamp: 'ns 11/23/2019 11:25:40'!
 checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
 
 	^(Cashier
 		toCheckout: cart
 		ownedBy: owner
-		charging: (CreditCard expiringOn: anExpirationMonthOfYear)
+		charging: (CreditCard expiringOn: anExpirationMonthOfYear )
 		throught: systemFacade merchantProcessor
 		on: self today
-		registeringOn: systemFacade salesBook) checkOut ! !
+		registeringOn: systemFacade salesBook) checkOut! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -247,14 +247,14 @@ totalOf: anItem quantity: aQuantity
 	^(cart catalog at: anItem) * aQuantity  ! !
 
 
-!Cashier methodsFor: 'checkout' stamp: 'HernanWilkinson 6/22/2013 12:28'!
+!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:28:31'!
 checkOut
 
 	self createTicket.
 	self debitTotal.
 	self registerSale.
 
-	^ ticket ! !
+	^ ticket! !
 
 
 !Cashier methodsFor: 'initialization' stamp: 'HernanWilkinson 6/22/2013 12:02'!
@@ -378,6 +378,11 @@ Object subclass: #LineItem
 item
 
 	^ item! !
+
+!LineItem methodsFor: 'accessing' stamp: 'ns 11/23/2019 11:54:05'!
+quantity
+
+	^ quantity! !
 
 !LineItem methodsFor: 'accessing' stamp: 'HernanWilkinson 6/22/2013 12:21'!
 total
@@ -614,10 +619,10 @@ add: anAmount of: aBook toCartIdentifiedAs: aCartId
 
 	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession addToCart: anAmount of: aBook ]! !
 
-!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'HernanWilkinson 6/17/2015 20:47'!
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/23/2019 11:14:48'!
 checkOutCartIdentifiedAs: aCartId withCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringOn: anExpirationMonthOfYear
 
-	self
+	^self
 		withCartSessionIdentifiedAs: aCartId
 		do: [ :cartSession | cartSession
 			checkOutCartWithCreditCardNumbered: aCreditCartNumber
@@ -664,14 +669,19 @@ salesBook
 	^ salesBook! !
 
 
-!TusLibrosSystemFacade methodsFor: 'private' stamp: 'HernanWilkinson 6/17/2015 20:56'!
+!TusLibrosSystemFacade methodsFor: 'private' stamp: 'ns 11/23/2019 12:22:17'!
 list: aSale on: salesOrderedByBook
 
 	"Esto es un indicio de que por ahi conviene empezar a pensar en modelar un SaleBook - Hernan"
-	aSale lineItemsDo: [ :aLineItem | | oldTotal newTotal |
-		oldTotal := salesOrderedByBook at: aLineItem item ifAbsentPut: [ 0 ].
+	aSale lineItemsDo: [ :aLineItem | | oldTotal newTotal oldQty newQty itemDict |
+		itemDict := salesOrderedByBook at: aLineItem item ifAbsentPut:[Dictionary new].
+		oldTotal := itemDict at: 'total' ifAbsentPut: [ 0 ].
 		newTotal := oldTotal + aLineItem total.
-		salesOrderedByBook at: aLineItem item put: newTotal ]! !
+		oldQty := itemDict at: 'qty' ifAbsentPut: [ 0 ].
+		newQty := oldQty + aLineItem quantity.
+		itemDict at: 'total' put: newTotal.		
+		itemDict at: 'qty' put: newQty.
+		salesOrderedByBook at: aLineItem item put: itemDict ]! !
 
 !TusLibrosSystemFacade methodsFor: 'private' stamp: 'HernanWilkinson 6/17/2015 20:55'!
 salesDoneBy: aUser
@@ -724,62 +734,53 @@ Object subclass: #TusLibrosSystemFacadeServer
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/21/2019 23:34:22'!
-add: aBookQuantity of: aBook toCartIdentifiedAs: cartId.
-
-	[
-		restInterface add: (aBookQuantity asNumber) of: aBook toCartIdentifiedAs: (cartId asNumber).
-	] 
-	on: Error 
-	do: [ :anError |
-		^ self error: (self errorWithMessage: anError messageText).].! !
-
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/21/2019 23:05:47'!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:13:32'!
 create200ResponseWith: aValue and: aRequest
-		| responseAsJson valueAsString |
-		
-		valueAsString := aValue asString.
-		responseAsJson := WebUtils jsonEncode: ('0|', valueAsString).
+		| responseAsJson |
+
+		responseAsJson := WebUtils jsonEncode: (aValue).
 		aRequest send200Response: (responseAsJson asUtf8) 
 		contentType: 'application/json; charset=utf-8' do: [:resp | 
 		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
 
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/21/2019 23:08:49'!
-createCartFor: clientId authenticatedWith: password
-	|cartId|
-	
-	[
-		cartId := restInterface createCartFor: clientId authenticatedWith: password.
-		^cartId.
-	] 
-	on: Error 
-	do: [ :anError |
-		^ self error: (self errorWithMessage: anError messageText).].! !
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 11:27:33'!
+createDateWith: monthAndYear
+	| month year |
+	month := monthAndYear copyFrom: 1 to: 2.
+	year := '20', (monthAndYear copyFrom: 3 to: 4).
+	^ Month month: month asNumber year: year asNumber.! !
 
 !TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/18/2019 23:43:57'!
 destroy
 	
 	webServer ifNotNil:[webServer destroy].! !
 
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/19/2019 22:02:07'!
-errorWithMessage: anErrorMessage
-
-	^ '1|', anErrorMessage.! !
-
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:26:12'!
-getListFor: aList
-	| products listResult productQuantity |
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:40'!
+getCartSummary: aProductList
+	| products productQuantity |
 	products := Dictionary new.
-	listResult := '0'.
-	aList do: [
+	aProductList do: [
 		:anItem | 
 		productQuantity := products at: anItem ifAbsent: 0.
 		products at: anItem put: (productQuantity + 1).
 	].
-	products keysDo: [:aProduct | listResult := listResult, '|', aProduct , '|' products at: aProduct].
-	^ listResult.! !
+	^ products.! !
 
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/21/2019 23:32:17'!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:00'!
+getTicketSummary: ticket
+	| ticketSummary |
+	ticketSummary := Dictionary new.
+	ticket lineItemsDo: [
+		:anItem | | itemDict |
+			itemDict := Dictionary new.
+			itemDict at: 'total' put: anItem total.
+			itemDict at: 'qty' put: anItem quantity.
+			ticketSummary at: anItem item put: itemDict
+	].
+
+	^ ticketSummary.! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:48'!
 initializeWith: aPortNumber
 	
 	testObjectsFactory := StoreTestObjectsFactory new.
@@ -800,7 +801,7 @@ initializeWith: aPortNumber
 	[
 		clientId := request fields at: 'clientId'.
 		password := request fields at: 'password'.
-		cartId  := self createCartFor: clientId authenticatedWith: password.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
 		self create200ResponseWith: cartId and: request.
 	 ]
 	on: Error 
@@ -812,8 +813,8 @@ initializeWith: aPortNumber
 	[	cartId := request fields at: 'cartId'.
 		bookIsbn := request fields at: 'bookIsbn'.
 		bookQuantity := request fields at: 'bookQuantity'.
-		"TODO VALIDAR PARAMETROS"
-		self add: bookQuantity of: bookIsbn toCartIdentifiedAs: cartId.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
 		self create200ResponseWith: 'OK' and: request.
 	] 
 	on: Error 
@@ -821,74 +822,42 @@ initializeWith: aPortNumber
 		request send404Response: (anError messageText) ]].
 
 
-	webServer addService: '/listCart' action:[:request | | cartId |
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
 	
 	[
 		cartId := request fields at: 'cartId'.
-		self create200ResponseWith: [self listCart: cartId] and: request.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].
 
-	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco |
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
 	
 	[	cartId := request fields at: 'cartId'.
 		ccn := request fields at: 'ccn'.
 		cced := request fields at: 'cced'.
 		cco := request fields at: 'cco'.
-		"TODO VALIDAR PARAMETROS Y HACER EL METODO CHECKOUT"
-		self create200ResponseWith: [self checkout] and: request.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].
 
 
-	webServer addService: '/listPurchases' action:[:request | | clientId password |
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
 	
 	[	clientId := request fields at: 'clientId'.
 		password := request fields at: 'password'.
-		restInterface checkClientInformationWith: clientId and: password.
-		self create200ResponseWith: [self listPurchasesFor: clientId and: password] and: request.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
 	] 
 	on: Error 
 	do: [ :anError |
 		request send404Response: (anError messageText) ]].! !
-
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:26:57'!
-listCart: aCartID
-	| cartProducts |
-	[
-		cartProducts := restInterface listCart: aCartID.
-		self getListFor: cartProducts.
-	] 
-	on: Error 
-	do: [ :anError |
-		^ self errorWithMessage: anError messageText.].! !
-
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/20/2019 23:31:12'!
-listPurchasesFor: aClientId and: aClientPassword
-
-	| purchases purchasesTotal ticketProducts |
-	
-	[
-		purchases := restInterface listPurchasesFor: aClientId and: aClientPassword. 
-		purchasesTotal := 0.
-		ticketProducts := OrderedCollection new.
-		purchases do: [
-			"para cada ticket"
-			:aTicket |
-			purchasesTotal := purchasesTotal + aTicket total.
-			ticketProducts addAll: aTicket products.
-		].
-		^ self getListFor: ticketProducts, '|', purchasesTotal asString.
-	] 
-	on: Error 
-	do: [ :anError |
-		^ self errorWithMessage: anError messageText.].
-	
-	! !
 
 !TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/18/2019 23:42:52'!
 port
