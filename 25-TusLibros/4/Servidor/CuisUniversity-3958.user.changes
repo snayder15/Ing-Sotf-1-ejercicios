@@ -33979,3 +33979,514 @@ TusLibrosSystemFacadeServer allInstances do: [
 ----SNAPSHOT----(23 November 2019 12:50:02) CuisUniversity-3958.image priorSource: 16369081!
 
 ----QUIT----(23 November 2019 12:50:10) CuisUniversity-3958.image priorSource: 16369175!
+
+----STARTUP---- (25 November 2019 18:59:39) as /media/libre/linux64/CuisUniversity-3958.image!
+
+
+x := Bag new.
+x add: 3 withOccurrences: 4.!
+
+x := Bag new.
+x add: 3 withOccurrences: 4.
+x remove: 3!
+
+x occurrencesOf: 3!
+
+x := Bag new.
+x add: 3 withOccurrences: 4.
+x remove: 3.!
+
+x occurrencesOf: 3!
+
+x remove: 3.!
+
+x occurrencesOf: 3!
+!CartTest methodsFor: 'tests' stamp: 'car 11/25/2019 19:09:26'!
+test09RemoveElementFromCart
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+
+	cart add: 2 of: testObjectsFactory itemSellByTheStore.
+	cart remove: testObjectsFactory itemSellByTheStore.
+	self assert: (cart occurrencesOf: testObjectsFactory itemSellByTheStore) = 1! !
+
+!testRun: #CartTest #test09RemoveElementFromCart stamp: 'car 11/25/2019 19:09:26'!
+ERROR!
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:09:32'!
+remove: aString 
+	self shouldBeImplemented.! !
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:10:00' prior: 50843217!
+remove: anItem 
+	
+	items remove: anItem .! !
+
+!testRun: #CartTest #test09RemoveElementFromCart stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+
+!testRun: #CartTest #test09RemoveElementFromCart stamp: 'car 11/25/2019 19:10:02'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'car 11/25/2019 19:11:38'!
+test10CanNotRemoveItemsThatDoNotBelongToStore
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	self
+		should: [ cart remove: testObjectsFactory itemNotSellByTheStore.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: cart isEmpty ]! !
+!CartTest methodsFor: 'tests' stamp: 'car 11/25/2019 19:12:02' prior: 50843257!
+test10CanNotRemoveItemsThatDoNotBelongToStore
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	self
+		should: [ cart remove: testObjectsFactory itemNotSellByTheStore.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: (cart occurrencesOf: testObjectsFactory itemSellByTheStore) = 1 ]! !
+
+!testRun: #CartTest #test10CanNotRemoveItemsThatDoNotBelongToStore stamp: 'car 11/25/2019 19:12:02'!
+FAILURE!
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:12:40' prior: 50843222!
+remove: anItem 
+	
+	self assertIsValidItem: anItem.
+	
+	items remove: anItem .! !
+
+!testRun: #CartTest #test10CanNotRemoveItemsThatDoNotBelongToStore stamp: 'car 11/25/2019 19:12:48'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'car 11/25/2019 19:13:57'!
+test11CanNotRemoveItemsFromEmptyCart
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+	self
+		should: [ cart remove: testObjectsFactory itemSellByTheStore.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart invalidItemErrorMessage.
+			self assert: cart isEmpty ]! !
+!CartTest methodsFor: 'tests' stamp: 'car 11/25/2019 19:14:50' prior: 50843301!
+test11CanNotRemoveItemsFromEmptyCart
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+	self
+		should: [ cart remove: testObjectsFactory itemSellByTheStore.]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart emptyCartErrorMessage.
+			self assert: cart isEmpty ]! !
+
+!testRun: #CartTest #test11CanNotRemoveItemsFromEmptyCart stamp: 'car 11/25/2019 19:14:51'!
+ERROR!
+!Cart methodsFor: 'error signal' stamp: 'car 11/25/2019 19:16:23'!
+signalEmptyCart
+
+	self error: self emptyCartErrorMessage 
+	! !
+!Cart methodsFor: 'error messages' stamp: 'car 11/25/2019 19:16:39'!
+emptyCartErrorMessage
+
+	^self class emptyCartErrorMessage ! !
+!Cart class methodsFor: 'error messages' stamp: 'car 11/25/2019 19:17:04'!
+emptyCartErrorMessage
+
+	^'Can not remove from empty cart'! !
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:19:07' prior: 50843293!
+remove: anItem 
+	
+	self assertIsValidItem: anItem.
+	
+	self isEmpty ifTrue: [ self signalEmptyCart ].
+	
+	items remove: anItem .! !
+
+!testRun: #CartTest #test11CanNotRemoveItemsFromEmptyCart stamp: 'car 11/25/2019 19:19:14'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'car 11/25/2019 19:20:28'!
+test12CanNotRemoveItemsThatDoNotBelongToCart
+
+	| cart |
+
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	self
+		should: [ cart remove: testObjectsFactory anotherItemSellByTheStore .]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = cart notInCartErrorMessage.
+			self assert: (cart occurrencesOf: testObjectsFactory itemSellByTheStore) = 1 ]! !
+
+!testRun: #CartTest #test12CanNotRemoveItemsThatDoNotBelongToCart stamp: 'car 11/25/2019 19:20:30'!
+ERROR!
+!Cart methodsFor: 'error signal' stamp: 'car 11/25/2019 19:21:04'!
+signalNotInCart
+
+	self error: self notInCartErrorMessage 
+	! !
+!Cart methodsFor: 'error messages' stamp: 'car 11/25/2019 19:21:15'!
+notInCartErrorMessage
+
+	^self class notInCartErrorMessage ! !
+!Cart class methodsFor: 'error messages' stamp: 'car 11/25/2019 19:21:37'!
+notInCartErrorMessage
+
+	^'Item does not belong to cart'! !
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:22:28' prior: 50843345!
+remove: anItem 
+	
+	self assertIsValidItem: anItem.
+	
+	self isEmpty ifTrue: [ self signalEmptyCart ].
+	
+	(items includes: anItem) ifFalse: [self signalNotInCart ].
+	
+	items remove: anItem .! !
+
+!testRun: #CartTest #test12CanNotRemoveItemsThatDoNotBelongToCart stamp: 'car 11/25/2019 19:22:35'!
+PASSED!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:24:59' prior: 50842571!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+	
+	webServer addService: '/removeFromCart' action:[:request | | bookIsbn cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		restInterface remove:  bookIsbn fromCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:26:17'!
+remove:  bookIsbn fromCartIdentifiedAs: aCartId 
+
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession remove:  bookIsbn fromCartIdentifiedAs: aCartId ]! !
+!CartSession methodsFor: 'cart' stamp: 'car 11/25/2019 19:27:45'!
+remove:  bookIsbn
+
+	^cart remove: bookIsbn! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:27:59' prior: 50843509!
+remove:  bookIsbn fromCartIdentifiedAs: aCartId 
+
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession remove:  bookIsbn]! !
+
+|server x|
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. 
+!
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].!
+
+----SNAPSHOT----(25 November 2019 19:31:44) CuisUniversity-3958.image priorSource: 16369269!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:34:01' prior: 50843403!
+initializeWith: aPortNumber
+	
+	testObjectsFactory := StoreTestObjectsFactory new.
+	clock := ManualClock now: testObjectsFactory today.
+	restInterface :=TusLibrosSystemFacade
+		authenticatingWith: testObjectsFactory validUsersAndPasswords
+		acceptingItemsOf: testObjectsFactory defaultCatalog
+		registeringOn: testObjectsFactory createSalesBook
+		debitingThrought: testObjectsFactory merchantProcessor
+		measuringTimeWith: clock.
+	
+	port:= aPortNumber.
+	
+	webServer := WebServer new listenOn: aPortNumber.
+	
+	webServer addService: '/createCart' action:[:request | | responseAsJson cartId clientId password |
+	
+	[
+		clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		cartId  := restInterface createCartFor: clientId authenticatedWith: password.
+		self create200ResponseWith: cartId and: request.
+	 ]
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		bookQuantity := request fields at: 'bookQuantity'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
+	
+	[
+		cartId := request fields at: 'cartId'.
+		cartProducts := restInterface listCartIdentifiedAs: cartId asNumber.
+		self create200ResponseWith: (self getCartSummary: cartProducts) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	
+	[	cartId := request fields at: 'cartId'.
+		ccn := request fields at: 'ccn'.
+		cced := request fields at: 'cced'.
+		cco := request fields at: 'cco'.
+		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
+	
+	[	clientId := request fields at: 'clientId'.
+		password := request fields at: 'password'.
+		purchases := restInterface listPurchasesOf: clientId authenticatingWith: password.
+		self create200ResponseWith: purchases and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+	
+	webServer addService: '/removeFromCart' action:[:request | | bookIsbn cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		restInterface remove:  bookIsbn fromCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+
+
+	webServer addService: '/getCatalog' action:[:request | | cartId |
+	
+	[	cartId := request fields at: 'cartId'.		
+		self create200ResponseWith: (restInterface getCatalog: (cartId asNumber)) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (anError messageText) ]].
+! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:34:56'!
+getCatalog: aCartId
+
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | | aBook anAmount | cartSession addToCart: anAmount of: aBook ]! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:35:19' prior: 50843655!
+getCatalog: aCartId
+
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession getCatalog ]! !
+!CartSession methodsFor: 'cart' stamp: 'car 11/25/2019 19:35:35'!
+getCatalog
+
+	^cart catalog.! !
+
+server := TusLibrosSystemFacadeServer listeningOn: 8080.
+
+server startListening. 
+!
+!CartSession methodsFor: 'cart' stamp: 'car 11/25/2019 19:37:11' prior: 50843669!
+getCatalog
+	^'asd'
+	"^cart catalog."! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:37:49' prior: 50843663!
+getCatalog: aCartId
+	^'asd'
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession getCatalog ]! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:38:01' prior: 50843681!
+getCatalog: aCartId
+	^'asd'
+	"self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession getCatalog ]"! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:38:17' prior: 50843688!
+getCatalog: aCartId	
+	
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession catalog ]! !
+!CartSession methodsFor: 'cart' stamp: 'car 11/25/2019 19:38:27'!
+catalog
+	^'asd'
+	"^cart catalog."! !
+
+!methodRemoval: CartSession #getCatalog stamp: 'car 11/25/2019 19:38:27'!
+getCatalog
+	^'asd'
+	"^cart catalog."!
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:39:11' prior: 50843696!
+getCatalog: aCartId	
+	
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | ^'asd' ]! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:39:23' prior: 50843710!
+getCatalog: aCartId	
+	
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | ^cartSession catalog ]! !
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:39:29' prior: 50843717!
+getCatalog: aCartId	
+	
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | ^cartSession catalog ]! !
+!CartSession methodsFor: 'cart' stamp: 'car 11/25/2019 19:39:46' prior: 50843702!
+catalog
+	
+	^cart catalog.! !
+
+----SNAPSHOT----(25 November 2019 19:41:42) CuisUniversity-3958.image priorSource: 16380327!
+
+----SNAPSHOT----(25 November 2019 19:41:44) CuisUniversity-3958.image priorSource: 16386684!
+
+----SNAPSHOT----(25 November 2019 19:42:33) CuisUniversity-3958.image priorSource: 16386778!
+
+----SNAPSHOT----(25 November 2019 19:42:37) CuisUniversity-3958.image priorSource: 16386872!
+
+----SNAPSHOT----(25 November 2019 19:54:58) CuisUniversity-3958.image priorSource: 16386966!
+
+----SNAPSHOT----(25 November 2019 19:55:02) CuisUniversity-3958.image priorSource: 16387060!
+
+----QUIT----(25 November 2019 19:55:05) CuisUniversity-3958.image priorSource: 16387154!
+
+----STARTUP---- (25 November 2019 19:55:14) as /media/libre/linux64/CuisUniversity-3958.image!
+
+
+TusLibrosSystemFacadeServer allInstances do: [
+	:anInstance |
+	anInstance stopListening.
+	anInstance destroy
+	].
+!
+
+----SNAPSHOT----(25 November 2019 19:55:26) CuisUniversity-3958.image priorSource: 16387248!
+
+----SNAPSHOT----(25 November 2019 19:55:28) CuisUniversity-3958.image priorSource: 16387551!
+
+----SNAPSHOT----(25 November 2019 19:56:20) CuisUniversity-3958.image priorSource: 16387645!
+
+----QUIT----(25 November 2019 19:56:23) CuisUniversity-3958.image priorSource: 16387739!
