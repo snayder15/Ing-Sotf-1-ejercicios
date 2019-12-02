@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Book Store</title>
+
+  <!-- Fonts to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <!-- Icons to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <!-- TODO: PASAR A UN ARCHIVO CSS -->
+  <style>
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script src="./lib/react.development.js" crossorigin="anonymous"></script>
+  <script src="./lib/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="./lib/material-ui.development.js" crossorigin="anonymous"></script>
+  <script src="./lib/babel.min.js" crossorigin="anonymous"></script>
+  <script src="./src/refreshbrowser.js" crossorigin="anonymous"></script>
+
+  <!-- Libraries fallback -->
+  <script>window.React || document.write('<script src="https://unpkg.com/react@16.11.0/umd/react.development.js">\x3C/script>')</script>
+  <script>window.ReactDOM || document.write('<script src="https://unpkg.com/react-dom@16.11.0/umd/react-dom.development.js">\x3C/script>')</script>
+  <script>window.MaterialUI || document.write('<script src="https://unpkg.com/@material-ui/core@4.6.1/umd/material-ui.development.js">\x3C/script>')</script>
+  <script>window.Babel || document.write('<script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js">\x3C/script>')</script>
+  <!-- end fallback -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #fafafa;
+    }
+    /* GENERAL */
+    
+    /* NAVBAR */
+    .bookstore-navbar {
+      background-color: #00b1ea;
+      box-shadow: none;
+    }
+    .create-cart-navbar {
+      height: 100px;
+    }
+    /* NAVBAR */
+
+
+    /* CREATE CART */
+    .create-cart-view {
+      text-align: center;
+      z-index: 9999;
+    }
+
+    .create-cart-form {
+      padding: 30px 40px;
+      border-radius: 4px;
+      background-color: white;
+      margin-top: -50px;
+      box-shadow: 0 1px 6px 0 rgba(0,0,0,.3)
+    }
+    .create-cart-title {
+      font-size: 20px;
+      padding: 10px 0;
+      font-weight: 300;
+    }
+
+    button.create-cart-button {
+      background-color: #00b1ea;
+      color: white;
+      text-transform: none;
+      padding: 6px 18px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button.create-cart-button:hover {
+      background-color: #02a8dd;
+    }
+
+    .create-cart-error {
+      margin-top: 20px;
+      width: 100%;
+      padding: 20px;
+      color: #ff5959;
+      font-size: 16px;
+    }
+
+    .create-cart-required {
+      text-align: left;
+      color: #ff5959;
+      padding-top: 5px;
+    }
+
+    /* CREATE CART */
+    
+
+    .app-container {
+      height: 100vh;
+    }
+    .app {
+      width: 100%;
+    }
+  
+    .catalog {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .item-card {
+      padding: 40px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 290px;
+    }
+    .item-information {
+      padding: 0 30px;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .item {
+      display: flex;
+    }
+
+    .item-name {
+      font-weight: 700;
+      font-size: 14px;
+      min-height: 40px;
+    }
+
+    .item-image {
+      height: 220px;
+      margin-bottom: 10px;
+      align-items: initial;
+      display: flex;
+      justify-content: center;
+    }
+
+    .item-image:hover, .item-name:hover {
+      cursor: pointer;
+    }
+
+    .item-price {
+      font-size: 16px;
+    }
+    
+    .item-actions {
+      justify-content: center;
+    }
+
+    .item-isbn {
+      color: #8f8f8f;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .catalog-actions {
+      padding-top: 10px;
+    }
+
+    .action {
+      display: inline-block;
+    }
+
+    .action.quantity {
+      padding: 0 10px;
+    }
+
+    .action-add, .action-remove {
+      background-color: #00b1ea;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+    }
+    .action-add.disabled, .action-remove.disabled {
+      background-color: #e3e3e3;
+    }
+
+    .books-container {
+      padding: 0;
+      height: calc(100vh - 64px);
+    }
+    
+    .books-container.landing {
+      padding: 0;
+      height: calc(100vh - 100px);
+    }
+
+    .books-content {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .catalog {
+      padding-top: 20px;
+    }
+    .catalog-view {
+      display: flex;
+      width: 100%;
+    }
+    .filters, .cart-total {
+      width: 15%;
+      max-width: 215px;
+      padding-top: 20px;
+      background-color: #00b1ea;
+    }
+    .create-cart-view {
+      padding-top: 20px;
+    }
+
+    .empty-cart {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding-top: 150px;
+      align-items: center;
+      font-size: 22px;
+      color: #8d8d8d;
+    }
+
+    .catalog-link:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .cart-total {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      font-size: 30px;
+      padding-top: 150px;
+      color: white;
+    }
+    .cart-total-btn {
+      background: white;
+      color: #02b1ea;
+      padding: 10px 20px;
+      margin-top: 30px;
+    }
+    .cart-total-btn:hover {
+      background-color: rgb(236, 236, 236); 
+    }
+    .ticket-view {
+      width: 70%;
+      padding-top: 50px;
+      display: flex;
+    flex-direction: column;
+    }
+    a.menu-items {
+      margin-right: 16px;
+      font-weight: 700;
+    }
+    a.menu-items:hover {
+      cursor: pointer;
+    }
+    .menu-item-icon:hover {
+      background-color: transparent;
+    }
+
+    .ticket-item {
+      display: flex;
+      margin-right: 50px;
+    }
+    .ticket-item-container {
+      font-size: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #c7c7c7;
+      cursor: progress;
+      padding-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+    }
+    .ticket-item-name {
+      font-weight: 700;
+    }
+    .ticket-item-total {
+      flex: 1;
+      justify-content: flex-end;
+    }
+    .ticket-total {
+      text-align: right;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .purchases-view {
+      margin-top: 50px;
+    }
+    .filters-container {
+      color: white;
+      padding: 15px;
+    }
+    .filter-item {
+      margin-bottom: 20px;
+    }
+    .filter-label {
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .filter-sublabel {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    .width100 {
+      width: 100%;
+    }
+    .detail-info {
+      flex: 1;
+    }
+    .detail-view {
+      display: flex;
+      width: 100%;
+    }
+    .detail-item-container {
+      display: flex;
+      width: 100%;
+      padding: 50px;
+    }
+    .detail-item{
+      margin-right: 20px;
+      margin-bottom: 20px;
+    }
+    .detail-item-name, .detail-item-price {
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .error-snackbar, .error-snackbar .MuiSnackbarContent-root {
+      background-color: #d32f2f;
+      color: white;
+    }
+  </style>
+
+  <script type="text/babel" type="module">
+    const {
+      // theme, styles
+      colors,
+      createMuiTheme,
+      makeStyles,
+      withStyles,
+      // components
+      AppBar,
+      Button,
+      Checkbox,
+      Container,
+      CssBaseline,
+      Icon,
+      IconButton,
+      Input,
+      InputAdornment,
+      InputLabel,
+      FormControl,
+      Link,
+      List,
+      ListItem,
+      ListItemIcon,
+      ListItemText,
+      MenuItem,
+      OutlinedInput,
+      Select,
+      Snackbar,
+      TextField,
+      ThemeProvider,
+      Toolbar,
+      Typography,
+    } = MaterialUI;
+    const theme = createMuiTheme({
+      palette: {
+        primary: {
+          main: '#556cd6',
+        },
+        secondary: {
+          main: '#19857b',
+        },
+        error: {
+          main: colors.red.A400,
+        },
+        background: {
+          default: '#fff',
+          paper: '#f5f5f5',
+        },
+      },
+    });
+    
+    const styles = theme => ({
+      root: {
+        margin: theme.spacing(6, 0, 3),
+      },
+      lightBulb: {
+        verticalAlign: 'middle',
+        // marginRight: theme.spacing(1),
+      },
+      rootToolBar: {
+        flexGrow: 1,
+      },
+      menuButton: {
+        marginRight: theme.spacing(2),
+      },
+      textField: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+      },
+      title: {
+        flexGrow: 1,
+      },
+      rootList: {
+        width: '100%',
+        backgroundColor: theme.palette.background.paper,
+        position: 'relative',
+        overflow: 'auto',
+        maxHeight: 300,
+      },
+      textFieldDetails: {
+        margin: theme.spacing(2),
+      }
+    })
+    
+    const useStyles = makeStyles(styles);
+
+    const getLocalAsJson = (path) => {
+      const port = 8082
+    
+      return fetch(`http://localhost:${port}/${path}`, {
+        method: "GET",
+        dataType: "JSON",
+        headers: {
+          "Access-Control-Request-Headers": "*"
+        }
+      })
+    }
+
+    // BORRAR ESTE ARCHIVO SI NO AGREGAMOS NINGUNA CONSTANTE
+    const CATALOG_ITEMS = {
+      anotherValidBook1: {
+        name: 'anotherValidBook1',
+        price: 10,
+        src: '',
+        author: 'test',
+        quantity: 0,
+      },
+      anotherValidBook2: {
+        name: 'anotherValidBook2',
+        price: 100,
+        src: '',
+        author: 'test',
+        quantity: 0,
+      },
+      anotherValidBook3: {
+        name: 'anotherValidBook3',
+        price: 20,
+        src: '',
+        author: 'test1',
+        quantity: 0,
+      },
+      anotherValidBook4: {
+        name: 'anotherValidBook4',
+        price: 30,
+        src: '',
+        author: 'test1',
+        quantity: 0,
+      },
+      anotherValidBook5: {
+        name: 'anotherValidBook5',
+        price: 500,
+        src: '',
+        author: 'test2',
+        quantity: 0,
+      },
+      anotherValidBook6: {
+        name: 'anotherValidBook6',
+        price: 10,
+        src: '',
+        author: 'test',
+        quantity: 0,
+      },
+      anotherValidBook7: {
+        name: 'anotherValidBook7',
+        price: 100,
+        src: '',
+        author: 'test',
+        quantity: 0,
+      },
+      anotherValidBook8: {
+        name: 'anotherValidBook8',
+        price: 20,
+        src: '',
+        author: 'test1',
+        quantity: 0,
+      },
+      anotherValidBook9: {
+        name: 'anotherValidBook9',
+        price: 30,
+        src: '',
+        author: 'test1',
+        quantity: 0,
+      },
+      anotherValidBook10: {
+        name: 'anotherValidBook10',
+        price: 500,
+        src: '',
+        author: 'test2',
+        quantity: 0,
+      },
+      anotherValidBook11: {
+        name: 'anotherValidBook11',
+        price: 10,
+        src: '',
+        author: 'test',
+        quantity: 0,
+      },
+      anotherValidBook12: {
+        name: 'anotherValidBook12',
+        price: 100,
+        src: '',
+        author: 'test',
+        quantity: 0,
+      },
+      anotherValidBook13: {
+        name: 'anotherValidBook13',
+        price: 20,
+        src: '',
+        author: 'test1',
+        quantity: 0,
+      },
+      anotherValidBook14: {
+        name: 'anotherValidBook14',
+        price: 30,
+        src: '',
+        author: 'test1',
+        quantity: 0,
+      },
+      anotherValidBook15: {
+        name: 'anotherValidBook15',
+        price: 500,
+        src: '',
+        author: 'test2',
+        quantity: 0,
+      }
+    };
+    
+    const CART_ITEMS = {
+      anotherValidBook1: 3,
+      anotherValidBook2: 2,
+      anotherValidBook3: 4,
+      anotherValidBook4: 1,
+    };
+    
+    const TICKET_ITEMS = {
+      anotherValidBook1: {
+        qty: 3,
+        total: 30
+      },
+      anotherValidBook2: {
+        qty: 2,
+        total: 200
+      },
+      anotherValidBook3: {
+        qty: 4,
+        total: 80
+      },
+      anotherValidBook4: {
+        qty: 1,
+        total: 30
+      },
+    };    function getSessionInformation() {
+      return JSON.parse(sessionStorage.getItem('sessionInfo') || 'null');
+    }
+    
+    function updateSessionInformation(property, value) {
+      const sessionInfo = JSON.parse(sessionStorage.getItem('sessionInfo') || 'null');
+      sessionInfo[property] = value;
+      sessionStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));
+    }
+    
+    function getItemDetails(catalog, id) {
+      return catalog.find(item => item.id === id);
+    }
+    
+    function getItemsInformation(catalog, items) {
+      return Object.keys(items).map(id => ({
+        ...getItemDetails(catalog, id),
+        quantity: items[id],
+      }));
+    }
+
+    class MyToolBarComponent extends React.Component {
+      constructor(props) {
+        super(props)
+      }
+    
+      render() {
+        const {
+          router,
+          title,
+          classes,
+        } = this.props
+    
+        const isAuthenticated = !!getSessionInformation();
+    
+        const isLanding = router.current() === '/';
+        const navBarClassName = `bookstore-navbar ${isLanding ? 'create-cart-navbar' : ''}`;
+        const menu = [
+          {
+            name: 'catalog',
+            label: 'Catalog',
+            onclick: () => router.navigate('/catalog', {}),
+          },
+          {
+            name: 'purchases',
+            label: 'My Purchases',
+            onclick: () => router.navigate('/purchases', {}),
+          },
+          {
+            name: 'cart',
+            icon: 'shopping_cart',
+            onclick: () => router.navigate('/cart', {}),
+          },
+          {
+            name: 'logout',
+            icon: 'logout',
+            onclick: () => {
+              sessionStorage.removeItem('sessionInfo');
+              router.navigate('/', {
+                authentication: null,
+              });
+            },
+          },
+        ];
+    
+        return (
+          <div className={classes.rootToolBar}>
+            <AppBar position='static' className={navBarClassName}>
+              <Toolbar>
+                <Typography variant='h6' className={classes.title}>
+                  {title}
+                </Typography>
+                {isAuthenticated && menu.map(m => (
+                m.icon ?
+                  <IconButton
+                    edge='start'
+                    className="menu-item-icon"
+                    color='inherit'
+                    onClick={m.onclick}
+                    key={m.name}
+                  >
+                    <Icon>{m.icon}</Icon>
+                  </IconButton> :
+                <a
+                  className="menu-items"
+                  key={m.name}
+                  onClick={m.onclick}>
+                    {m.label}
+                </a>
+                ))}
+              </Toolbar>
+            </AppBar>
+          </div>
+        )
+      }
+    
+    }
+    
+    // Add style
+    const MyToolBar = withStyles(styles, {
+      withTheme: true
+    })(MyToolBarComponent)
+    class ErrorSnackbar extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+    
+      render() {
+        const { message, onClose, open } = this.props;
+        return (<Snackbar
+          className="error-snackbar"
+          message={message}
+          open={open}
+          onClose={onClose}
+          autoHideDuration={2000}
+          anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+        />)
+      }
+    }
+    class EmptySection extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+    
+      goToCatalog() {
+        const { router } = this.props;
+        router.navigate('/catalog', {});
+      }
+    
+      render() {
+        const { label } = this.props;
+        return (
+          <div className="catalog-view">
+              <div className="empty-cart">
+                <div>
+                  {label}
+                </div>
+                <div>
+                  Go to the <a className="catalog-link" onClick={() => this.goToCatalog()}>catalog</a> to start shopping
+                </div>
+              </div>
+          </div>
+        );
+      }
+    }
+    class CreateCartView extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          authentication: {
+            id: '',
+            password: '',
+          },
+        }
+      };
+    
+      onUpdate(property, ev) {
+        const { authentication } = this.state;
+    
+        this.setState({
+          authentication: {
+            ...authentication,
+            [property]: ev.target.value,
+          },
+        })
+      }
+    
+      onSubmit() {
+        const { router } = this.props;
+        const { id, password } = this.state.authentication;
+        if (!id || !password) {
+          this.setState({ dirty: true })
+        } else {
+          this.setState({ dirty: false })
+          getLocalAsJson(`createCart?clientId=${id}&password=${password}`)
+          .then(async function (response) {
+            const dataAsJson = await response.json();
+            if (response.status === 404) {
+              throw dataAsJson;
+            }
+            return dataAsJson;
+          })
+          .then(async function (data) {
+            sessionStorage.setItem('sessionInfo', JSON.stringify({ id, password, cartId: data }));
+            router.navigate('/catalog', {});
+          })
+          .catch(function (errorMessage) {
+            const { setError } = this.props;
+            setError(errorMessage);
+          }.bind(this));  
+        }
+      }
+    
+      render() {
+    
+        const { dirty } = this.state;
+        const { id, password } = this.state.authentication;
+    
+        return (
+          <div className="create-cart-view">
+            <div className="create-cart-form">
+              <Typography component='h2' className="create-cart-title">
+                Please enter your Client Id and Password
+              </Typography>
+              <FormControl margin='dense' fullWidth variant='outlined'>
+                <InputLabel htmlFor='id-input'>Id</InputLabel>
+                <OutlinedInput
+                  id='id-input'
+                  value={id}
+                  onChange={ev => this.onUpdate('id', ev)}
+                  labelWidth={60}
+                  rows='1'
+                />
+                {dirty && !id && (<div className="create-cart-required">
+                  Id is required
+                </div>)}
+              </FormControl>
+              <FormControl margin='dense' fullWidth variant='outlined'>
+                  <InputLabel htmlFor='password-input'>Password</InputLabel>
+                  <OutlinedInput
+                    id='password-input'
+                    type='password'
+                    value={password}
+                    onChange={ev => this.onUpdate('password', ev)}
+                    labelWidth={60}
+                    rows='1'
+                  />
+                  {dirty && !password && (<div className="create-cart-required">
+                    Password is required
+                  </div>)}
+              </FormControl>
+    
+              <Button
+                className="create-cart-button"
+                onClick={() => this.onSubmit()}>
+                Create cart
+            </Button>
+            </div>
+          </div>
+        );
+      }
+    }
+    
+    class Filters extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+    
+      filterByName(ev) {
+        const { filters, onFilter } = this.props;
+        onFilter({
+          ...filters,
+          byName: ev.target.value,
+        })
+      }
+    
+      filterByAuthor(ev, name) {
+        const { filters, onFilter } = this.props;
+        let { byAuthor: authors } = filters;
+        if (ev.target.checked) {
+          authors.push(name);
+        } else {
+          authors = authors.filter(author => author !== name)
+        }
+    
+        onFilter({
+          ...filters,
+          byAuthor: authors,
+        })
+      }
+    
+      filterByPrice(ev, type) {
+        const { filters, onFilter } = this.props;
+        const { byPrice } = filters;
+    
+        onFilter({
+          ...filters,
+          byPrice: {
+            ...byPrice,
+            [type]: ev.target.value,
+          },
+        })
+      }
+    
+      getAuthors() {
+        const { catalog } = getSessionInformation();
+        const authorNames = {};
+        catalog.map(item => authorNames[item.author] = true);
+        return Object.keys(authorNames);
+      }
+    
+      orderBy(ev) {
+        const { filters, onFilter } = this.props;
+    
+        onFilter({
+          ...filters,
+          orderBy: ev.target.value,
+        })
+      }
+    
+      render() {
+        const { catalog } = getSessionInformation();
+        const { filters } = this.props;
+    
+        return catalog ?
+          (<div className="filters-container">
+            <div className="filter-item order-by">
+              <div className="filter-label">Order By</div>
+              <Select
+                className="width100"
+                value={filters.orderBy}
+                onChange={ev => this.orderBy(ev)}
+              >
+                <MenuItem value="name">Name</MenuItem>
+                <MenuItem value="price-low"> Lowest Price </MenuItem>
+                <MenuItem value="price-high"> Highest Price </MenuItem>
+    
+              </Select>
+            </div>
+            <div className="filter-item by-name">
+              <div className="filter-label">Name</div>
+              <Input
+                className="width100"
+                value={filters.byName}
+                onChange={ev => this.filterByName(ev)}
+                rows='1'
+              />
+            </div>
+            <div className="filter-item by-author">
+              <div className="filter-label">Author</div>
+              {this.getAuthors().map(author => (
+                <div key={author}>
+                  <Checkbox
+                    checked={filters.byAuthor.includes(author)}
+                    onChange={ev => this.filterByAuthor(ev, author)}
+                  />
+                  {author}
+                </div>
+              ))}
+            </div>
+            <div className="filter-item by-price">
+              <div className="filter-label">Price</div>
+              <div className="filter-item filter-min">
+                <div className="filter-sublabel">Min</div>
+                <Input
+                  className="width100"
+                  value={filters.byPrice.min}
+                  onChange={ev => this.filterByPrice(ev, 'min')}
+                  rows='1'
+                  type="number"
+                />
+              </div>
+              <div className="filter-item filter-max">
+                <div className="filter-sublabel">Max</div>
+                <Input
+                  className="width100"
+                  value={filters.byPrice.max}
+                  onChange={ev => this.filterByPrice(ev, 'max')}
+                  rows='1'
+                  type="number"
+                />
+              </div>
+            </div>
+          </div>) :
+          (<div></div>);
+      }
+    }
+    class CatalogItemActions extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+    
+      render() {
+        const { item, onAdd, onRemove } = this.props;
+        const isDisabled = item.quantity === 0;
+    
+        const removeClassName = `action action-remove ${isDisabled ? 'disabled' : ''}`;
+        return (
+          <div className="catalog-actions"> 
+            <div className={removeClassName}>
+              <Button
+                disabled={item.quantity === 0}
+                color='inherit'
+                onClick={onRemove}>
+                -
+              </Button>
+            </div>
+            <div className="action quantity">
+              {item.quantity}
+            </div>
+            <div className="action action-add">
+              <Button
+                  color='inherit'
+                  onClick={onAdd}>
+                  +
+                </Button>
+            </div>
+          </div>
+        );
+      }
+    }
+    class CatalogItem extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+    
+      render() {
+        const { item, onAdd, onRemove, onShowDetail } = this.props;
+        return (
+          <div className="item-card">
+            <div className="item-image" onClick={onShowDetail}>
+              <img src={item.src} />
+            </div>
+            <div className="item-information">
+              <div className="item item-name" onClick={onShowDetail}>
+                {item.name}
+              </div>
+              <div className="item item-isbn">
+                isbn: {item.id}
+              </div>
+              <div className="item item-author">
+                {item.author}
+              </div>
+              <div className="item item-price">
+                ${item.price}
+              </div>
+            </div>
+            <div className="item item-actions">
+              <CatalogItemActions
+                item={item}
+                onAdd={onAdd}
+                onRemove={onRemove}
+              />
+            </div>
+          </div>
+        );
+      }
+    }
+    class Catalog extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+      
+      render() {
+        const { items, onAdd, onRemove, onShowDetail } = this.props;
+        const showDetails = (id) => (!!onShowDetail ? (() => onShowDetail(id)) : (() => {}));
+        return (
+          <div className="catalog">
+            {items.map(item => (
+              <CatalogItem
+                key={item.name}
+                item={item}
+                onAdd={() => onAdd(item.id)}
+                onRemove={() => onRemove(item.id)}
+                onShowDetail={showDetails(item.id)}
+              />
+            ))}
+          </div>
+        );
+      }
+    }
+    class CatalogView extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          catalog: [],
+          error: null,
+          cartItems: {},
+        };
+        this.onAdd = this.onAdd.bind(this);
+        this.onRemove = this.onRemove.bind(this);
+        this.onShowDetail = this.onShowDetail.bind(this);
+      }
+      
+      getItemQuantity(id) {
+        return (this.state.cartItems[id] || 0);
+      }
+      
+      componentDidMount() {
+        const { cartId } = getSessionInformation();
+        getLocalAsJson(`listCart?cartId=${cartId}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (cartItems) {
+          this.setState({ cartItems })
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+          setError(errorMessage);
+        }.bind(this));
+    
+        getLocalAsJson('getCatalog')
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          const catalog = Object.keys(data).map(id => ({
+              ...data[id],
+              id,
+              quantity: this.getItemQuantity(id),
+          }));
+          updateSessionInformation('catalog', catalog);
+          this.setState({ catalog });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      onAdd(id) {
+        const { cartId } = getSessionInformation();
+        const { catalog } = this.state;
+        let catalogItem = catalog.find(c => c.id === id);
+        getLocalAsJson(`addToCart?cartId=${cartId}&bookIsbn=${id}&bookQuantity=1`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          catalogItem.quantity++;
+          this.setState({ catalog });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+          setError(errorMessage);
+        }.bind(this));
+      }
+    
+      onRemove(id) {
+        const { cartId } = getSessionInformation();
+        const { catalog } = this.state;
+        let catalogItem = catalog.find(c => c.id === id);
+        getLocalAsJson(`removeFromCart?cartId=${cartId}&bookIsbn=${id}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          catalogItem.quantity--;
+          this.setState({ catalog });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      onShowDetail(id) {
+        const { router } = this.props;
+        router.navigate('/detail', { selectedBook: id });
+      }
+    
+      filterItems(items) {
+        const { filters } = this.props;
+        const { byName, byAuthor, byPrice } = filters;
+        const filterRegexp = new RegExp(byName, 'i');
+        return items.filter(item => {
+          let matches = true;
+          if (byName) {
+            matches = matches && (item.name.match(filterRegexp));
+          }
+          if (byAuthor.length) {
+            matches = matches && (byAuthor.length && byAuthor.includes(item.author));
+          }
+          if (byPrice.min) {
+            matches = matches && (byPrice.min <= item.price);
+          }
+          if (byPrice.max) {
+            matches = matches && (byPrice.max >= item.price);
+          }
+            return matches;
+          }
+        )
+      }
+    
+      sortItems(items) {
+        const { filters } = this.props;
+        const { orderBy } = filters;
+        if (orderBy) {
+          if (orderBy === 'name') {
+            items = items.sort((a, b) => {
+              if (a.name.toLowerCase() <= b.name.toLowerCase()) {
+                return -1;
+              } else {
+                return 1
+              }
+            });
+          } else if(orderBy === 'price-low') {
+            items = items.sort((a, b) => {
+              if (a.price <= b.price) {
+                return -1;
+              } else {
+                return 1
+              }
+            });
+          } else if (orderBy === 'price-high') {
+            items = items.sort((a, b) => {
+              if (a.price >= b.price) {
+                return -1;
+              } else {
+                return 1
+              }
+            });
+          }
+        }
+        return items;
+      }
+    
+      render() {
+        const { catalog } = this.state;
+        const { filters, onFilter } = this.props;
+        return (
+          <div className="catalog-view">
+            <div className="filters">
+              <Filters 
+                onFilter={onFilter}
+                filters={filters}
+              />
+            </div>
+            <Catalog
+              className="catalog"
+              items={this.sortItems(this.filterItems(catalog))}
+              onRemove={this.onRemove}
+              onAdd={this.onAdd}
+              onShowDetail={this.onShowDetail}
+            />
+          </div>
+        );
+      }
+    }
+    
+    class Ticket extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+    
+      getTotal(items) {
+        return items.reduce( (total, item) => total += (item.quantity * item.price), 0);
+      }
+    
+      render() {
+        const { items } = this.props;
+        return (
+          <div className="ticket-view">
+            <div className="ticket-total">
+              Order Total: ${this.getTotal(items)}
+            </div>
+            {items.map(item => (<div className="ticket-item-container" key={item.id}>
+              <div className="ticket-item ticket-item-image">
+                <img src={item.src} />
+              </div>
+              <div className="ticket-item ticket-item-name">
+                {item.name}
+              </div>
+              <div className="ticket-item ticket-item-quantity">
+                <b>Qty.:</b> {item.quantity}
+              </div>
+              <div className="ticket-item ticket-item-total">
+                <b>Total:</b> ${item.price * item.quantity}
+              </div>
+              </div>))}
+          </div>
+        );
+      }
+    }
+
+    class ItemDetailView extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          item: null,
+        }
+      }
+    
+      componentDidMount() {
+        const { cartId } = getSessionInformation();
+        getLocalAsJson(`listCart?cartId=${cartId}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (cartItems) {
+          const { catalog } = getSessionInformation();
+          let { item } = this.props;
+          item = catalog.find(i => i.id === item);
+          const items = getItemsInformation(catalog, cartItems);
+          const itemInCart = items.find(i => i.id === item.id);
+          if (itemInCart) {
+            item.quantity = itemInCart.quantity;
+          } else {
+            item.quantity = 0;
+          }
+          this.setState({ item });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+          setError(errorMessage);
+        }.bind(this));
+      }
+    
+      onAdd(id) {
+        const { cartId } = getSessionInformation();
+        const { item } = this.state;
+        getLocalAsJson(`addToCart?cartId=${cartId}&bookIsbn=${id}&bookQuantity=1`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          item.quantity++;
+          this.setState({ item });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      onRemove(id) {
+        const { cartId } = getSessionInformation();
+        const { item } = this.state;
+        getLocalAsJson(`removeFromCart?cartId=${cartId}&bookIsbn=${id}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          // TODO VER SI ESTA OK Y MOSTRAR ERROR
+          item.quantity--;
+          this.setState({ item });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+          setError(errorMessage);
+        }.bind(this));
+      }
+    
+      render() {
+        const { item } = this.state;
+        return (
+          <div className="detail-view">
+            <React.Fragment>
+              {item && <div className="detail-item-container">
+                <div className="detail-img">
+                  <div className="detail-item detail-item-image">
+                    <img src={item.src} />
+                    <div className="detail-item-actions">
+                      <CatalogItemActions
+                        item={item}
+                        onAdd={() => this.onAdd(item.id)}
+                        onRemove={() => this.onRemove(item.id)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="detail-info">
+                  <div className="detail-item detail-item-name">
+                    {item.name}
+                  </div>
+                  <div className="detail-item detail-item-description">
+                    {item.description}
+                  </div>
+                  <div className="detail-item detail-item-price">
+                    ${item.price}
+                  </div>
+                </div>
+              </div>}
+            </React.Fragment>
+          </div>
+        );
+      }
+    }
+    class CartView extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          items: [],
+        };
+        this.onAdd = this.onAdd.bind(this);
+        this.onRemove = this.onRemove.bind(this);
+        this.onShowDetail = this.onShowDetail.bind(this);
+      }
+    
+      componentDidMount() {
+        const { cartId } = getSessionInformation();
+        getLocalAsJson(`listCart?cartId=${cartId}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (cartItems) {
+          const { catalog } = getSessionInformation();
+          const items = getItemsInformation(catalog, cartItems);
+          this.getTotal(items);
+          this.setState({ items });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      getTotal (items) {
+        const total = items.reduce( (total, item) => total += (item.quantity * item.price), 0);
+        this.setState({ total });
+      }
+    
+      onCheckout() {
+        const { cartId, id } = getSessionInformation();
+        const { router } = this.props;
+        getLocalAsJson(`checkoutCart?cartId=${cartId}&clientId=${id}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (ticket) {
+          let ticketItems = {};
+          Object.keys(ticket).forEach(item => {
+            ticketItems[item] = ticket[item].qty;
+          });
+          const { catalog } = getSessionInformation();
+          const items = getItemsInformation(catalog, ticketItems);
+          router.navigate('/ticket', { ticket: items })
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      updateCart(items) {
+        const cartItems = items.filter(item => item.quantity > 0);
+        this.setState({ items: cartItems });
+        this.getTotal(cartItems);
+      }
+    
+      onAdd(id) {
+        const { cartId } = getSessionInformation();
+        const { items } = this.state;
+        let item = items.find(c => c.id === id);
+        getLocalAsJson(`addToCart?cartId=${cartId}&bookIsbn=${id}&bookQuantity=1`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          item.quantity++;
+          this.updateCart(items);
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      onRemove(id) {
+        const { cartId } = getSessionInformation();
+        const { items } = this.state;
+        let item = items.find(c => c.id === id);
+        getLocalAsJson(`removeFromCart?cartId=${cartId}&bookIsbn=${id}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (data) {
+          // TODO VER SI ESTA OK Y MOSTRAR ERROR
+          item.quantity--;
+          this.updateCart(items);
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+          setError(errorMessage);
+        }.bind(this));
+      }
+    
+      goToCatalog() {
+        const { router } = this.props;
+        router.navigate('/catalog', {});
+      }
+    
+      onShowDetail(id) {
+        const { router } = this.props;
+        router.navigate('/detail', { selectedBook: id });
+      }
+    
+      render() {
+        const { router } = this.props;
+        const { items, total } = this.state;
+        return (
+          <div className="catalog-view">
+            <React.Fragment>
+              {(items && items.length) ?
+              (<Catalog
+                className="catalog"
+                items={items}
+                onRemove={this.onRemove}
+                onAdd={this.onAdd}
+                onShowDetail={this.onShowDetail}
+              />) :
+              (<EmptySection
+                router={router}
+                label="Your cart is empty"
+              />
+              )}
+              
+              <div className="cart-total">
+                <div className="items-total">
+                  TOTAL ${total}
+                </div>
+                <Button
+                  className="cart-total-btn"
+                  color='inherit'
+                  onClick={() => this.onCheckout()}
+                  disabled={items.length === 0}
+                  >
+                  Checkout
+                </Button>
+              </div>
+            </React.Fragment>
+          </div>
+        );
+      }
+    }
+    class PurchasesView extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          items: [],
+        }
+      }
+    
+      componentDidMount() {
+        
+        const { catalog, id, password } = getSessionInformation();
+        getLocalAsJson(`listPurchases?clientId=${id}&password=${password}`)
+        .then(async function (response) {
+          const dataAsJson = await response.json();
+          if (response.status === 404) {
+            throw dataAsJson;
+          }
+          return dataAsJson;
+        })
+        .then(function (purchasesItems) {
+          let ticketItems = {};
+          Object.keys(purchasesItems).forEach(item => {
+            ticketItems[item] = purchasesItems[item].qty;
+          });
+          const items = getItemsInformation(catalog, ticketItems);
+          this.setState({ items });
+        }.bind(this))
+        .catch(function (errorMessage) {
+          const { setError } = this.props;
+            setError(errorMessage);
+        }.bind(this));
+      }
+    
+      render() {
+        const { items } = this.state;
+        const { router } = this.props;
+        return (
+          <div className="purchases-view">        
+            {items.length ? items.map(item => (<div className="ticket-item-container" key={item.id}>
+                <div className="ticket-item ticket-item-image">
+                  <img src={item.src} />
+                </div>
+                <div className="ticket-item ticket-item-name">
+                  {item.name}
+                </div>
+                <div className="ticket-item ticket-item-quantity">
+                  <b>Qty.:</b> {item.quantity}
+                </div>
+                <div className="ticket-item ticket-item-total">
+                  <b>Total:</b> ${item.price * item.quantity}
+                </div>
+                </div>)) :
+                (<EmptySection
+                  router={router}
+                  label="You don't have any purchases on your history"
+                />
+                )}
+          </div>
+        );
+      }
+    }
+    class App extends React.Component {
+      constructor(props) {
+        super(props);
+    
+        const isAuthenticated = !!getSessionInformation();
+    
+        this.state = {
+          path: isAuthenticated ? '/catalog' : '/',
+          selectedBook: null,
+          ticket: null,
+          filters: {
+            byName: '',
+            byAuthor: [],
+            byPrice: {
+              min: '',
+              max: '',
+            },
+            orderBy: '',
+          },
+          error: null,
+        };
+        this.onFilter = this.onFilter.bind(this);
+      }
+    
+      onFilter(filters) {
+        this.setState({ filters });
+      }
+    
+      render() {
+        const isLanding = this.state.path === '/';
+        const containerClassName = `books-container ${isLanding ? 'landing' : ''}`;
+    
+        const title = 'Book Store';
+        let content = null;
+        const router = {
+          current: () => this.state.path,
+          navigate: (path, state) => {
+            // http://es6-features.org/#SpreadOperator
+            this.setState({ ...state, path: path })
+          },
+        };
+    
+        const { error } = this.state;
+    
+        const setError = errorMessage => {
+          this.setState({ error: {
+            message: errorMessage,
+          } })
+        }
+    
+        if (this.state.path === '/') {
+          content = (<CreateCartView
+            router={router}
+            setError={setError}
+          />);
+        } else if (this.state.path === '/catalog') {
+          content = (<CatalogView
+            router={router}
+            filters={this.state.filters}
+            onFilter={this.onFilter}
+            setError={setError}
+          />);
+        } else if (this.state.path === '/detail') {
+          content = (<ItemDetailView
+            router={router}
+            item={this.state.selectedBook}
+            setError={setError}
+          />);
+        } else if (this.state.path === '/cart') {
+          content = (<CartView
+            router={router}
+            catalog={this.state.catalog}
+            setError={setError}
+          />);
+        } else if (this.state.path === '/purchases') {
+          content = (<PurchasesView
+            router={router}
+            catalog={this.state.catalog}
+            setError={setError}
+          />);
+        } else if (this.state.path === '/ticket') {
+          content = (<Ticket
+            router={router}
+            items={this.state.ticket}
+            setError={setError}
+          />);
+        }
+        return (
+          <div>
+            <MyToolBar
+              title={title}
+              router={router}
+            />
+            <Container 
+              className={containerClassName}
+              maxWidth={false}>
+              <div className="books-content">
+                {content}
+              </div>
+            </Container>
+            <ErrorSnackbar
+              message={error && error.message}
+              onClose={() => this.setState({ error: null })}
+              open={!!error}
+            />
+          </div>
+        );
+      }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Initial render
+    //
+    ReactDOM.render(
+      <ThemeProvider
+        theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>,
+      document.getElementById('root')
+    )
+  </script>
+
+  <!-- <button onclick="window.location.reload(true)">reload</button> -->
+</body>
+
+</html>

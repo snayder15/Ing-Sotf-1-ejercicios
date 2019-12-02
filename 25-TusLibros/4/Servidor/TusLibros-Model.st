@@ -5,6 +5,11 @@ Object subclass: #Cart
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
+!Cart methodsFor: 'error messages' stamp: 'car 11/25/2019 19:16:39'!
+emptyCartErrorMessage
+
+	^self class emptyCartErrorMessage ! !
+
 !Cart methodsFor: 'error messages' stamp: 'HernanWilkinson 6/21/2013 23:59'!
 invalidItemErrorMessage
 
@@ -14,6 +19,11 @@ invalidItemErrorMessage
 invalidQuantityErrorMessage
 
 	^self class invalidQuantityErrorMessage ! !
+
+!Cart methodsFor: 'error messages' stamp: 'car 11/25/2019 19:21:15'!
+notInCartErrorMessage
+
+	^self class notInCartErrorMessage ! !
 
 
 !Cart methodsFor: 'assertions' stamp: 'HernanWilkinson 6/22/2013 14:17'!
@@ -37,7 +47,7 @@ content
 
 	^items copy! !
 
-!Cart methodsFor: 'content' stamp: 'HernanWilkinson 6/23/2013 12:10'!
+!Cart methodsFor: 'content' stamp: 'ns 12/1/2019 16:59:19'!
 itemsAndQuantitiesDo: aBlock
 
 	^ items contents keysAndValuesDo: [ :anItem :aQuantity | aBlock value: anItem value: aQuantity ]! !
@@ -55,6 +65,12 @@ initializeAcceptingItemsOf: aCatalog
 	items := Bag new.! !
 
 
+!Cart methodsFor: 'error signal' stamp: 'car 11/25/2019 19:16:23'!
+signalEmptyCart
+
+	self error: self emptyCartErrorMessage 
+	! !
+
 !Cart methodsFor: 'error signal' stamp: 'HernanWilkinson 6/22/2013 14:18'!
 signalInvalidItem
 
@@ -64,6 +80,12 @@ signalInvalidItem
 signalInvalidQuantity
 
 	self error: self invalidQuantityErrorMessage ! !
+
+!Cart methodsFor: 'error signal' stamp: 'car 11/25/2019 19:21:04'!
+signalNotInCart
+
+	self error: self notInCartErrorMessage 
+	! !
 
 
 !Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
@@ -90,11 +112,33 @@ add: aQuantity of: anItem
 
 	items add: anItem withOccurrences: aQuantity ! !
 
+!Cart methodsFor: 'adding' stamp: 'ns 12/2/2019 00:49:29'!
+removeAllItems
+
+	items := Bag new.! !
+
+
+!Cart methodsFor: 'as yet unclassified' stamp: 'car 11/25/2019 19:22:28'!
+remove: anItem 
+	
+	self assertIsValidItem: anItem.
+	
+	self isEmpty ifTrue: [ self signalEmptyCart ].
+	
+	(items includes: anItem) ifFalse: [self signalNotInCart ].
+	
+	items remove: anItem .! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Cart class' category: #'TusLibros-Model'!
 Cart class
 	instanceVariableNames: ''!
+
+!Cart class methodsFor: 'error messages' stamp: 'car 11/25/2019 19:17:04'!
+emptyCartErrorMessage
+
+	^'Can not remove from empty cart'! !
 
 !Cart class methodsFor: 'error messages' stamp: 'HernanWilkinson 6/21/2013 23:59'!
 invalidItemErrorMessage
@@ -105,6 +149,11 @@ invalidItemErrorMessage
 invalidQuantityErrorMessage
 
 	^'Invalid number of items'! !
+
+!Cart class methodsFor: 'error messages' stamp: 'car 11/25/2019 19:21:37'!
+notInCartErrorMessage
+
+	^'Item does not belong to cart'! !
 
 
 !Cart class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 17:48'!
@@ -188,6 +237,11 @@ checkOutCartWithCreditCardNumbered: aCreditCartNumber ownedBy: anOwner expiringO
 		on: self today
 		registeringOn: systemFacade salesBook) checkOut! !
 
+!CartSession methodsFor: 'cart' stamp: 'car 11/25/2019 19:27:45'!
+remove:  bookIsbn
+
+	^cart remove: bookIsbn! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'CartSession class' category: #'TusLibros-Model'!
@@ -236,23 +290,31 @@ debitTotal
 	merchantProcessor debit: ticket total from: creditCard.
 	! !
 
+!Cashier methodsFor: 'checkout - private' stamp: 'ns 12/2/2019 00:41:00'!
+emptyCart
+
+	^ cart removeAllItems
+! !
+
 !Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/17/2013 19:06'!
 registerSale
 
 	salesBook add: self createSale! !
 
-!Cashier methodsFor: 'checkout - private' stamp: 'HernanWilkinson 6/22/2013 12:17'!
+!Cashier methodsFor: 'checkout - private' stamp: 'ns 12/1/2019 17:03:48'!
 totalOf: anItem quantity: aQuantity
+	| itemInformation |
+	itemInformation := cart catalog at: anItem.
+	^(itemInformation at: 'price') * aQuantity  ! !
 
-	^(cart catalog at: anItem) * aQuantity  ! !
 
-
-!Cashier methodsFor: 'checkout' stamp: 'ns 11/23/2019 11:28:31'!
+!Cashier methodsFor: 'checkout' stamp: 'ns 12/2/2019 00:36:58'!
 checkOut
 
 	self createTicket.
 	self debitTotal.
 	self registerSale.
+	self emptyCart.
 
 	^ ticket! !
 
@@ -641,6 +703,11 @@ createCartFor: aUser authenticatedWith: aPassword
 
 		cartId  ]! !
 
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'ns 11/30/2019 19:37:25'!
+getCatalog
+
+	^ catalog! !
+
 !TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'HernanWilkinson 6/17/2015 20:48'!
 listCartIdentifiedAs: aCartId
 
@@ -656,6 +723,11 @@ listPurchasesOf: aUser authenticatingWith: aPassword
 			into: [ :salesOrderedByBook :aSale |
 				self list: aSale on: salesOrderedByBook.
 				salesOrderedByBook ] ]! !
+
+!TusLibrosSystemFacade methodsFor: 'facade protocol' stamp: 'car 11/25/2019 19:27:59'!
+remove:  bookIsbn fromCartIdentifiedAs: aCartId 
+
+	self withCartSessionIdentifiedAs: aCartId do: [ :cartSession | cartSession remove:  bookIsbn]! !
 
 
 !TusLibrosSystemFacade methodsFor: 'checkout support' stamp: 'HernanWilkinson 6/17/2015 20:49'!
@@ -734,7 +806,7 @@ Object subclass: #TusLibrosSystemFacadeServer
 	poolDictionaries: ''
 	category: 'TusLibros-Model'!
 
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 00:13:32'!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/30/2019 19:35:51'!
 create200ResponseWith: aValue and: aRequest
 		| responseAsJson |
 
@@ -750,10 +822,187 @@ createDateWith: monthAndYear
 	year := '20', (monthAndYear copyFrom: 3 to: 4).
 	^ Month month: month asNumber year: year asNumber.! !
 
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/2/2019 03:05:00'!
+defaultCatalog
+
+		^ Dictionary new
+at: 'book1' put:
+  (Dictionary new
+  	at: 'name' put: 'The Terry Pratchett Diary';
+ 	 at: 'price' put: 10;
+ 	 at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4732/9781473208339.jpg';
+  	at: 'author' put: 'Author';
+    at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+    yourself);
+at: 'book2' put:
+  (Dictionary new
+  at: 'name' put: 'Bridget Jones: The Edge of Reason';
+  at: 'price' put: 100;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/3303/9780330367356.jpg';
+  at: 'author' put: 'Author';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book3' put:
+  (Dictionary new
+  at: 'name' put: 'Under the Jaguar Sun';
+  at: 'price' put: 20;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/1411/9780141189727.jpg';
+  at: 'author' put: 'Author1';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book4' put:
+  (Dictionary new
+  at: 'name' put: 'QI The Pocket Book of Animals';
+  at: 'price' put: 30;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/5712/9780571245130.jpg';
+  at: 'author' put: 'Author1';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book5' put:
+  (Dictionary new
+  at: 'name' put: 'The Help';
+  at: 'price' put: 500;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/1410/9780141039282.jpg';
+  at: 'author' put: 'Author2';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book6' put:
+  (Dictionary new
+  at: 'name' put: 'Meditations';
+  at: 'price' put: 10;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/7538/9780753820162.jpg';
+  at: 'author' put: 'Author';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book7' put:
+  (Dictionary new
+  at: 'name' put: 'The Magic of Reality';
+  at: 'price' put: 100;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/5527/9780552778053.jpg';
+  at: 'author' put: 'Author';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book8' put:
+  (Dictionary new
+  at: 'name' put: 'Death Cure';
+  at: 'price' put: 20;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/9084/9781908435200.jpg';
+  at: 'author' put: 'Author1';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book9' put:
+  (Dictionary new
+  at: 'name' put: 'Hallucinations';
+  at: 'price' put: 30;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4472/9781447208266.jpg';
+  at: 'author' put: 'Author1';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book10' put:
+  (Dictionary new
+  at: 'name' put: 'Snow Crash';
+  at: 'price' put: 500;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/2419/9780241953181.jpg';
+  at: 'author' put: 'Author2';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book11' put:
+  (Dictionary new
+  at: 'name' put: 'Anatomy of the Spirit';
+  at: 'price' put: 10;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/5535/9780553505276.jpg';
+  at: 'author' put: 'Author';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book12' put:
+  (Dictionary new
+  at: 'name' put: 'The End of the Affair';
+  at: 'price' put: 100;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9780/0994/9780099478447.jpg';
+  at: 'author' put: 'Author';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book13' put:
+  (Dictionary new
+  at: 'name' put: 'The Samurai';
+  at: 'price' put: 20;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/8452/9781845299477.jpg';
+  at: 'author' put: 'Author1';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book14' put:
+  (Dictionary new
+  at: 'name' put: 'Fullmetal Alchemist Vol. 1';
+  at: 'price' put: 30;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4215/9781421599779.jpg';
+  at: 'author' put: 'Author1';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book15' put:
+  (Dictionary new
+  at: 'name' put: 'Death Note Black Edition, Vol. 1';
+  at: 'price' put: 500;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4215/9781421539645.jpg';
+  at: 'author' put: 'Author2';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+
+at: 'book16' put:
+  (Dictionary new
+  at: 'name' put: 'Dragon Ball Z, Vol. 1';
+  at: 'price' put: 150;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4215/9781421520643.jpg';
+  at: 'author' put: 'Author2';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book17' put:
+  (Dictionary new
+  at: 'name' put: 'Dragon Ball Z, Vol. 2';
+  at: 'price' put: 20;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4215/9781421520650.jpg';
+  at: 'author' put: 'Author2';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+at: 'book18' put:
+  (Dictionary new
+  at: 'name' put: 'Dragon Ball Z, Vol. 3';
+  at: 'price' put: 300;
+  at: 'src' put: 'https://d1w7fb2mkkr3kw.cloudfront.net/assets/images/book/mid/9781/4215/9781421520667.jpg';
+  at: 'author' put: 'Author2';
+  at: 'description' put: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean neque leo, rhoncus quis maximus a, placerat non arcu. Pellentesque in iaculis felis. Ut accumsan posuere libero, sed vulputate quam scelerisque vitae. Suspendisse vehicula elementum mi id pharetra. Ut sollicitudin at est at pellentesque. Ut nisi erat, tincidunt a convallis at, molestie nec orci. Vivamus sagittis eros non dapibus vulputate. Ut pulvinar enim a eros ultrices lacinia. Nam bibendum, enim non bibendum rhoncus, lorem velit accumsan dolor, ut condimentum est risus sit amet erat. Aenean vitae condimentum odio. Nullam aliquet mollis dolor eget congue. Praesent gravida rutrum magna vitae lacinia. Sed dui urna, malesuada vitae nibh ut, aliquam feugiat augue. Nam elementum sit amet lacus vel pulvinar. Donec ut risus non felis aliquet accumsan.';
+  yourself);
+yourself! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/1/2019 20:34:58'!
+defaultCced
+
+	^ '1230'! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/1/2019 20:34:46'!
+defaultCcn
+
+	^ 123456! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/1/2019 20:35:11'!
+defaultCco
+
+	^ 'validOwner'! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/2/2019 09:17:21'!
+defaultExpiredCced
+
+	^ '1117'! !
+
 !TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/18/2019 23:43:57'!
 destroy
 	
 	webServer ifNotNil:[webServer destroy].! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/2/2019 09:23:51'!
+getCardExpirationFor: aClient
+
+	aClient = 'expiredCardUser' ifTrue: [^ self defaultExpiredCced ].
+	^ self defaultCced.! !
 
 !TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:28:40'!
 getCartSummary: aProductList
@@ -780,14 +1029,14 @@ getTicketSummary: ticket
 
 	^ ticketSummary.! !
 
-!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/23/2019 12:31:48'!
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/2/2019 09:32:47'!
 initializeWith: aPortNumber
 	
 	testObjectsFactory := StoreTestObjectsFactory new.
 	clock := ManualClock now: testObjectsFactory today.
 	restInterface :=TusLibrosSystemFacade
-		authenticatingWith: testObjectsFactory validUsersAndPasswords
-		acceptingItemsOf: testObjectsFactory defaultCatalog
+		authenticatingWith: self validUsersAndPasswords
+		acceptingItemsOf: self defaultCatalog
 		registeringOn: testObjectsFactory createSalesBook
 		debitingThrought: testObjectsFactory merchantProcessor
 		measuringTimeWith: clock.
@@ -806,20 +1055,22 @@ initializeWith: aPortNumber
 	 ]
 	on: Error 
 	do: [ :anError |
-		request send404Response: (anError messageText) ]].
+				request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
 
 	webServer addService: '/addToCart' action:[:request | | bookIsbn bookQuantity cartId |
 	
 	[	cartId := request fields at: 'cartId'.
 		bookIsbn := request fields at: 'bookIsbn'.
 		bookQuantity := request fields at: 'bookQuantity'.
-		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
 		restInterface add: (bookQuantity asNumber) of: bookIsbn toCartIdentifiedAs: (cartId asNumber).
 		self create200ResponseWith: 'OK' and: request.
 	] 
 	on: Error 
 	do: [ :anError |
-		request send404Response: (anError messageText) ]].
+		
+		request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
 
 
 	webServer addService: '/listCart' action:[:request | | cartId cartProducts |
@@ -831,21 +1082,20 @@ initializeWith: aPortNumber
 	] 
 	on: Error 
 	do: [ :anError |
-		request send404Response: (anError messageText) ]].
+		request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
 
-	webServer addService: '/checkoutCart' action:[:request | | cartId ccn cced cco ticket |
+	webServer addService: '/checkoutCart' action:[:request | | cartId clientId ticket |
 	
 	[	cartId := request fields at: 'cartId'.
-		ccn := request fields at: 'ccn'.
-		cced := request fields at: 'cced'.
-		cco := request fields at: 'cco'.
-		"CONSULTAR SI HACE FALTA VALIDAR QUE LOS PARAMETROS TENGAN EL FORMATO CORRESPONDIENTE"
-		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (ccn asNumber) ownedBy: cco expiringOn: (self createDateWith: cced).
+		clientId := request fields at: 'clientId'.
+		ticket := restInterface checkOutCartIdentifiedAs: (cartId asNumber) withCreditCardNumbered: (self defaultCcn) ownedBy: (self defaultCco) expiringOn: (self createDateWith: (self getCardExpirationFor: clientId)).
 		self create200ResponseWith: (self getTicketSummary: ticket) and: request.
 	] 
 	on: Error 
 	do: [ :anError |
-		request send404Response: (anError messageText) ]].
+		request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
 
 
 	webServer addService: '/listPurchases' action:[:request | | clientId password purchases |
@@ -857,7 +1107,33 @@ initializeWith: aPortNumber
 	] 
 	on: Error 
 	do: [ :anError |
-		request send404Response: (anError messageText) ]].! !
+		request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
+	
+	webServer addService: '/removeFromCart' action:[:request | | bookIsbn cartId |
+	
+	[	cartId := request fields at: 'cartId'.
+		bookIsbn := request fields at: 'bookIsbn'.
+		restInterface remove:  bookIsbn fromCartIdentifiedAs: (cartId asNumber).
+		self create200ResponseWith: 'OK' and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
+
+
+	webServer addService: '/getCatalog' action:[:request | | cartId |
+	
+	[	"cartId := request fields at: 'cartId'."
+		"self create200ResponseWith: (restInterface getCatalog: (cartId asNumber)) and: request."
+		self create200ResponseWith: (restInterface getCatalog) and: request.
+	] 
+	on: Error 
+	do: [ :anError |
+		request send404Response: (WebUtils jsonEncode: (anError messageText)) do: [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]]].
+! !
 
 !TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 11/18/2019 23:42:52'!
 port
@@ -880,6 +1156,14 @@ stopListening
 	webServer stopListener.
 	
 	^'Stopped listening from port: ', self port asString! !
+
+!TusLibrosSystemFacadeServer methodsFor: 'as yet unclassified' stamp: 'ns 12/2/2019 09:17:51'!
+validUsersAndPasswords
+
+	^Dictionary new
+		at: 'validUser' put: 'validPassword';
+		at: 'expiredCardUser' put: 'expiredCardUserPassword';
+		yourself! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
