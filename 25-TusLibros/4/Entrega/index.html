@@ -33,9 +33,358 @@
   <!-- end fallback -->
   
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600&display=swap" rel="stylesheet">
-  <link href="./src/css/app.css" rel="stylesheet">
+  
   <style>
+    /* GENERAL */
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #fafafa;
+    }
+    .app-container {
+      height: 100vh;
+    }
+    .app {
+      width: 100%;
+    }
+
+    .books-container {
+      padding: 0;
+      height: calc(100vh - 64px);
+    }
+
+    .books-container.landing {
+      padding: 0;
+      height: calc(100vh - 100px);
+    }
+
+    .books-content {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .width100 {
+      width: 100%;
+    }
+
+    .error-snackbar, .error-snackbar .MuiSnackbarContent-root {
+      background-color: #d32f2f;
+      color: white;
+    }
     
+    /* NAVBAR */
+    .bookstore-navbar {
+      background-color: #3483fa;
+      box-shadow: none;
+    }
+    .create-cart-navbar {
+      height: 100px;
+    }
+
+    /* CREATE CART */
+    .create-cart-view {
+      text-align: center;
+      z-index: 1;
+      padding-top: 20px;
+    }
+
+    .create-cart-form {
+      padding: 30px 40px;
+      border-radius: 4px;
+      background-color: white;
+      margin-top: -50px;
+      box-shadow: 0 1px 6px 0 rgba(0,0,0,.3)
+    }
+    .create-cart-title {
+      font-size: 20px;
+      padding: 10px 0;
+      font-weight: 300;
+    }
+
+    button.create-cart-button {
+      background-color: #3483fa;
+      color: white;
+      text-transform: none;
+      padding: 6px 18px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    button.create-cart-button:hover {
+      background-color: #428eff;
+    }
+
+    .create-cart-error {
+      margin-top: 20px;
+      width: 100%;
+      padding: 20px;
+      color: #ff5959;
+      font-size: 16px;
+    }
+
+    .create-cart-required {
+      text-align: left;
+      color: #ff5959;
+      padding-top: 5px;
+    }
+
+    .password-icon {
+      position: absolute;
+      right: 10px;
+      top: 15px;
+      color: rgba(0,0,0,0.6);
+    }
+
+    .password-icon:hover {
+      cursor: pointer;
+    }
+
+    .MuiTooltip-tooltip {
+      background-color: #3483fa;
+      color: white;
+      font-size: 12px;
+    }
+
+    /* CATALOG */
+    .catalog {
+      display: flex;
+      flex-wrap: wrap;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      padding-top: 20px;
+    }
+
+    .catalog-view {
+      display: flex;
+      width: 100%;
+    }
+
+    .filters, .cart-total {
+      width: 15%;
+      max-width: 215px;
+      padding-top: 20px;
+      background-color: #3483fa;
+    }
+
+    .item-card {
+      padding: 40px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 290px;
+    }
+    .item-information {
+      padding: 0 30px;
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .item {
+      display: flex;
+    }
+
+    .item-name {
+      font-weight: 700;
+      font-size: 14px;
+      min-height: 40px;
+    }
+
+    .item-image {
+      height: 220px;
+      margin-bottom: 10px;
+      align-items: initial;
+      display: flex;
+      justify-content: center;
+    }
+
+    .item-image:hover, .item-name:hover {
+      cursor: pointer;
+    }
+
+    .item-price {
+      font-size: 16px;
+    }
+
+    .item-actions {
+      justify-content: center;
+    }
+
+    .item-isbn {
+      color: #8f8f8f;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+
+    .catalog-actions {
+      padding-top: 10px;
+    }
+
+    .action {
+      display: inline-block;
+    }
+
+    .action.quantity {
+      padding: 0 10px;
+    }
+
+    .action-add, .action-remove {
+      background-color: #3483fa;
+      border-radius: 4px;
+      color: white;
+      font-size: 16px;
+    }
+    .action-add.disabled, .action-remove.disabled {
+      background-color: #e3e3e3;
+    }
+
+    .catalog-link:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .filters-container {
+      color: white;
+      padding: 15px;
+    }
+    .filter-item {
+      margin-bottom: 20px;
+    }
+    .filter-label {
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    .filter-sublabel {
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .item-wishlist {
+      color: #3483fa;
+      justify-content: center;
+      align-items: center;
+    }
+    .wishlist-button {
+      text-transform: none;
+        margin-top: 5px;
+    }
+    .wishlist-button:hover {
+      background: none;
+    }
+    .favorite-icon {
+      margin-left: 5px;
+    }
+    .catalog-actions-container {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* CART */
+    .empty-cart {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding-top: 150px;
+      align-items: center;
+      font-size: 22px;
+      color: #8d8d8d;
+    }
+
+    .cart-total {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      font-size: 30px;
+      padding-top: 150px;
+      color: white;
+    }
+    .cart-total-btn {
+      background: white;
+      color: #02b1ea;
+      padding: 10px 20px;
+      margin-top: 30px;
+    }
+    .cart-total-btn:hover {
+      background-color: rgb(236, 236, 236); 
+    }
+
+    /* TICKET */
+    .ticket-view {
+      width: 70%;
+      padding-top: 50px;
+      display: flex;
+      flex-direction: column;
+    }
+    a.menu-items {
+      margin-right: 16px;
+      font-weight: 700;
+    }
+    a.menu-items:hover {
+      cursor: pointer;
+    }
+    .menu-item-icon:hover {
+      background-color: transparent;
+    }
+
+    .ticket-item {
+      display: flex;
+      margin-right: 50px;
+    }
+    .ticket-item-container {
+      font-size: 20px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #c7c7c7;
+      padding-bottom: 20px;
+      display: flex;
+      align-items: baseline;
+    }
+    .ticket-item-name {
+      font-weight: 700;
+    }
+    .ticket-item-total {
+      flex: 1;
+      justify-content: flex-end;
+    }
+    .ticket-total {
+      text-align: right;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .purchases-view {
+      margin-top: 50px;
+    }
+
+    /* DETAIL */
+    .detail-info {
+      flex: 1;
+    }
+    .detail-view {
+      display: flex;
+      width: 100%;
+    }
+    .detail-item-container {
+      display: flex;
+      width: 100%;
+      padding: 50px;
+    }
+    .detail-item-image {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    }
+    .detail-img {
+      width: 220px;
+    }
+    .detail-item{
+      margin-right: 20px;
+      margin-bottom: 20px;
+    }
+    .detail-item-name, .detail-item-price {
+      font-weight: 700;
+      font-size: 16px;
+    }
   </style>
 
   <script type="text/babel" type="module">
